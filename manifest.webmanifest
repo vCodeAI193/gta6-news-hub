@@ -1,0 +1,27 @@
+{
+  "name": "GTA 6 News Hub",
+  "short_name": "GTA6 Hub",
+  "description": "Worldwide GTA 6 news aggregator: trailers, leaks, official announcements and a live countdown.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0c0c14",
+  "theme_color": "#0c0c14",
+  "categories": ["news", "games", "entertainment"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230c0c14'/%3E%3Ctext x='256' y='350' font-size='260' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23ff2e88'%3EVI%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%230c0c14'/%3E%3Ctext x='96' y='132' font-size='98' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23ff2e88'%3EVI%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
