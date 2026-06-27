@@ -11,14 +11,17 @@ import {
   type PendingComment,
   type Report,
 } from '../services/moderationApi'
+import { communityApi } from '../services/communityApi'
+import type { Article } from '../types'
 import { timeAgo } from '../lib/filterArticles'
 
-type Tab = 'comments' | 'reports' | 'users' | 'audit'
+type Tab = 'submissions' | 'comments' | 'reports' | 'users' | 'audit'
 
 export function ModerationPage() {
   const { user, loading } = useAuth()
   const { notify } = useToast()
-  const [tab, setTab] = useState<Tab>('comments')
+  const [tab, setTab] = useState<Tab>('submissions')
+  const [submissions, setSubmissions] = useState<Article[]>([])
   const [comments, setComments] = useState<PendingComment[]>([])
   const [reports, setReports] = useState<Report[]>([])
   const [users, setUsers] = useState<ModUser[]>([])
@@ -26,12 +29,14 @@ export function ModerationPage() {
 
   const reload = useCallback(async () => {
     try {
-      const [c, r, u, a] = await Promise.all([
+      const [s, c, r, u, a] = await Promise.all([
+        communityApi.submissions(),
         moderationApi.pendingComments(),
         moderationApi.reports(),
         moderationApi.users(),
         moderationApi.audit(),
       ])
+      setSubmissions(s)
       setComments(c)
       setReports(r)
       setUsers(u)
@@ -61,6 +66,7 @@ export function ModerationPage() {
   }
 
   const tabs: Array<[Tab, string, number]> = [
+    ['submissions', 'Einreichungen', submissions.length],
     ['comments', 'Kommentare', comments.length],
     ['reports', 'Meldungen', reports.length],
     ['users', 'Nutzer', users.length],
@@ -89,6 +95,25 @@ export function ModerationPage() {
           </button>
         ))}
       </div>
+
+      {tab === 'submissions' && (
+        <ModList
+          items={submissions}
+          empty="Keine offenen Einreichungen."
+          render={(s) => (
+            <li key={s.id} className="modrow">
+              <div>
+                <span className={`card__tag tag--${s.category}`}>{s.category}</span> <strong>{s.title}</strong>
+                <p className="modrow__text">{s.excerpt || s.body?.slice(0, 120)} — Quelle: {s.source}</p>
+              </div>
+              <div className="modrow__actions">
+                <button className="btn btn--small" onClick={() => act(() => communityApi.approveSubmission(s.id), 'Veröffentlicht')}>Veröffentlichen</button>
+                <button className="btn btn--small btn--ghost btn--danger" onClick={() => act(() => communityApi.rejectSubmission(s.id), 'Abgelehnt')}>Ablehnen</button>
+              </div>
+            </li>
+          )}
+        />
+      )}
 
       {tab === 'comments' && (
         <ModList

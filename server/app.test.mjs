@@ -223,6 +223,76 @@ describe('Moderation', () => {
   })
 })
 
+describe('Gamification', () => {
+  it('Kommentieren bringt Reputation', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', auth).send({ text: 'Guter Artikel' })
+    const me = await request(app).get('/api/auth/me').set('Authorization', auth)
+    assert.ok(me.body.user.reputation >= 2)
+  })
+
+  it('Upvote auf fremden Kommentar erhöht Autor-Reputation', async () => {
+    const admin = await register() // admin/author
+    const reader = await registerSecond()
+    // Reader kommentiert
+    const c = await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', `Bearer ${reader.body.token}`).send({ text: 'Mein Kommentar' })
+    const commentId = c.body.comment.id
+    const repBefore = (await request(app).get('/api/auth/me').set('Authorization', `Bearer ${reader.body.token}`)).body.user.reputation
+    // Admin upvotet
+    const vote = await request(app).post(`/api/comments/${commentId}/vote`).set('Authorization', `Bearer ${admin.body.token}`).send({ value: 1 })
+    assert.equal(vote.body.score, 1)
+    const repAfter = (await request(app).get('/api/auth/me').set('Authorization', `Bearer ${reader.body.token}`)).body.user.reputation
+    assert.equal(repAfter, repBefore + 1)
+  })
+
+  it('eigene Kommentare sind nicht bewertbar', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const c = await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', auth).send({ text: 'Selbst' })
+    const res = await request(app).post(`/api/comments/${c.body.comment.id}/vote`).set('Authorization', auth).send({ value: 1 })
+    assert.equal(res.status, 403)
+  })
+
+  it('Einreichung → Freigabe veröffentlicht & belohnt den Einreicher', async () => {
+    const admin = await register()
+    const reader = await registerSecond()
+    const sub = await request(app).post('/api/submissions').set('Authorization', `Bearer ${reader.body.token}`).send({ title: 'Leak: Neue Map', source: 'Forum', body: 'Details', category: 'leak' })
+    assert.equal(sub.status, 201)
+    const id = sub.body.id
+
+    // Vor Freigabe nicht öffentlich
+    const before = await request(app).get('/api/articles')
+    assert.equal(before.body.articles.some((a) => a.id === id), false)
+
+    // Freigeben
+    const approve = await request(app).post(`/api/submissions/${id}/approve`).set('Authorization', `Bearer ${admin.body.token}`)
+    assert.equal(approve.status, 200)
+
+    const after = await request(app).get('/api/articles')
+    assert.equal(after.body.articles.some((a) => a.id === id), true)
+    const rep = (await request(app).get('/api/auth/me').set('Authorization', `Bearer ${reader.body.token}`)).body.user.reputation
+    assert.ok(rep >= 10)
+  })
+
+  it('Profil liefert Level, Badges und Stats', async () => {
+    const { body } = await register()
+    await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', `Bearer ${body.token}`).send({ text: 'Hi' })
+    const res = await request(app).get(`/api/users/${body.user.id}/profile`)
+    assert.equal(res.status, 200)
+    assert.equal(res.body.profile.stats.commentCount, 1)
+    assert.ok(res.body.profile.badges.some((b) => b.id === 'first-comment'))
+    assert.ok(res.body.profile.level >= 1)
+  })
+
+  it('Rangliste sortiert nach Reputation', async () => {
+    await register()
+    const res = await request(app).get('/api/leaderboard')
+    assert.equal(res.status, 200)
+    assert.ok(Array.isArray(res.body.leaders))
+  })
+})
+
 describe('Rate limiting', () => {
   it('greift nach vielen Auth-Anfragen', async () => {
     let limited = false

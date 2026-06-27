@@ -44,8 +44,14 @@ export function AuthMenu() {
         <div className="authmenu__panel" role="menu">
           <div className="authmenu__head">
             <strong>{user.displayName}</strong>
-            <span className="authmenu__role">{user.role}</span>
+            <span className="authmenu__role">{user.role} · {user.reputation} Rep</span>
           </div>
+          <NavLink to={`/u/${user.id}`} className="authmenu__item" role="menuitem" onClick={() => setOpen(false)}>
+            Mein Profil
+          </NavLink>
+          <NavLink to="/einreichen" className="authmenu__item" role="menuitem" onClick={() => setOpen(false)}>
+            News einreichen
+          </NavLink>
           <NavLink to="/settings" className="authmenu__item" role="menuitem" onClick={() => setOpen(false)}>
             Einstellungen
           </NavLink>

@@ -41,6 +41,7 @@ export function publicUser(row) {
     email: row.email,
     displayName: row.display_name,
     role: row.role,
+    reputation: row.reputation ?? 0,
     createdAt: row.created_at,
   }
 }

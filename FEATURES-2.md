@@ -47,6 +47,18 @@ Details: [server/README.md](./server/README.md).
   alle verbundenen Clients in Echtzeit; optionaler Discord-Webhook
 - 25 Backend-Tests (inkl. 3 Realtime-Tests) — alle grün
 
+### ✅ Welle 4 umgesetzt — Gamification & Community
+
+- **Reputationssystem**: Punkte fürs Kommentieren (+2), erhaltene Upvotes (+1)
+  und freigegebene Einreichungen (+10)
+- **Kommentar-Upvotes/Downvotes** mit Score-Sortierung (beste zuerst)
+- **Level & Abzeichen**: Ränge (Rookie → Legende) + automatische Badges
+- **Nutzer-Einreichungen** (`/einreichen`): Leser reichen News ein → Moderations-
+  Queue → Freigabe veröffentlicht & belohnt
+- **Öffentliche Profile** (`/u/:id`) mit Reputation/Level/Badges + **Rangliste**
+  (`/rangliste`)
+- 37 Backend-Tests (inkl. Gamification + Level/Badge-Unit-Tests) — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -54,7 +66,7 @@ Details: [server/README.md](./server/README.md).
 - [x] **Registrierung & Login** — Echte Nutzerkonten mit E-Mail/Passwort.
 - [ ] **OAuth-Login** — Anmeldung via Google, Discord, Apple.
 - [ ] **Magic-Link-Login** — Passwortlose Anmeldung per E-Mail-Link.
-- [ ] **Öffentliche Profilseiten** — Avatar, Bio, Aktivität, Kommentare eines Nutzers.
+- [x] **Öffentliche Profilseiten** — Avatar, Bio, Aktivität, Kommentare eines Nutzers. *(/u/:id — Reputation, Level, Badges, Kommentare)*
 - [ ] **2-Faktor-Authentifizierung** — TOTP/Authenticator-App-Support.
 - [ ] **Server-seitige Sync** — Lesezeichen/Einstellungen geräteübergreifend synchronisieren.
 - [x] **Rollen & Berechtigungen** — Leser, Autor, Moderator, Admin.
@@ -116,11 +128,11 @@ Details: [server/README.md](./server/README.md).
 
 ## 16. Gamification & Community
 
-- [ ] **Reputationssystem** — Punkte/Karma für hilfreiche Beiträge.
-- [ ] **Abzeichen & Achievements** — Badges für Aktivität & Meilensteine.
-- [ ] **Level & Fortschritt** — Sichtbarer Community-Rang.
-- [ ] **Nutzer-Einreichungen** — Leser reichen News/Leaks zur Prüfung ein.
-- [ ] **Upvote/Downvote für Kommentare** — Beste Kommentare nach oben.
+- [x] **Reputationssystem** — Punkte/Karma für hilfreiche Beiträge.
+- [x] **Abzeichen & Achievements** — Badges für Aktivität & Meilensteine.
+- [x] **Level & Fortschritt** — Sichtbarer Community-Rang.
+- [x] **Nutzer-Einreichungen** — Leser reichen News/Leaks zur Prüfung ein. *(→ Moderations-Queue, +Rep bei Freigabe)*
+- [x] **Upvote/Downvote für Kommentare** — Beste Kommentare nach oben.
 - [ ] **Wöchentliche Community-Challenges** — Themen-Aktionen mit Belohnung.
 - [ ] **Tippspiel zum Release** — Wetten auf Termin/Details, Bestenliste.
 - [ ] **Folgen & Feed** — Autoren/Themen folgen, personalisierter Aktivitäts-Feed.

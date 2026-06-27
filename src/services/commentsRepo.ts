@@ -42,3 +42,10 @@ export async function removeComment(id: string): Promise<void> {
   }
   local.removeComment(id)
 }
+
+/** Kommentar up-/downvoten (nur im Backend-Modus). value: 1 | -1 | 0. */
+export async function voteComment(id: string, value: number): Promise<{ score: number; myVote: number }> {
+  return api<{ score: number; myVote: number }>(`/api/comments/${id}/vote`, { method: 'POST', body: { value } })
+}
+
+export const commentsSupportVoting = isApiEnabled

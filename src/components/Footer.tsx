@@ -32,6 +32,8 @@ export function Footer() {
           <h4 className="site-footer__h">Hub</h4>
           <ul>
             <li><Link to="/bookmarks">Lesezeichen</Link></li>
+            <li><Link to="/rangliste">Rangliste</Link></li>
+            <li><Link to="/einreichen">News einreichen</Link></li>
             <li><Link to="/settings">Einstellungen</Link></li>
             <li><Link to="/admin">Redaktion</Link></li>
             <li><a href="/feed.xml">RSS-Feed</a></li>

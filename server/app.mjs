@@ -3,6 +3,7 @@ import cors from 'cors'
 import { randomUUID } from 'node:crypto'
 import { createDb, logAudit, rowToArticle } from './db.mjs'
 import { classifyComment } from './moderation.mjs'
+import { awardReputation, badgesFor, levelFor, POINTS } from './gamification.mjs'
 import {
   authenticate,
   hashPassword,
@@ -151,14 +152,39 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
   })
 
   // -------------------------------------------------------------- comments
-  app.get('/api/articles/:id/comments', (req, res) => {
+  app.get('/api/articles/:id/comments', optionalAuth(db), (req, res) => {
     const rows = db
       .prepare("SELECT * FROM comments WHERE article_id = ? AND status = 'visible' ORDER BY created_at ASC")
       .all(req.params.id)
+    const userId = req.auth?.user?.id
     res.json({ comments: rows.map((c) => ({
-      id: c.id, articleId: c.article_id, author: c.author, text: c.text,
+      id: c.id, articleId: c.article_id, author: c.author, authorId: c.user_id, text: c.text,
       parentId: c.parent_id, createdAt: c.created_at,
+      score: commentScore(db, c.id),
+      myVote: userId ? (db.prepare('SELECT value FROM comment_votes WHERE comment_id = ? AND user_id = ?').get(c.id, userId)?.value ?? 0) : 0,
     })) })
+  })
+
+  // Kommentar up-/downvoten (value: 1, -1 oder 0 zum Zurücknehmen).
+  app.post('/api/comments/:id/vote', requireAuth(db), (req, res) => {
+    const value = Number(req.body?.value)
+    if (![1, -1, 0].includes(value)) return res.status(400).json({ error: 'Ungültiger Wert' })
+    const comment = db.prepare('SELECT * FROM comments WHERE id = ?').get(req.params.id)
+    if (!comment) return res.status(404).json({ error: 'Nicht gefunden' })
+    if (comment.user_id === req.auth.user.id)
+      return res.status(403).json({ error: 'Eigene Kommentare nicht bewertbar' })
+
+    const prev = db.prepare('SELECT value FROM comment_votes WHERE comment_id = ? AND user_id = ?').get(req.params.id, req.auth.user.id)?.value ?? 0
+    if (value === 0) {
+      db.prepare('DELETE FROM comment_votes WHERE comment_id = ? AND user_id = ?').run(req.params.id, req.auth.user.id)
+    } else {
+      db.prepare('INSERT INTO comment_votes (comment_id, user_id, value) VALUES (?, ?, ?) ON CONFLICT(comment_id, user_id) DO UPDATE SET value = excluded.value').run(req.params.id, req.auth.user.id, value)
+    }
+    // Autor-Reputation: +1 je erhaltenem Upvote (an/aus).
+    const repDelta = (value > 0 ? 1 : 0) - (prev > 0 ? 1 : 0)
+    if (repDelta) awardReputation(db, comment.user_id, repDelta)
+
+    res.json({ score: commentScore(db, req.params.id), myVote: value })
   })
 
   app.post('/api/articles/:id/comments', requireAuth(db), (req, res) => {
@@ -176,6 +202,9 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     db.prepare(
       'INSERT INTO comments (id, article_id, user_id, author, text, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     ).run(id, req.params.id, req.auth.user.id, req.auth.user.display_name, text.trim(), parentId ?? null, verdict.status, now)
+
+    // Reputation fürs Mitmachen.
+    awardReputation(db, req.auth.user.id, POINTS.comment)
 
     const comment = { id, articleId: req.params.id, author: req.auth.user.display_name, text: text.trim(), parentId: parentId ?? null, createdAt: now }
     // Nur sofort sichtbare Kommentare live verteilen.
@@ -338,6 +367,77 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     res.status(201).json({ ok: true, id })
   })
 
+  // ----------------------------------------------------------- submissions
+  // Leser reichen News/Leaks zur Prüfung ein (status 'submitted').
+  app.post('/api/submissions', requireAuth(db), (req, res) => {
+    if (req.auth.user.banned) return res.status(403).json({ error: 'Konto gesperrt' })
+    const b = req.body ?? {}
+    if (!b.title?.trim() || !b.source?.trim()) return res.status(400).json({ error: 'Titel & Quelle nötig' })
+    const id = randomUUID()
+    const now = new Date().toISOString()
+    db.prepare(
+      `INSERT INTO articles (id, title, excerpt, body, category, date, source, source_url, image, tags, author, reliability, status, submitted_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted', ?, ?, ?)`,
+    ).run(
+      id, b.title.trim(), b.excerpt ?? '', b.body ?? '', b.category ?? 'leak', now.slice(0, 10),
+      b.source.trim(), b.sourceUrl ?? null, b.image ?? 'https://picsum.photos/seed/einreichung/800/450',
+      JSON.stringify(b.tags ?? []), req.auth.user.display_name, b.reliability ?? 'unconfirmed',
+      req.auth.user.id, now, now,
+    )
+    res.status(201).json({ ok: true, id })
+  })
+
+  app.get('/api/moderation/submissions', requireAuth(db, 'moderator'), (_req, res) => {
+    const rows = db.prepare("SELECT * FROM articles WHERE status = 'submitted' ORDER BY created_at DESC").all()
+    res.json({ submissions: rows.map(rowToArticle) })
+  })
+
+  app.post('/api/submissions/:id/approve', requireAuth(db, 'moderator'), (req, res) => {
+    const row = db.prepare("SELECT * FROM articles WHERE id = ? AND status = 'submitted'").get(req.params.id)
+    if (!row) return res.status(404).json({ error: 'Nicht gefunden' })
+    db.prepare("UPDATE articles SET status = 'published', updated_at = ? WHERE id = ?").run(new Date().toISOString(), req.params.id)
+    awardReputation(db, row.submitted_by, POINTS.submissionApproved)
+    logAudit(db, req.auth.user, 'submission.approve', 'article', req.params.id, row.title)
+    publish('article', { action: 'created', id: req.params.id })
+    res.json({ ok: true })
+  })
+
+  app.post('/api/submissions/:id/reject', requireAuth(db, 'moderator'), (req, res) => {
+    db.prepare("UPDATE articles SET status = 'rejected' WHERE id = ? AND status = 'submitted'").run(req.params.id)
+    logAudit(db, req.auth.user, 'submission.reject', 'article', req.params.id)
+    res.json({ ok: true })
+  })
+
+  // ------------------------------------------------------ profile & ranking
+  app.get('/api/users/:id/profile', (req, res) => {
+    const u = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id)
+    if (!u) return res.status(404).json({ error: 'Nutzer nicht gefunden' })
+    const commentCount = db.prepare("SELECT COUNT(*) AS n FROM comments WHERE user_id = ? AND status = 'visible'").get(u.id).n
+    const submissionsApproved = db.prepare("SELECT COUNT(*) AS n FROM articles WHERE submitted_by = ? AND status = 'published'").get(u.id).n
+    const recent = db.prepare("SELECT id, article_id, text, created_at FROM comments WHERE user_id = ? AND status = 'visible' ORDER BY created_at DESC LIMIT 5").all(u.id)
+    res.json({
+      profile: {
+        id: u.id,
+        displayName: u.display_name,
+        role: u.role,
+        reputation: u.reputation,
+        joinedAt: u.created_at,
+        ...levelFor(u.reputation),
+        badges: badgesFor({ reputation: u.reputation, commentCount, submissionsApproved }),
+        stats: { commentCount, submissionsApproved },
+        recentComments: recent.map((c) => ({ id: c.id, articleId: c.article_id, text: c.text, createdAt: c.created_at })),
+      },
+    })
+  })
+
+  app.get('/api/leaderboard', (_req, res) => {
+    const rows = db.prepare('SELECT id, display_name, role, reputation FROM users ORDER BY reputation DESC, created_at ASC LIMIT 10').all()
+    res.json({ leaders: rows.map((u, i) => ({
+      rank: i + 1, id: u.id, displayName: u.display_name, role: u.role,
+      reputation: u.reputation, level: levelFor(u.reputation).name,
+    })) })
+  })
+
   // ------------------------------------------------------------- not found
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Route nicht gefunden' }))
 
@@ -360,6 +460,10 @@ function forwardToDiscord(content) {
   } catch {
     /* Integration darf die API nie blockieren. */
   }
+}
+
+function commentScore(db, commentId) {
+  return db.prepare('SELECT COALESCE(SUM(value), 0) AS s FROM comment_votes WHERE comment_id = ?').get(commentId).s
 }
 
 function reactionCounts(db, articleId) {

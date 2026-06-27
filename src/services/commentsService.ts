@@ -7,6 +7,10 @@ export interface Comment {
   text: string
   createdAt: string // ISO
   parentId: string | null
+  /** Backend-Felder (Gamification) — im lokalen Modus undefined. */
+  authorId?: string | null
+  score?: number
+  myVote?: number
 }
 
 const KEY = 'comments'

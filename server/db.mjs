@@ -147,6 +147,12 @@ const MIGRATIONS = [
     status TEXT NOT NULL DEFAULT 'open',
     created_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS comment_votes (
+    comment_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    value INTEGER NOT NULL,
+    PRIMARY KEY (comment_id, user_id)
+  )`,
 ]
 
 export function createDb(path = ':memory:') {
@@ -155,6 +161,8 @@ export function createDb(path = ':memory:') {
   db.exec('PRAGMA foreign_keys = ON')
   for (const sql of MIGRATIONS) db.exec(sql)
   ensureColumn(db, 'users', 'banned', 'INTEGER NOT NULL DEFAULT 0')
+  ensureColumn(db, 'users', 'reputation', 'INTEGER NOT NULL DEFAULT 0')
+  ensureColumn(db, 'articles', 'submitted_by', 'TEXT')
   seedArticles(db)
   return db
 }

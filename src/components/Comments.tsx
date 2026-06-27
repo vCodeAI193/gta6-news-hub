@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { addComment, getComments, removeComment } from '../services/commentsRepo'
+import { addComment, getComments, removeComment, voteComment } from '../services/commentsRepo'
 import type { Comment } from '../services/commentsService'
 import { ApiError, isApiEnabled } from '../services/api'
 import { usePreferences } from '../context/PreferencesContext'
@@ -42,10 +42,27 @@ export function Comments({ articleId, live = false }: CommentsProps) {
   }, [articleId])
 
   const tree = useMemo(() => {
-    const roots = comments.filter((c) => !c.parentId)
+    // Wurzelkommentare nach Score sortieren (beste zuerst), dann nach Zeit.
+    const roots = comments
+      .filter((c) => !c.parentId)
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.createdAt.localeCompare(b.createdAt))
     const childrenOf = (id: string) => comments.filter((c) => c.parentId === id)
     return { roots, childrenOf }
   }, [comments])
+
+  const vote = async (c: Comment, value: number) => {
+    if (!user) {
+      notify('Bitte melde dich an, um zu bewerten.', 'info')
+      return
+    }
+    try {
+      const next = c.myVote === value ? 0 : value
+      await voteComment(c.id, next)
+      await refresh()
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : 'Bewerten fehlgeschlagen', 'error')
+    }
+  }
 
   const submit = async (e: React.FormEvent, parentId: string | null) => {
     e.preventDefault()
@@ -99,10 +116,35 @@ export function Comments({ articleId, live = false }: CommentsProps) {
   const renderComment = (c: Comment, depth = 0) => (
     <li key={c.id} className="comment" style={{ marginLeft: depth * 16 }}>
       <div className="comment__head">
-        <span className="comment__author">{c.author}</span>
+        {c.authorId ? (
+          <Link className="comment__author" to={`/u/${c.authorId}`}>{c.author}</Link>
+        ) : (
+          <span className="comment__author">{c.author}</span>
+        )}
         <time className="comment__time" dateTime={c.createdAt}>
           {timeAgo(c.createdAt)}
         </time>
+        {isApiEnabled() && (
+          <span className="comment__votes">
+            <button
+              type="button"
+              className={`votebtn${c.myVote === 1 ? ' votebtn--up' : ''}`}
+              aria-label="Hochstimmen"
+              onClick={() => vote(c, 1)}
+            >
+              ▲
+            </button>
+            <span className="comment__score">{c.score ?? 0}</span>
+            <button
+              type="button"
+              className={`votebtn${c.myVote === -1 ? ' votebtn--down' : ''}`}
+              aria-label="Runterstimmen"
+              onClick={() => vote(c, -1)}
+            >
+              ▼
+            </button>
+          </span>
+        )}
       </div>
       <p className="comment__text">{c.text}</p>
       <div className="comment__actions">

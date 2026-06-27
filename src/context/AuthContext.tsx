@@ -14,6 +14,7 @@ export interface AuthUser {
   email: string
   displayName: string
   role: 'reader' | 'author' | 'moderator' | 'admin'
+  reputation: number
   createdAt: string
 }
 
