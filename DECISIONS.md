@@ -5,6 +5,29 @@ codebase stays transparent over time. Newest entries on top.
 
 ---
 
+## ADR-010 — Comfort layer: view modes, i18n, shortcuts, TTS, connectivity
+- **Decision:** Add a set of convenience features on top of the core 100:
+  - **View modes** `data-view` = `casual` | `standard` | `insider`. Casual hides
+    rumors and power-user metadata (larger, calmer feed); Insider is denser and
+    surfaces every detail (region/lang highlighted). Most differences are pure CSS on
+    the `data-view` attribute; the only behavioural rule is "casual ⇒ verified-only".
+  - **UI i18n (DE/EN)** via a single `I18N` dict + `t(key)`; static chrome is tagged
+    with `data-i18n`/`data-i18n-ph` and re-rendered on switch. Default language is
+    derived from `navigator.language`. Dynamic strings (toasts, modal chrome, relative
+    times) also go through `t()`.
+  - **Keyboard shortcuts**: `/` search, `j/k` move, `o` open, `t` theme, `v` cycle
+    view, `l` language, `?` help, `Esc` close — ignored while typing in a field.
+  - **Text-to-speech** read-aloud in the article modal using the Web Speech API, with
+    the utterance language matched to the article's `lang`.
+  - **Online/offline banner** driven by `online`/`offline` events (complements the SW).
+  - **Visible PWA install button** surfaced from `beforeinstallprompt`.
+  - **Restore last section** on load (only when there is no URL hash).
+- **Why:** The owner asked for genuine convenience features and explicitly for
+  "simple / normal / expert" views. View modes + DE/EN i18n also reinforce the
+  worldwide, multi-audience vision (ADR-007).
+- **Naming:** The three views are surfaced as **Casual / Standard / Insider**
+  (EN) and **Einfach / Standard / Experte** (DE).
+
 ## ADR-008 — Global `[hidden]` override
 - **Decision:** Add `[hidden] { display: none !important; }` globally.
 - **Why:** Components like `.modal-backdrop` set `display: grid`, which has higher

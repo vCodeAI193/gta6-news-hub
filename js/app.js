@@ -23,18 +23,177 @@ const Store = {
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
+// ===========================================================================
+// i18n (ADR-009) — UI language switch DE/EN
+// ===========================================================================
+const I18N = {
+  en: {
+    skip: 'Skip to content',
+    offline: 'You are offline — showing cached news.',
+    online: 'Back online ✓',
+    'nav.news': 'News', 'nav.channels': 'Channels', 'nav.countdown': 'Countdown',
+    'nav.media': 'Media', 'nav.roadmap': 'Roadmap', 'nav.community': 'Community',
+    'nav.faq': 'FAQ', 'nav.saved': 'Saved articles',
+    'hero.eyebrow': 'Worldwide GTA VI coverage · every channel, one hub',
+    'hero.title2': 'from everywhere.',
+    'hero.lede': 'Official news, trailers, leaks and community buzz — aggregated worldwide so you never miss a beat. Launches <strong>November 19, 2026</strong>.',
+    'cta.read': 'Read the news', 'cta.channels': 'Browse channels',
+    'countdown.label': 'Countdown to launch',
+    'cd.days': 'days', 'cd.hrs': 'hrs', 'cd.min': 'min', 'cd.sec': 'sec',
+    'btn.addCal': '📅 Add to calendar', 'btn.remind': '🔔 Remind me',
+    'search.placeholder': 'Search GTA 6 news…',
+    'sort.newest': 'Newest first', 'sort.oldest': 'Oldest first', 'sort.popular': 'Most popular',
+    'filter.lang': 'Language / region:', 'filter.verifiedOnly': 'Verified only', 'filter.clear': 'Clear all filters',
+    'section.latest': 'Latest News',
+    'mode.latest': 'Latest', 'mode.trending': 'Trending', 'mode.official': 'Official only',
+    'btn.refresh': '⟳ Refresh', 'feed.empty': 'No articles match your filters.', 'feed.reset': 'Reset filters',
+    'btn.loadMore': 'Load more',
+    'section.channels': 'Channels Hub',
+    'channels.sub': 'Every GTA 6 source worldwide, in one place — official, press, community & social.',
+    'section.media': 'Media Gallery',
+    'media.all': 'All', 'media.trailers': 'Trailers', 'media.screenshots': 'Screenshots', 'media.art': 'Art',
+    'subhead.characters': 'Characters & world',
+    'section.roadmap': 'Release Roadmap', 'section.community': 'Community',
+    'card.newsletter': '📨 Newsletter', 'newsletter.desc': 'Get major GTA 6 updates in your inbox.', 'newsletter.subscribe': 'Subscribe',
+    'card.polls': '📊 Community Polls',
+    'card.tip': '💡 Submit a Tip', 'tip.desc': 'Spotted GTA 6 news? Share the link.', 'tip.note': "What's it about?", 'tip.send': 'Send tip',
+    'card.join': '🌐 Join the conversation',
+    'section.faq': 'Frequently Asked Questions', 'section.saved': '🔖 Saved Articles',
+    'saved.empty': "You haven't saved any articles yet. Tap the 🔖 on any card.",
+    'footer.about': 'A community news platform dedicated to GTA 6. Not affiliated with Rockstar Games or Take-Two Interactive.',
+    'footer.sections': 'Sections', 'footer.topchannels': 'Top channels',
+    'footer.copy': '© 2026 GTA 6 News Hub · Fan-made. GTA and Grand Theft Auto are trademarks of Take-Two Interactive.',
+    'footer.release': 'Release target: November 19, 2026',
+    'prefs.title': 'Preferences', 'prefs.view': 'View', 'prefs.lang': 'Language', 'prefs.theme': 'Theme',
+    'theme.dark': 'Dark', 'theme.light': 'Light',
+    'prefs.accent': 'Accent color', 'prefs.textsize': 'Text size', 'prefs.density': 'Density',
+    'density.comfortable': 'Comfortable', 'density.compact': 'Compact',
+    'prefs.shortcuts': '⌨️ Keyboard shortcuts', 'prefs.reset': 'Reset all preferences',
+    'view.casual': 'Casual', 'view.standard': 'Standard', 'view.insider': 'Insider',
+    'view.hint.casual': 'Clean & simple — only verified highlights, no rumors, larger cards.',
+    'view.hint.standard': 'Balanced full view — all news with verified & rumor badges.',
+    'view.hint.insider': 'Everything, for power users — leaks, rumors, full source & region detail.',
+    'consent.text': 'We store preferences and your saved articles locally on your device. No tracking, no servers.',
+    'consent.ok': 'Got it',
+    'lang.all': 'All',
+    // toasts
+    't.filtersCleared': 'Filters cleared', 't.saved': 'Saved 🔖', 't.removed': 'Removed from saved',
+    't.commentPosted': 'Comment posted', 't.voteCounted': 'Vote counted ✓', 't.alreadyVoted': 'You already voted',
+    't.subscribed': 'Subscribed to the newsletter 📨', 't.tipSubmitted': 'Tip submitted — thank you!',
+    't.linkCopied': 'Link copied to clipboard', 't.feedUpdated': 'Feed up to date ✓',
+    't.calDownloaded': 'Calendar event downloaded 📅', 't.remindersOn': 'Reminders on 🔔',
+    't.notifNotSupported': 'Notifications not supported', 't.notifBlocked': 'Notifications blocked',
+    't.prefsReset': 'Preferences reset', 't.install': '💾 Install this app from your browser menu',
+    't.installed': 'App installed ✓', 't.langSwitched': 'Language: English',
+    // modal chrome
+    'm.by': 'By', 'm.minread': 'min read', 'm.source': 'Source', 'm.related': 'Related',
+    'm.comments': 'Comments', 'm.firstComment': 'Be the first to comment.',
+    'm.namePh': 'Your name', 'm.commentPh': 'Add a comment…', 'm.postComment': 'Post comment',
+    'm.copy': '🔗 Copy link', 'm.share': '𝕏 Share', 'm.save': '🏷 Save', 'm.saved': '🔖 Saved',
+    'm.verified': '✓ Verified', 'm.rumor': '⚠ Rumor', 'm.readAloud': '🔊 Read aloud', 'm.stop': '⏹ Stop',
+    'sc.title': 'Keyboard shortcuts',
+    'sc.body': '/ search · j/k next/prev · o open · t theme · v cycle view · l language · Esc close',
+  },
+  de: {
+    skip: 'Zum Inhalt springen',
+    offline: 'Du bist offline — zwischengespeicherte News werden angezeigt.',
+    online: 'Wieder online ✓',
+    'nav.news': 'News', 'nav.channels': 'Kanäle', 'nav.countdown': 'Countdown',
+    'nav.media': 'Medien', 'nav.roadmap': 'Fahrplan', 'nav.community': 'Community',
+    'nav.faq': 'FAQ', 'nav.saved': 'Gespeicherte Artikel',
+    'hero.eyebrow': 'Weltweite GTA-VI-Berichte · alle Kanäle, ein Hub',
+    'hero.title2': 'von überall.',
+    'hero.lede': 'Offizielle News, Trailer, Leaks und Community-Buzz — weltweit gebündelt, damit du nichts verpasst. Erscheint am <strong>19. November 2026</strong>.',
+    'cta.read': 'News lesen', 'cta.channels': 'Kanäle entdecken',
+    'countdown.label': 'Countdown bis Release',
+    'cd.days': 'Tage', 'cd.hrs': 'Std', 'cd.min': 'Min', 'cd.sec': 'Sek',
+    'btn.addCal': '📅 Zum Kalender', 'btn.remind': '🔔 Erinnern',
+    'search.placeholder': 'GTA-6-News suchen…',
+    'sort.newest': 'Neueste zuerst', 'sort.oldest': 'Älteste zuerst', 'sort.popular': 'Beliebteste',
+    'filter.lang': 'Sprache / Region:', 'filter.verifiedOnly': 'Nur verifiziert', 'filter.clear': 'Alle Filter zurücksetzen',
+    'section.latest': 'Aktuelle News',
+    'mode.latest': 'Aktuell', 'mode.trending': 'Angesagt', 'mode.official': 'Nur offiziell',
+    'btn.refresh': '⟳ Aktualisieren', 'feed.empty': 'Keine Artikel passen zu deinen Filtern.', 'feed.reset': 'Filter zurücksetzen',
+    'btn.loadMore': 'Mehr laden',
+    'section.channels': 'Kanal-Hub',
+    'channels.sub': 'Jede GTA-6-Quelle weltweit an einem Ort — offiziell, Presse, Community & Social.',
+    'section.media': 'Mediengalerie',
+    'media.all': 'Alle', 'media.trailers': 'Trailer', 'media.screenshots': 'Screenshots', 'media.art': 'Artworks',
+    'subhead.characters': 'Charaktere & Welt',
+    'section.roadmap': 'Release-Fahrplan', 'section.community': 'Community',
+    'card.newsletter': '📨 Newsletter', 'newsletter.desc': 'Erhalte wichtige GTA-6-Updates per E-Mail.', 'newsletter.subscribe': 'Abonnieren',
+    'card.polls': '📊 Community-Umfragen',
+    'card.tip': '💡 Tipp einsenden', 'tip.desc': 'GTA-6-News entdeckt? Teile den Link.', 'tip.note': 'Worum geht es?', 'tip.send': 'Tipp senden',
+    'card.join': '🌐 Mitreden',
+    'section.faq': 'Häufige Fragen', 'section.saved': '🔖 Gespeicherte Artikel',
+    'saved.empty': 'Du hast noch keine Artikel gespeichert. Tippe auf das 🔖 einer Karte.',
+    'footer.about': 'Eine Community-News-Plattform rund um GTA 6. Nicht mit Rockstar Games oder Take-Two Interactive verbunden.',
+    'footer.sections': 'Bereiche', 'footer.topchannels': 'Top-Kanäle',
+    'footer.copy': '© 2026 GTA 6 News Hub · Fan-Projekt. GTA und Grand Theft Auto sind Marken von Take-Two Interactive.',
+    'footer.release': 'Release-Ziel: 19. November 2026',
+    'prefs.title': 'Einstellungen', 'prefs.view': 'Ansicht', 'prefs.lang': 'Sprache', 'prefs.theme': 'Design',
+    'theme.dark': 'Dunkel', 'theme.light': 'Hell',
+    'prefs.accent': 'Akzentfarbe', 'prefs.textsize': 'Schriftgröße', 'prefs.density': 'Dichte',
+    'density.comfortable': 'Luftig', 'density.compact': 'Kompakt',
+    'prefs.shortcuts': '⌨️ Tastenkürzel', 'prefs.reset': 'Alle Einstellungen zurücksetzen',
+    'view.casual': 'Einfach', 'view.standard': 'Standard', 'view.insider': 'Experte',
+    'view.hint.casual': 'Aufgeräumt & einfach — nur verifizierte Highlights, keine Gerüchte, große Karten.',
+    'view.hint.standard': 'Ausgewogene Vollansicht — alle News mit Verifiziert- & Gerücht-Badges.',
+    'view.hint.insider': 'Alles für Profis — Leaks, Gerüchte, volle Quellen- & Regionsdetails.',
+    'consent.text': 'Wir speichern Einstellungen und gespeicherte Artikel lokal auf deinem Gerät. Kein Tracking, keine Server.',
+    'consent.ok': 'Verstanden',
+    'lang.all': 'Alle',
+    't.filtersCleared': 'Filter zurückgesetzt', 't.saved': 'Gespeichert 🔖', 't.removed': 'Aus Gespeicherten entfernt',
+    't.commentPosted': 'Kommentar gepostet', 't.voteCounted': 'Stimme gezählt ✓', 't.alreadyVoted': 'Du hast bereits abgestimmt',
+    't.subscribed': 'Newsletter abonniert 📨', 't.tipSubmitted': 'Tipp gesendet — danke!',
+    't.linkCopied': 'Link in die Zwischenablage kopiert', 't.feedUpdated': 'Feed ist aktuell ✓',
+    't.calDownloaded': 'Kalendereintrag heruntergeladen 📅', 't.remindersOn': 'Erinnerungen an 🔔',
+    't.notifNotSupported': 'Benachrichtigungen nicht unterstützt', 't.notifBlocked': 'Benachrichtigungen blockiert',
+    't.prefsReset': 'Einstellungen zurückgesetzt', 't.install': '💾 Installiere die App über das Browser-Menü',
+    't.installed': 'App installiert ✓', 't.langSwitched': 'Sprache: Deutsch',
+    'm.by': 'Von', 'm.minread': 'Min Lesezeit', 'm.source': 'Quelle', 'm.related': 'Ähnliche Artikel',
+    'm.comments': 'Kommentare', 'm.firstComment': 'Sei der/die Erste mit einem Kommentar.',
+    'm.namePh': 'Dein Name', 'm.commentPh': 'Kommentar hinzufügen…', 'm.postComment': 'Kommentar posten',
+    'm.copy': '🔗 Link kopieren', 'm.share': '𝕏 Teilen', 'm.save': '🏷 Speichern', 'm.saved': '🔖 Gespeichert',
+    'm.verified': '✓ Verifiziert', 'm.rumor': '⚠ Gerücht', 'm.readAloud': '🔊 Vorlesen', 'm.stop': '⏹ Stopp',
+    'sc.title': 'Tastenkürzel',
+    'sc.body': '/ Suche · j/k weiter/zurück · o öffnen · t Design · v Ansicht · l Sprache · Esc schließen',
+  },
+};
+let LANG = Store.get('uilang', null) || ((navigator.language || 'en').toLowerCase().startsWith('de') ? 'de' : 'en');
+function t(key) { return (I18N[LANG] && I18N[LANG][key]) ?? I18N.en[key] ?? key; }
+function applyI18n() {
+  document.documentElement.dataset.uilang = LANG;
+  document.documentElement.lang = LANG;
+  $('#langLabel').textContent = LANG.toUpperCase();
+  $$('[data-i18n]').forEach((el) => { el.innerHTML = t(el.dataset.i18n); });
+  $$('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+  $$('#langSeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.langVal === LANG));
+  updateViewHint();
+}
+function setLang(lang) {
+  LANG = lang; Store.set('uilang', lang);
+  applyI18n();
+  // re-render dynamic content that contains translated chrome
+  buildLangChips(); renderFeed(); renderSaved();
+  tickCountdown();
+  toast(t('t.langSwitched'));
+}
+
 // --- App state -------------------------------------------------------------
 const state = {
   articles: getArticles(),
   query: Store.get('lastQuery', ''),
   categories: new Set(Store.get('lastCategories', [])),
+  langFilter: new Set(Store.get('langFilter', [])),
   sort: Store.get('lastSort', 'newest'),
   verifiedOnly: Store.get('verifiedOnly', false),
+  viewMode: Store.get('viewMode', 'standard'),
   mode: 'latest',
   visible: PAGE_SIZE,
   saved: new Set(Store.get('saved', [])),
   read: new Set(Store.get('read', [])),
-  likes: Store.get('likes', {}),       // id -> bonus likes by this user (0/1)
+  likes: Store.get('likes', {}),
   recent: Store.get('recent', []),
 };
 
@@ -44,6 +203,13 @@ const state = {
 function timeAgo(iso) {
   const diff = Date.now() - new Date(iso).getTime();
   const d = Math.floor(diff / 86400000);
+  if (LANG === 'de') {
+    if (d <= 0) return 'heute';
+    if (d === 1) return 'gestern';
+    if (d < 30) return `vor ${d} Tagen`;
+    const mo = Math.floor(d / 30);
+    return mo === 1 ? 'vor einem Monat' : `vor ${mo} Monaten`;
+  }
   if (d <= 0) return 'today';
   if (d === 1) return 'yesterday';
   if (d < 30) return `${d} days ago`;
@@ -67,7 +233,6 @@ function highlight(text, q) {
 }
 function totalLikes(a) { return a.likes + (state.likes[a.id] ? 1 : 0); }
 
-let toastTimer;
 function toast(msg) {
   const stack = $('#toastStack');
   const el = document.createElement('div');
@@ -84,8 +249,10 @@ function toast(msg) {
 function getFilteredArticles() {
   let list = state.articles.slice();
   if (state.mode === 'official') list = list.filter((a) => a.category === 'Official' || a.verified);
-  if (state.verifiedOnly) list = list.filter((a) => a.verified);
+  // Casual view hides rumors entirely (comfort: simplified, trustworthy feed)
+  if (state.verifiedOnly || state.viewMode === 'casual') list = list.filter((a) => a.verified);
   if (state.categories.size) list = list.filter((a) => state.categories.has(a.category));
+  if (state.langFilter.size) list = list.filter((a) => state.langFilter.has(a.lang) || state.langFilter.has(a.region));
   if (state.query) {
     const q = state.query.toLowerCase();
     list = list.filter((a) =>
@@ -103,19 +270,20 @@ function articleCard(a) {
   const card = document.createElement('article');
   card.className = 'card article-card' + (read ? ' is-read' : '');
   card.dataset.id = a.id;
+  card.tabIndex = 0;
   card.innerHTML = `
     <div class="card-media ${a.image}" role="img" aria-label="${escapeHtml(a.title)}">
       <span class="tag">${a.category}</span>
-      <span class="badge-verify ${a.verified ? 'verified' : 'rumor'}">${a.verified ? '✓ Verified' : '⚠ Rumor'}</span>
+      <span class="badge-verify ${a.verified ? 'verified' : 'rumor'}">${a.verified ? t('m.verified') : t('m.rumor')}</span>
     </div>
     <div class="card-body">
       <h3>${highlight(a.title, state.query)}</h3>
       <p class="card-excerpt">${highlight(a.excerpt, state.query)}</p>
       <div class="card-meta">
-        <span>${escapeHtml(channelName(a.source))}</span>·
-        <span>${timeAgo(a.date)}</span>·
-        <span>${readingTime(a.body)} min</span>·
-        <span>${a.lang}/${a.region}</span>
+        <span class="meta-source">${escapeHtml(channelName(a.source))}</span>
+        <span class="meta-time">${timeAgo(a.date)}</span>
+        <span class="meta-read">${readingTime(a.body)} min</span>
+        <span class="meta-region">${a.lang}/${a.region}</span>
       </div>
       <div class="card-actions">
         <button class="act-like ${state.likes[a.id] ? 'is-active' : ''}" data-act="like" aria-label="Like">♥ <span>${totalLikes(a)}</span></button>
@@ -141,9 +309,9 @@ function renderFeed() {
   $('#feedEmpty').hidden = list.length !== 0;
   $('#loadMore').style.display = state.visible < list.length ? '' : 'none';
 
-  // persist filter state (feature 42)
   Store.set('lastQuery', state.query);
   Store.set('lastCategories', [...state.categories]);
+  Store.set('langFilter', [...state.langFilter]);
   Store.set('lastSort', state.sort);
   Store.set('verifiedOnly', state.verifiedOnly);
 }
@@ -171,6 +339,27 @@ function buildCategoryChips() {
   });
 }
 
+// Language / region filter chips (comfort + worldwide vision)
+function buildLangChips() {
+  const langs = [...new Set(state.articles.flatMap((a) => [a.lang, a.region]))].sort();
+  const wrap = $('#langChips');
+  wrap.innerHTML = '';
+  langs.forEach((code) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (state.langFilter.has(code) ? ' is-active' : '');
+    b.textContent = code;
+    b.setAttribute('aria-pressed', state.langFilter.has(code));
+    b.addEventListener('click', () => {
+      state.langFilter.has(code) ? state.langFilter.delete(code) : state.langFilter.add(code);
+      b.classList.toggle('is-active');
+      b.setAttribute('aria-pressed', state.langFilter.has(code));
+      state.visible = PAGE_SIZE;
+      renderFeed();
+    });
+    wrap.appendChild(b);
+  });
+}
+
 let searchDebounce;
 function initSearch() {
   const input = $('#searchInput');
@@ -181,7 +370,7 @@ function initSearch() {
       state.query = input.value.trim();
       state.visible = PAGE_SIZE;
       renderFeed();
-    }, 220); // debounce (feature 41)
+    }, 220);
   });
 
   $('#sortSelect').value = state.sort;
@@ -200,9 +389,9 @@ function initSearch() {
   });
 }
 function clearFilters() {
-  state.query = ''; state.categories.clear(); state.verifiedOnly = false; state.sort = 'newest'; state.visible = PAGE_SIZE;
+  state.query = ''; state.categories.clear(); state.langFilter.clear(); state.verifiedOnly = false; state.sort = 'newest'; state.visible = PAGE_SIZE;
   $('#searchInput').value = ''; $('#sortSelect').value = 'newest'; $('#verifiedOnly').checked = false;
-  buildCategoryChips(); renderFeed(); toast('Filters cleared');
+  buildCategoryChips(); buildLangChips(); renderFeed(); toast(t('t.filtersCleared'));
 }
 
 function initFeedModes() {
@@ -211,11 +400,10 @@ function initFeedModes() {
     btn.classList.add('is-active');
     state.mode = btn.dataset.mode; state.visible = PAGE_SIZE; renderFeed();
   }));
-  $('#loadMore').addEventListener('click', () => { state.visible += PAGE_SIZE; renderFeed(); }); // feature 30
-  $('#refreshFeed').addEventListener('click', () => { renderFeed(); toast('Feed up to date ✓'); }); // feature 34
+  $('#loadMore').addEventListener('click', () => { state.visible += PAGE_SIZE; renderFeed(); });
+  $('#refreshFeed').addEventListener('click', () => { renderFeed(); toast(t('t.feedUpdated')); });
 }
 
-// Card action delegation (like/save/share/open)
 function initFeedActions() {
   document.addEventListener('click', (e) => {
     const card = e.target.closest('.article-card');
@@ -232,6 +420,12 @@ function initFeedActions() {
     }
     openArticle(id);
   });
+  // keyboard: Enter/Space opens focused card
+  document.addEventListener('keydown', (e) => {
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement?.classList?.contains('article-card')) {
+      e.preventDefault(); openArticle(document.activeElement.dataset.id);
+    }
+  });
 }
 
 function toggleLike(id) {
@@ -244,7 +438,7 @@ function toggleSave(id) {
   Store.set('saved', [...state.saved]);
   updateSavedCount();
   renderFeed(); renderSaved();
-  toast(state.saved.has(id) ? 'Saved 🔖' : 'Removed from saved');
+  toast(state.saved.has(id) ? t('t.saved') : t('t.removed'));
 }
 function updateSavedCount() {
   const badge = $('#savedCount');
@@ -256,8 +450,8 @@ async function shareArticle(id) {
   const a = state.articles.find((x) => x.id === id);
   const url = location.origin + location.pathname + '#article-' + id;
   const data = { title: a.title, text: a.excerpt, url };
-  if (navigator.share) { try { await navigator.share(data); return; } catch {} } // feature 53
-  try { await navigator.clipboard.writeText(url); toast('Link copied to clipboard'); }
+  if (navigator.share) { try { await navigator.share(data); return; } catch {} }
+  try { await navigator.clipboard.writeText(url); toast(t('t.linkCopied')); }
   catch { toast('Share: ' + url); }
 }
 
@@ -274,13 +468,13 @@ function renderSaved() {
 }
 
 // ===========================================================================
-// Article modal (features 23, 31, 47-56)
+// Article modal (features 23, 31, 47-56) + Text-to-speech (comfort)
 // ===========================================================================
 function openArticle(id) {
   const a = state.articles.find((x) => x.id === id);
   if (!a) return;
+  stopTTS();
 
-  // mark read + recent (features 55, 56)
   state.read.add(id); Store.set('read', [...state.read]);
   state.recent = [id, ...state.recent.filter((x) => x !== id)].slice(0, 8);
   Store.set('recent', state.recent);
@@ -296,11 +490,12 @@ function openArticle(id) {
     <span class="tag">${a.category}</span>
     <h1 id="modalTitle">${escapeHtml(a.title)}</h1>
     <div class="modal-meta">
-      <span class="badge-verify ${a.verified ? 'verified' : 'rumor'}">${a.verified ? '✓ Verified' : '⚠ Rumor'}</span>
-      <span>By ${escapeHtml(a.author)}</span>·
-      <span>${timeAgo(a.date)}</span>·
-      <span>${readingTime(a.body)} min read</span>·
-      <a href="${a.sourceUrl}" target="_blank" rel="noopener">Source: ${escapeHtml(channelName(a.source))} ↗</a>
+      <span class="badge-verify ${a.verified ? 'verified' : 'rumor'}">${a.verified ? t('m.verified') : t('m.rumor')}</span>
+      <span>${t('m.by')} ${escapeHtml(a.author)}</span>
+      <span>${timeAgo(a.date)}</span>
+      <span>${readingTime(a.body)} ${t('m.minread')}</span>
+      <a href="${a.sourceUrl}" target="_blank" rel="noopener">${t('m.source')}: ${escapeHtml(channelName(a.source))} ↗</a>
+      <button class="btn btn-small btn-ghost" id="ttsBtn">${t('m.readAloud')}</button>
     </div>
     <div class="modal-hero ${a.image}"></div>
     ${a.body.split('\n\n').map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
@@ -311,30 +506,32 @@ function openArticle(id) {
     </div>
 
     <div class="share-row">
-      <button class="btn btn-small" data-share="copy">🔗 Copy link</button>
-      <a class="btn btn-small" data-share="x" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(location.href)}">𝕏 Share</a>
+      <button class="btn btn-small" data-share="copy">${t('m.copy')}</button>
+      <a class="btn btn-small" data-share="x" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(location.href)}">${t('m.share')}</a>
       <a class="btn btn-small" data-share="reddit" target="_blank" rel="noopener" href="https://www.reddit.com/submit?title=${encodeURIComponent(a.title)}&url=${encodeURIComponent(location.href)}">Reddit</a>
       <a class="btn btn-small" data-share="wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(a.title + ' ' + location.href)}">WhatsApp</a>
-      <button class="btn btn-small ${state.saved.has(id) ? 'btn-primary' : 'btn-ghost'}" data-share="save">${state.saved.has(id) ? '🔖 Saved' : '🏷 Save'}</button>
+      <button class="btn btn-small ${state.saved.has(id) ? 'btn-primary' : 'btn-ghost'}" data-share="save">${state.saved.has(id) ? t('m.saved') : t('m.save')}</button>
     </div>
 
     <div class="comments">
-      <h3>Comments (<span id="commentCount">${comments.length}</span>)</h3>
+      <h3>${t('m.comments')} (<span id="commentCount">${comments.length}</span>)</h3>
       <form class="comment-form" id="commentForm">
-        <input type="text" id="commentName" placeholder="Your name" value="${escapeHtml(Store.get('commenterName', ''))}" aria-label="Your name" />
-        <textarea id="commentText" placeholder="Add a comment…" rows="3" aria-label="Comment"></textarea>
-        <button class="btn btn-primary btn-small" type="submit">Post comment</button>
+        <input type="text" id="commentName" placeholder="${t('m.namePh')}" value="${escapeHtml(Store.get('commenterName', ''))}" aria-label="${t('m.namePh')}" />
+        <textarea id="commentText" placeholder="${t('m.commentPh')}" rows="3" aria-label="Comment"></textarea>
+        <button class="btn btn-primary btn-small" type="submit">${t('m.postComment')}</button>
       </form>
-      <div id="commentList">${comments.map(renderComment).join('') || '<p class="muted">Be the first to comment.</p>'}</div>
+      <div id="commentList">${comments.map(renderComment).join('') || `<p class="muted">${t('m.firstComment')}</p>`}</div>
     </div>
 
-    ${related.length ? `<div class="related"><h3>Related</h3><div class="related-list">${related.map((r) => `
+    ${related.length ? `<div class="related"><h3>${t('m.related')}</h3><div class="related-list">${related.map((r) => `
       <div class="related-item" data-related="${r.id}">
         <div class="ri-thumb ${r.image}"></div><span>${escapeHtml(r.title)}</span>
       </div>`).join('')}</div></div>` : ''}
   `;
 
-  // wire reactions
+  // TTS (comfort: read article aloud)
+  $('#ttsBtn').addEventListener('click', () => toggleTTS(a, $('#ttsBtn')));
+
   $$('#modalBody .reaction').forEach((btn) => btn.addEventListener('click', () => {
     const emo = btn.dataset.emo;
     const r = Store.get('reactions_' + id, {});
@@ -348,14 +545,12 @@ function openArticle(id) {
     openArticle(id);
   }));
 
-  // wire share row
   $$('#modalBody [data-share]').forEach((btn) => btn.addEventListener('click', () => {
-    const t = btn.dataset.share;
-    if (t === 'copy') shareArticle(id);
-    if (t === 'save') { toggleSave(id); openArticle(id); }
+    const ty = btn.dataset.share;
+    if (ty === 'copy') shareArticle(id);
+    if (ty === 'save') { toggleSave(id); openArticle(id); }
   }));
 
-  // wire comments (features 48-50)
   $('#commentForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = $('#commentName').value.trim() || 'Anonymous';
@@ -366,16 +561,14 @@ function openArticle(id) {
     list.unshift({ name, text, time: new Date().toISOString() });
     Store.set('comments_' + id, list);
     openArticle(id);
-    toast('Comment posted');
+    toast(t('t.commentPosted'));
   });
 
-  // related navigation
   $$('#modalBody [data-related]').forEach((el) => el.addEventListener('click', () => openArticle(el.dataset.related)));
 
   showModal('#modalBackdrop');
-  $('#modalBody').parentElement.scrollTop = 0;
-  // article modal reading progress (feature 54)
   const modal = $('#articleModal');
+  modal.scrollTop = 0;
   modal.onscroll = () => {
     const p = modal.scrollTop / (modal.scrollHeight - modal.clientHeight || 1);
     $('#modalProgress').style.width = Math.min(100, p * 100) + '%';
@@ -385,6 +578,23 @@ function openArticle(id) {
 function renderComment(c) {
   return `<div class="comment"><span class="c-author">${escapeHtml(c.name)}</span>
     <span class="c-time">· ${timeAgo(c.time)}</span><p>${escapeHtml(c.text)}</p></div>`;
+}
+
+// Text-to-speech (comfort / accessibility)
+let ttsActiveBtn = null;
+function toggleTTS(a, btn) {
+  if (!('speechSynthesis' in window)) { toast('TTS not supported'); return; }
+  if (speechSynthesis.speaking) { stopTTS(); return; }
+  const u = new SpeechSynthesisUtterance(a.title + '. ' + a.body.replace(/\n+/g, ' '));
+  u.lang = a.lang === 'DE' ? 'de-DE' : a.lang === 'FR' ? 'fr-FR' : a.lang === 'JP' ? 'ja-JP' : 'en-US';
+  u.onend = () => { if (ttsActiveBtn) ttsActiveBtn.textContent = t('m.readAloud'); ttsActiveBtn = null; };
+  ttsActiveBtn = btn; btn.textContent = t('m.stop');
+  speechSynthesis.speak(u);
+}
+function stopTTS() {
+  if ('speechSynthesis' in window && speechSynthesis.speaking) speechSynthesis.cancel();
+  if (ttsActiveBtn) ttsActiveBtn.textContent = t('m.readAloud');
+  ttsActiveBtn = null;
 }
 
 // ===========================================================================
@@ -401,6 +611,7 @@ function showModal(sel) {
 function hideModal(sel) {
   $(sel).hidden = true;
   document.body.style.overflow = '';
+  if (sel === '#modalBackdrop') stopTTS();
   if (lastFocused) lastFocused.focus();
 }
 function initModals() {
@@ -420,11 +631,11 @@ function renderChannels() {
   const types = ['All', ...new Set(CHANNELS.map((c) => c.type))];
   const fwrap = $('#channelFilter');
   fwrap.innerHTML = '';
-  types.forEach((t) => {
+  types.forEach((ty) => {
     const b = document.createElement('button');
-    b.className = 'chip' + (t === channelTypeFilter ? ' is-active' : '');
-    b.textContent = t;
-    b.addEventListener('click', () => { channelTypeFilter = t; renderChannels(); });
+    b.className = 'chip' + (ty === channelTypeFilter ? ' is-active' : '');
+    b.textContent = ty === 'All' ? t('lang.all') : ty;
+    b.addEventListener('click', () => { channelTypeFilter = ty; renderChannels(); });
     fwrap.appendChild(b);
   });
 
@@ -439,7 +650,7 @@ function renderChannels() {
         <span class="pill">${c.type}</span><span class="pill">${c.region}</span><span class="pill">${c.lang}</span>
       </div>
       <p>${escapeHtml(c.desc)}</p>
-      <a class="btn btn-small btn-ghost" href="${c.url}" target="_blank" rel="noopener">Visit channel ↗</a>`;
+      <a class="btn btn-small btn-ghost" href="${c.url}" target="_blank" rel="noopener">Visit ↗</a>`;
     grid.appendChild(el);
   });
 }
@@ -474,7 +685,6 @@ function initMedia() {
   $$('[data-media]').forEach((b) => b.addEventListener('click', () => { mediaFilter = b.dataset.media; renderMedia(); }));
 }
 
-// Lightbox (features 65-67)
 let lightboxIndex = -1;
 function openLightbox(i) {
   const visible = MEDIA.filter((m) => mediaFilter === 'all' || m.type === mediaFilter);
@@ -503,7 +713,6 @@ function openLightbox(i) {
   const item = visible[i] || MEDIA[i];
   $('#lbImg').className = item.image;
   $('#lbLabel').textContent = item.label;
-  // generate a downloadable SVG wallpaper (feature 67)
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ff2e88'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='1920' height='1080' fill='url(%23g)'/><text x='960' y='560' font-size='180' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>GTA VI</text></svg>`;
   $('#lbDownload').href = 'data:image/svg+xml,' + svg;
   lb.hidden = false;
@@ -524,7 +733,6 @@ function closeLightbox() {
   if (lb && !lb.hidden) { lb.hidden = true; document.body.style.overflow = ''; }
 }
 
-// Characters (feature 69)
 function renderCharacters() {
   const grid = $('#characterGrid');
   grid.innerHTML = '';
@@ -543,12 +751,12 @@ function renderCharacters() {
 function renderTimeline() {
   const list = $('#timelineList');
   list.innerHTML = '';
-  TIMELINE.forEach((t) => {
-    const done = new Date(t.date) < new Date();
+  TIMELINE.forEach((tl) => {
+    const done = new Date(tl.date) < new Date();
     const li = document.createElement('li');
     if (done) li.className = 'is-done';
-    li.innerHTML = `<span class="t-date">${new Date(t.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-      <h3>${escapeHtml(t.title)}</h3><p>${escapeHtml(t.desc)}</p>`;
+    li.innerHTML = `<span class="t-date">${new Date(tl.date).toLocaleDateString(LANG === 'de' ? 'de-DE' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+      <h3>${escapeHtml(tl.title)}</h3><p>${escapeHtml(tl.desc)}</p>`;
     list.appendChild(li);
   });
 }
@@ -568,10 +776,11 @@ function tickCountdown() {
   $('#cdMins').textContent = String(m).padStart(2, '0');
   $('#cdSecs').textContent = String(s).padStart(2, '0');
   const since = Math.floor((now - ANNOUNCE_DATE.getTime()) / 86400000);
-  $('#countdownSince').textContent = `${since} days since the first reveal (Dec 4, 2023).`;
+  $('#countdownSince').textContent = LANG === 'de'
+    ? `${since} Tage seit dem ersten Reveal (4. Dez. 2023).`
+    : `${since} days since the first reveal (Dec 4, 2023).`;
 }
 function initCountdownActions() {
-  // Add to calendar — .ics download (feature 60)
   $('#addToCalendar').addEventListener('click', () => {
     const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//GTA6 News Hub//EN', 'BEGIN:VEVENT',
       'UID:gta6-release@newshub', 'DTSTART;VALUE=DATE:20261119', 'DTEND;VALUE=DATE:20261120',
@@ -581,14 +790,13 @@ function initCountdownActions() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'gta6-release.ics'; a.click();
     URL.revokeObjectURL(a.href);
-    toast('Calendar event downloaded 📅');
+    toast(t('t.calDownloaded'));
   });
-  // Browser notification opt-in (feature 86)
   $('#notifyToggle').addEventListener('click', async () => {
-    if (!('Notification' in window)) { toast('Notifications not supported'); return; }
+    if (!('Notification' in window)) { toast(t('t.notifNotSupported')); return; }
     const perm = await Notification.requestPermission();
-    if (perm === 'granted') { Store.set('notify', true); toast('Reminders on 🔔'); new Notification('GTA 6 News Hub', { body: "We'll remind you about big drops!" }); }
-    else toast('Notifications blocked');
+    if (perm === 'granted') { Store.set('notify', true); toast(t('t.remindersOn')); new Notification('GTA 6 News Hub', { body: "We'll remind you about big drops!" }); }
+    else toast(t('t.notifBlocked'));
   });
 }
 
@@ -615,10 +823,10 @@ function renderPolls() {
   $$('[data-poll]').forEach((el) => {
     const vote = () => {
       const pid = el.dataset.poll, opt = +el.dataset.opt;
-      if (Store.get('pollVote_' + pid, null) != null) { toast('You already voted'); return; }
+      if (Store.get('pollVote_' + pid, null) != null) { toast(t('t.alreadyVoted')); return; }
       const votes = Store.get('poll_' + pid, POLLS.find((p) => p.id === pid).options.map(() => 0));
       votes[opt]++; Store.set('poll_' + pid, votes); Store.set('pollVote_' + pid, opt);
-      renderPolls(); toast('Vote counted ✓');
+      renderPolls(); toast(t('t.voteCounted'));
     };
     el.addEventListener('click', vote);
     el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); vote(); } });
@@ -627,14 +835,14 @@ function renderPolls() {
 
 function initNewsletter() {
   const form = $('#newsletterForm'), msg = $('#newsletterMsg');
-  if (Store.get('subscribed', false)) { msg.textContent = "You're subscribed ✓"; msg.className = 'form-msg ok'; }
+  if (Store.get('subscribed', false)) { msg.textContent = "✓"; msg.className = 'form-msg ok'; }
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = $('#newsletterEmail').value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = 'Please enter a valid email.'; msg.className = 'form-msg err'; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = LANG === 'de' ? 'Bitte gültige E-Mail eingeben.' : 'Please enter a valid email.'; msg.className = 'form-msg err'; return; }
     Store.set('subscribed', true); Store.set('subscriberEmail', email);
-    msg.textContent = 'Thanks! You are subscribed ✓'; msg.className = 'form-msg ok';
-    form.reset(); toast('Subscribed to the newsletter 📨');
+    msg.textContent = LANG === 'de' ? 'Danke! Du bist abonniert ✓' : 'Thanks! You are subscribed ✓'; msg.className = 'form-msg ok';
+    form.reset(); toast(t('t.subscribed'));
   });
 }
 function initTipForm() {
@@ -642,12 +850,12 @@ function initTipForm() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const url = $('#tipUrl').value.trim();
-    if (!/^https?:\/\/.+/.test(url)) { msg.textContent = 'Enter a valid URL.'; msg.className = 'form-msg err'; return; }
+    if (!/^https?:\/\/.+/.test(url)) { msg.textContent = LANG === 'de' ? 'Gültige URL eingeben.' : 'Enter a valid URL.'; msg.className = 'form-msg err'; return; }
     const tips = Store.get('tips', []);
     tips.unshift({ url, note: $('#tipNote').value.trim(), time: new Date().toISOString() });
     Store.set('tips', tips);
-    msg.textContent = 'Thanks for the tip! 💡'; msg.className = 'form-msg ok';
-    form.reset(); toast('Tip submitted — thank you!');
+    msg.textContent = LANG === 'de' ? 'Danke für den Tipp! 💡' : 'Thanks for the tip! 💡'; msg.className = 'form-msg ok';
+    form.reset(); toast(t('t.tipSubmitted'));
   });
 }
 function renderFAQ() {
@@ -669,7 +877,7 @@ function renderFAQ() {
 }
 
 // ===========================================================================
-// Preferences (features 11-20)
+// Preferences + view modes (features 11-20 + comfort views)
 // ===========================================================================
 function applyPrefs() {
   const html = document.documentElement;
@@ -677,6 +885,7 @@ function applyPrefs() {
   html.dataset.accent = Store.get('accent', 'pink');
   html.dataset.font = Store.get('font', 'normal');
   html.dataset.density = Store.get('density', 'comfortable');
+  html.dataset.view = state.viewMode;
   syncPrefUI();
   $('#themeToggle').textContent = html.dataset.theme === 'dark' ? '🌙' : '☀️';
 }
@@ -689,10 +898,25 @@ function syncPrefUI() {
   $$('#accentPicker button').forEach((b) => b.classList.toggle('is-active', b.dataset.accentVal === html.dataset.accent));
   $$('#fontSeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.fontVal === html.dataset.font));
   $$('#densitySeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.densityVal === html.dataset.density));
+  $$('#viewSeg button').forEach((b) => b.classList.toggle('is-active', b.dataset.viewVal === state.viewMode));
+}
+function updateViewHint() {
+  const hint = $('#viewHint');
+  if (hint) hint.textContent = t('view.hint.' + state.viewMode);
+}
+function setView(mode) {
+  state.viewMode = mode; Store.set('viewMode', mode);
+  document.documentElement.dataset.view = mode;
+  state.visible = PAGE_SIZE;
+  syncPrefUI(); updateViewHint(); renderFeed(); renderSaved();
 }
 function initPrefs() {
   $('#prefsToggle').addEventListener('click', () => showModal('#prefsBackdrop'));
   $('#themeToggle').addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+
+  $$('#viewSeg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.viewVal)));
+  $$('#langSeg button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.langVal)));
+  $('#langToggle').addEventListener('click', () => setLang(LANG === 'en' ? 'de' : 'en'));
 
   $$('#themeSeg button').forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeVal)));
   $$('#accentPicker button').forEach((b) => b.addEventListener('click', () => {
@@ -704,19 +928,58 @@ function initPrefs() {
   $$('#densitySeg button').forEach((b) => b.addEventListener('click', () => {
     document.documentElement.dataset.density = b.dataset.densityVal; Store.set('density', b.dataset.densityVal); syncPrefUI();
   }));
+  $('#shortcutsBtn').addEventListener('click', () => toast(t('sc.title') + ' — ' + t('sc.body')));
   $('#resetPrefs').addEventListener('click', () => {
-    ['theme', 'accent', 'font', 'density'].forEach((k) => localStorage.removeItem('gta6_' + k));
-    applyPrefs(); toast('Preferences reset');
+    ['theme', 'accent', 'font', 'density', 'viewMode'].forEach((k) => localStorage.removeItem('gta6_' + k));
+    state.viewMode = 'standard';
+    applyPrefs(); renderFeed(); toast(t('t.prefsReset'));
   });
 }
-function setTheme(t) {
-  document.documentElement.dataset.theme = t; Store.set('theme', t);
-  $('#themeToggle').textContent = t === 'dark' ? '🌙' : '☀️';
+function setTheme(ty) {
+  document.documentElement.dataset.theme = ty; Store.set('theme', ty);
+  $('#themeToggle').textContent = ty === 'dark' ? '🌙' : '☀️';
   syncPrefUI();
 }
 
 // ===========================================================================
-// Header behaviour, scroll spy, back-to-top, drawer (features 2,5,8,89)
+// Keyboard shortcuts (comfort)
+// ===========================================================================
+function initShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    const typing = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
+    if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+    // don't hijack while a modal is open (except handled elsewhere)
+    const cards = $$('#feedGrid .article-card');
+    switch (e.key) {
+      case '/':
+        e.preventDefault(); $('#searchPanel').hidden = false; $('#searchInput').focus(); break;
+      case 't': setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); break;
+      case 'l': setLang(LANG === 'en' ? 'de' : 'en'); break;
+      case 'v': {
+        const order = ['casual', 'standard', 'insider'];
+        setView(order[(order.indexOf(state.viewMode) + 1) % 3]);
+        toast(t('view.' + state.viewMode)); break;
+      }
+      case '?': toast(t('sc.title') + ' — ' + t('sc.body')); break;
+      case 'j': case 'k': {
+        if (!cards.length) break;
+        const cur = document.activeElement?.classList?.contains('article-card') ? cards.indexOf(document.activeElement) : -1;
+        let next = e.key === 'j' ? cur + 1 : cur - 1;
+        next = Math.max(0, Math.min(cards.length - 1, next));
+        cards[next].focus(); cards[next].scrollIntoView({ block: 'center', behavior: 'smooth' });
+        break;
+      }
+      case 'o': {
+        if (document.activeElement?.classList?.contains('article-card')) openArticle(document.activeElement.dataset.id);
+        break;
+      }
+    }
+  });
+}
+
+// ===========================================================================
+// Header behaviour, scroll spy, back-to-top, drawer
 // ===========================================================================
 function initScroll() {
   const header = $('#siteHeader');
@@ -736,11 +999,10 @@ function initScroll() {
     backTop.hidden = y < 400;
     ring.style.strokeDashoffset = ringLen - p * ringLen;
 
-    // scroll spy (feature 8)
     let current = '';
     sections.forEach((s) => { if (s.getBoundingClientRect().top <= 120) current = s.id; });
     navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
-    if (current) Store.set('lastSection', current); // feature 19
+    if (current) Store.set('lastSection', current);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -760,7 +1022,7 @@ function initDrawer() {
 }
 
 // ===========================================================================
-// Consent, visit tracking, new-since badge (features 87, 88)
+// Consent, visit tracking, restore last section
 // ===========================================================================
 function initConsent() {
   if (!Store.get('consent', false)) {
@@ -775,34 +1037,67 @@ function initVisitTracking() {
     if (newCount > 0) {
       const el = $('#newSince');
       el.hidden = false;
-      el.textContent = `✨ ${newCount} new article${newCount > 1 ? 's' : ''} since your last visit.`;
+      el.textContent = LANG === 'de'
+        ? `✨ ${newCount} neue${newCount > 1 ? '' : 'r'} Artikel seit deinem letzten Besuch.`
+        : `✨ ${newCount} new article${newCount > 1 ? 's' : ''} since your last visit.`;
     }
   }
   Store.set('lastVisit', Date.now());
 }
+// Restore last visited section (comfort) — only when arriving without a hash
+function restoreLastSection() {
+  if (location.hash) return;
+  const last = Store.get('lastSection', null);
+  if (last && last !== 'home') {
+    const el = document.getElementById(last);
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: 'auto' }), 60);
+  }
+}
 
 // ===========================================================================
-// PWA service worker (features 79-84)
+// Online/offline indicator (comfort)
 // ===========================================================================
+function initConnectivity() {
+  const banner = $('#offlineBanner');
+  const update = (online) => {
+    banner.hidden = online;
+    if (online) banner.classList.remove('show'); else banner.classList.add('show');
+  };
+  window.addEventListener('online', () => { update(true); toast(t('online')); });
+  window.addEventListener('offline', () => { update(false); });
+  update(navigator.onLine !== false);
+}
+
+// ===========================================================================
+// PWA service worker + install button (features 79-84 + comfort)
+// ===========================================================================
+let deferredInstall = null;
 function initPWA() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   }
-  let deferredPrompt;
+  const btn = $('#installBtn');
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); deferredPrompt = e;
-    if (!Store.get('installDismissed', false)) {
-      toast('💾 Install this app from your browser menu');
-    }
+    e.preventDefault(); deferredInstall = e; btn.hidden = false;
+    if (!Store.get('installHinted', false)) { toast(t('t.install')); Store.set('installHinted', true); }
   });
+  btn.addEventListener('click', async () => {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    await deferredInstall.userChoice;
+    deferredInstall = null; btn.hidden = true;
+  });
+  window.addEventListener('appinstalled', () => { btn.hidden = true; toast(t('t.installed')); });
 }
 
 // ===========================================================================
 // Boot
 // ===========================================================================
 function init() {
+  applyI18n();
   applyPrefs();
   buildCategoryChips();
+  buildLangChips();
   initSearch();
   initFeedModes();
   initFeedActions();
@@ -820,20 +1115,23 @@ function init() {
   renderFAQ();
   initModals();
   initPrefs();
+  initShortcuts();
   initScroll();
   initDrawer();
   initCountdownActions();
   initConsent();
   initVisitTracking();
+  initConnectivity();
   initPWA();
 
   tickCountdown();
   setInterval(tickCountdown, 1000);
 
-  // open article from hash (feature 52 deep link)
   if (location.hash.startsWith('#article-')) {
     const id = location.hash.replace('#article-', '');
     setTimeout(() => openArticle(id), 300);
+  } else {
+    restoreLastSection();
   }
 }
 

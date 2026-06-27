@@ -132,3 +132,13 @@ by area. The static frontend implements client-side behaviour via vanilla JS and
 98. ✅ Canonical link + favicon set
 99. ✅ Sitemap-style footer + robots-friendly markup
 100. ✅ Print-friendly stylesheet for articles
+
+## 13. Comfort layer (beyond the original 100)
+101. ✅ View modes — Casual / Standard / Insider (einfach / normal / experte)
+102. ✅ UI language switch (DE/EN) with `navigator.language` auto-detect
+103. ✅ Language / region filter in the news feed
+104. ✅ Keyboard shortcuts (/ search, j/k move, o open, t theme, v view, l lang, ? help)
+105. ✅ Text-to-speech "read aloud" in the article view
+106. ✅ Online/offline status banner
+107. ✅ Visible PWA "install app" button
+108. ✅ Restore last visited section on return

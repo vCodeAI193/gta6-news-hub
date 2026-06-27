@@ -420,6 +420,35 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: va
   .cd-unit span { font-size: 1.4rem; }
 }
 
+/* ---------- Comfort: status banner, lang/install, view modes ---------- */
+.status-banner { background: #fb923c; color: #1a1a27; text-align: center; padding: .5rem 1rem; font-size: .86rem; font-weight: 700; }
+
+.lang-btn { width: auto; padding: 0 .55rem; gap: .2rem; font-size: .95rem; }
+.lang-btn span { font-size: .72rem; font-weight: 800; }
+.install-btn { animation: pulseGlow 2s ease-in-out infinite; }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+
+/* Language / region filter row */
+.filter-lang { display: flex; align-items: center; gap: .6rem; margin-top: .8rem; flex-wrap: wrap; }
+.filter-label { font-size: .82rem; color: var(--text-muted); font-weight: 600; }
+
+/* Preferences: view modes */
+.pref-view { border-bottom: 0; padding-bottom: .25rem; }
+.pref-hint { margin: 0 0 .5rem; font-size: .8rem; color: var(--text-muted); padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+#viewSeg button, #langSeg button { display: inline-flex; align-items: center; gap: .25rem; }
+
+/* View mode: Casual — simpler, larger, hide power-user detail */
+html[data-view="casual"] .feed-grid { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+html[data-view="casual"] .meta-region { display: none; }
+html[data-view="casual"] #langFilterWrap { display: none; }
+html[data-view="casual"] .card-media { aspect-ratio: 16/8; }
+
+/* View mode: Insider — denser, surface every detail */
+html[data-view="insider"] .feed-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+html[data-view="insider"] .card-body { gap: .35rem; padding: .9rem; }
+html[data-view="insider"] .card-meta { font-size: .72rem; }
+html[data-view="insider"] .meta-region { color: var(--accent); font-weight: 700; }
+
 /* ---------- Print (feature 100) ---------- */
 @media print {
   .site-header, .site-footer, .back-to-top, .toast-stack, .consent, .search-panel, .modal-close, .share-row, .reactions, .comment-form, .feed-modes, .header-actions { display: none !important; }
