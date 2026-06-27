@@ -37,6 +37,16 @@ Details: [server/README.md](./server/README.md).
 - **Faktencheck**: Moderator setzt die Verlässlichkeit eines Leaks (mit Audit)
 - 22 Backend-Tests (inkl. 6 Moderationstests) — alle grün
 
+### ✅ Welle 3 umgesetzt — Echtzeit (WebSockets)
+
+- **WebSocket-Server** (`/ws`) am API-Server; Frontend-`RealtimeProvider` mit
+  Auto-Reconnect (inaktiv ohne `VITE_API_URL`)
+- **Live-Kommentare**: neue/freigegebene Kommentare erscheinen ohne Reload
+- **Präsenzanzeige**: „👁 X lesen das gerade" pro Artikel + Online-Zähler im Header
+- **Breaking-News-Banner**: Redaktion sendet Eilmeldungen (Admin-Formular) an
+  alle verbundenen Clients in Echtzeit; optionaler Discord-Webhook
+- 25 Backend-Tests (inkl. 3 Realtime-Tests) — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -93,16 +103,16 @@ Details: [server/README.md](./server/README.md).
 
 ## 15. Echtzeit & Benachrichtigungen
 
-- [ ] **WebSocket-Live-Updates** — Neue Artikel/Kommentare ohne Reload.
+- [x] **WebSocket-Live-Updates** — Neue Artikel/Kommentare ohne Reload.
 - [ ] **Echter Web-Push-Server** — Server-seitige Push-Benachrichtigungen (VAPID).
 - [ ] **E-Mail-Newsletter-Versand** — Echter Versand via Provider (Resend/Postmark).
 - [ ] **Tägliche/wöchentliche Digests** — Zusammenfassungs-Mails nach Interessen.
-- [ ] **Live-Kommentar-Threads** — Echtzeit-Diskussion zu Events (z. B. Trailer-Launch).
-- [ ] **Präsenzanzeige** — „X Nutzer lesen das gerade".
-- [ ] **Breaking-News-Banner** — Sofort-Einblendung bei Eilmeldungen.
+- [x] **Live-Kommentar-Threads** — Echtzeit-Diskussion zu Events (z. B. Trailer-Launch).
+- [x] **Präsenzanzeige** — „X Nutzer lesen das gerade".
+- [x] **Breaking-News-Banner** — Sofort-Einblendung bei Eilmeldungen.
 - [ ] **Benachrichtigungs-Einstellungen** — Granular pro Kanal/Thema/Frequenz.
 - [ ] **Countdown-Push** — Erinnerungen zu Release-Meilensteinen.
-- [ ] **Discord-/Webhook-Integration** — Neue Artikel in Communities posten.
+- [x] **Discord-/Webhook-Integration** — Neue Artikel in Communities posten. *(Eilmeldungen → Discord, inert ohne DISCORD_WEBHOOK_URL)*
 
 ## 16. Gamification & Community
 

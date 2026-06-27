@@ -6,6 +6,7 @@ import { ThemeProvider } from '../context/ThemeContext'
 import { PreferencesProvider } from '../context/PreferencesContext'
 import { ToastProvider } from '../context/ToastContext'
 import { AuthProvider } from '../context/AuthContext'
+import { RealtimeProvider } from '../context/RealtimeContext'
 import { I18nProvider } from '../i18n/I18nContext'
 
 interface Options extends Omit<RenderOptions, 'wrapper'> {
@@ -21,7 +22,9 @@ export function renderWithProviders(ui: ReactElement, { route = '/', ...options 
           <PreferencesProvider>
             <ToastProvider>
               <AuthProvider>
-                <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+                <RealtimeProvider>
+                  <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+                </RealtimeProvider>
               </AuthProvider>
             </ToastProvider>
           </PreferencesProvider>

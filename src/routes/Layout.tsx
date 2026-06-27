@@ -5,6 +5,7 @@ import { ToastViewport } from '../components/ToastViewport'
 import { CookieConsent } from '../components/CookieConsent'
 import { OnboardingDialog } from '../components/OnboardingDialog'
 import { ScrollToTopOnNavigate, ScrollTopButton } from '../components/ScrollHelpers'
+import { BreakingNewsBanner } from '../components/BreakingNewsBanner'
 
 /** Gemeinsames Seitengerüst mit globalen Overlays. */
 export function Layout() {
@@ -14,6 +15,7 @@ export function Layout() {
         Zum Inhalt springen
       </a>
       <ScrollToTopOnNavigate />
+      <BreakingNewsBanner />
       <Header />
       <main id="main" className="container page-transition">
         <Outlet />

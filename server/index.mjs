@@ -1,17 +1,22 @@
+import { createServer } from 'node:http'
 import { createApp } from './app.mjs'
+import { attachWebSocket, createHub } from './realtime.mjs'
 
 /**
  * Produktiver Einstiegspunkt. Persistente DB-Datei via DB_PATH (Default:
- * server/data.sqlite). Start: `npm run server`.
+ * server/data.sqlite). Startet HTTP-API + WebSocket-Echtzeit. Start: `npm run server`.
  */
 const port = Number(process.env.PORT || 8787)
 const dbPath = process.env.DB_PATH || new URL('./data.sqlite', import.meta.url).pathname
 
-const { app } = createApp({ dbPath })
+const hub = createHub()
+const { app } = createApp({ dbPath, hub })
+const server = createServer(app)
+attachWebSocket(server, hub)
 
-app.listen(port, () => {
+server.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`🎮 GTA 6 News Hub API läuft auf http://localhost:${port}`)
   // eslint-disable-next-line no-console
-  console.log(`   Health: http://localhost:${port}/api/health`)
+  console.log(`   WebSocket: ws://localhost:${port}/ws`)
 })

@@ -6,6 +6,7 @@ import { ApiError, isApiEnabled } from '../services/api'
 import { usePreferences } from '../context/PreferencesContext'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { useRealtime } from '../context/RealtimeContext'
 import { useI18n } from '../i18n/I18nContext'
 import { timeAgo } from '../lib/filterArticles'
 
@@ -20,6 +21,7 @@ export function Comments({ articleId, live = false }: CommentsProps) {
   const { prefs, update } = usePreferences()
   const { user } = useAuth()
   const { notify } = useToast()
+  const { subscribe } = useRealtime()
   const [comments, setComments] = useState<Comment[]>([])
   const [name, setName] = useState(prefs.displayName)
   const [text, setText] = useState('')
@@ -31,6 +33,11 @@ export function Comments({ articleId, live = false }: CommentsProps) {
   const refresh = () => getComments(articleId).then(setComments)
   useEffect(() => {
     refresh()
+    // Live: bei neuen/freigegebenen Kommentaren dieses Artikels neu laden.
+    const unsub = subscribe('comment', (msg) => {
+      if (msg.articleId === articleId) refresh()
+    })
+    return unsub
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [articleId])
 

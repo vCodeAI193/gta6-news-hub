@@ -21,8 +21,9 @@ const REACTION_EMOJIS = ['👍', '🔥', '😮', '😂', '😢']
  * Baut die Express-App. `dbPath` erlaubt eine echte Datei (Produktion) oder
  * `:memory:` (Tests). Gibt { app, db } zurück.
  */
-export function createApp({ dbPath = ':memory:' } = {}) {
+export function createApp({ dbPath = ':memory:', hub = null } = {}) {
   const db = createDb(dbPath)
+  const publish = (type, payload) => hub?.publish(type, payload)
   const app = express()
   app.use(cors())
   app.use(express.json({ limit: '1mb' }))
@@ -122,6 +123,7 @@ export function createApp({ dbPath = ':memory:' } = {}) {
       b.author ?? req.auth.user.display_name, b.reliability ?? null,
       b.status ?? 'published', b.publishAt ?? null, now, now,
     )
+    publish('article', { action: 'created', id })
     res.status(201).json({ article: rowToArticle(db.prepare('SELECT * FROM articles WHERE id = ?').get(id)) })
   })
 
@@ -175,8 +177,12 @@ export function createApp({ dbPath = ':memory:' } = {}) {
       'INSERT INTO comments (id, article_id, user_id, author, text, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     ).run(id, req.params.id, req.auth.user.id, req.auth.user.display_name, text.trim(), parentId ?? null, verdict.status, now)
 
+    const comment = { id, articleId: req.params.id, author: req.auth.user.display_name, text: text.trim(), parentId: parentId ?? null, createdAt: now }
+    // Nur sofort sichtbare Kommentare live verteilen.
+    if (verdict.status === 'visible') publish('comment', { articleId: req.params.id, comment })
+
     res.status(201).json({
-      comment: { id, articleId: req.params.id, author: req.auth.user.display_name, text: text.trim(), parentId: parentId ?? null, createdAt: now },
+      comment,
       // 'pending' bedeutet: erst nach Freigabe öffentlich sichtbar.
       moderation: verdict.status === 'pending' ? verdict.reason : null,
     })
@@ -268,6 +274,14 @@ export function createApp({ dbPath = ':memory:' } = {}) {
   app.post('/api/comments/:id/approve', requireAuth(db, 'moderator'), (req, res) => {
     db.prepare("UPDATE comments SET status = 'visible' WHERE id = ?").run(req.params.id)
     logAudit(db, req.auth.user, 'comment.approve', 'comment', req.params.id)
+    // Freigegebene Kommentare live verteilen.
+    const c = db.prepare('SELECT * FROM comments WHERE id = ?').get(req.params.id)
+    if (c) {
+      publish('comment', {
+        articleId: c.article_id,
+        comment: { id: c.id, articleId: c.article_id, author: c.author, text: c.text, parentId: c.parent_id, createdAt: c.created_at },
+      })
+    }
     res.json({ ok: true })
   })
 
@@ -312,10 +326,40 @@ export function createApp({ dbPath = ':memory:' } = {}) {
     res.json({ entries: db.prepare('SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 100').all() })
   })
 
+  // -------------------------------------------------------------- broadcast
+  // Eilmeldung an alle verbundenen Clients (Breaking-News-Banner).
+  app.post('/api/broadcast/breaking', requireAuth(db, 'author'), (req, res) => {
+    const message = (req.body?.message ?? '').trim()
+    if (!message) return res.status(400).json({ error: 'Nachricht nötig' })
+    const id = randomUUID()
+    publish('breaking', { id, message })
+    forwardToDiscord(`📣 **Eilmeldung:** ${message}`)
+    logAudit(db, req.auth.user, 'broadcast.breaking', 'broadcast', id, message)
+    res.status(201).json({ ok: true, id })
+  })
+
   // ------------------------------------------------------------- not found
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Route nicht gefunden' }))
 
   return { app, db }
+}
+
+/**
+ * Optionale Discord-Integration: leitet Eilmeldungen an einen Webhook weiter,
+ * sofern DISCORD_WEBHOOK_URL gesetzt ist (sonst No-op).
+ */
+function forwardToDiscord(content) {
+  const url = process.env.DISCORD_WEBHOOK_URL
+  if (!url) return
+  try {
+    void fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    })
+  } catch {
+    /* Integration darf die API nie blockieren. */
+  }
 }
 
 function reactionCounts(db, articleId) {

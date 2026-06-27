@@ -4,6 +4,7 @@ import { categories } from '../data/categories'
 import { useToast } from '../context/ToastContext'
 import { formatDate } from '../lib/filterArticles'
 import { emitWebhook, importMockFeed } from '../services/integrations'
+import { api, isApiEnabled } from '../services/api'
 import {
   deleteArticle,
   getAllRaw,
@@ -28,7 +29,20 @@ export function AdminPage() {
   const { notify } = useToast()
   const [list, setList] = useState<Article[]>(() => getAllRaw())
   const [form, setForm] = useState<ArticleInput>(EMPTY)
+  const [breaking, setBreaking] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const sendBreaking = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!breaking.trim()) return
+    try {
+      await api('/api/broadcast/breaking', { method: 'POST', body: { message: breaking.trim() } })
+      notify('Eilmeldung an alle Leser gesendet 📣', 'success')
+      setBreaking('')
+    } catch {
+      notify('Senden fehlgeschlagen (Backend & Rolle nötig)', 'error')
+    }
+  }
 
   const refresh = () => setList(getAllRaw())
 
@@ -99,6 +113,18 @@ export function AdminPage() {
           (localStorage) — in Produktion gegen eine echte API/CMS austauschbar.
         </p>
       </header>
+
+      {isApiEnabled() && (
+        <form className="breaking-form" onSubmit={sendBreaking}>
+          <input
+            value={breaking}
+            onChange={(e) => setBreaking(e.target.value)}
+            placeholder="📣 Eilmeldung an alle Leser senden…"
+            aria-label="Eilmeldung"
+          />
+          <button type="submit" className="btn btn--small">Senden</button>
+        </form>
+      )}
 
       <form className="admin-form" onSubmit={submit}>
         <div className="admin-form__grid">

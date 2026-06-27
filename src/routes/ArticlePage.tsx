@@ -18,6 +18,7 @@ import { RelatedArticles } from '../components/RelatedArticles'
 import { SkeletonGrid } from '../components/Skeleton'
 import { categoryMap } from '../data/categories'
 import { useArticles } from '../hooks/useArticles'
+import { useRealtime } from '../context/RealtimeContext'
 import { useI18n } from '../i18n/I18nContext'
 import { formatDate } from '../lib/filterArticles'
 import { readingTimeLabel } from '../lib/readingTime'
@@ -31,9 +32,24 @@ export function ArticlePage() {
   const { id = '' } = useParams()
   const { t } = useI18n()
   const { articles } = useArticles()
+  const { setViewing, subscribe } = useRealtime()
   const [article, setArticle] = useState<Article | null | undefined>(undefined)
   const [lightbox, setLightbox] = useState<string | null>(null)
   const [readLater, setReadLater] = useState(false)
+  const [presence, setPresence] = useState(0)
+
+  // Präsenz: diesen Artikel als „betrachtet" melden und Zähler empfangen.
+  useEffect(() => {
+    if (!id) return
+    setViewing(id)
+    const unsub = subscribe('presence', (msg) => {
+      if (msg.articleId === id) setPresence(Number(msg.count) || 0)
+    })
+    return () => {
+      setViewing(null)
+      unsub()
+    }
+  }, [id, setViewing, subscribe])
 
   useEffect(() => {
     let active = true
@@ -95,6 +111,11 @@ export function ArticlePage() {
             </span>
           )}
           <span>{readingTimeLabel(article.body)}</span>
+          {presence > 1 && (
+            <span className="presence" title="Gerade aktive Leser:innen">
+              👁 {presence} lesen das gerade
+            </span>
+          )}
         </div>
       </header>
 

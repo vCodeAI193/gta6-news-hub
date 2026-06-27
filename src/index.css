@@ -398,6 +398,19 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .auth-form input { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.6rem 0.7rem; font-size: 0.95rem; }
 .auth-card__switch { font-size: 0.88rem; color: var(--text-muted); text-align: center; }
 
+/* ---------- Realtime ---------- */
+.breaking { display: flex; align-items: center; gap: 0.7rem; background: linear-gradient(90deg, var(--pink), var(--purple)); color: #fff; padding: 0.6rem 1rem; font-weight: 600; }
+.breaking__label { font-weight: 900; letter-spacing: 0.05em; font-size: 0.72rem; background: rgba(0,0,0,0.25); padding: 0.2rem 0.5rem; border-radius: 6px; }
+.breaking__text { flex: 1; }
+.breaking__close { background: none; border: none; color: #fff; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.online { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--text-muted); font-weight: 600; padding: 0 0.4rem; }
+.online__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 rgba(46,204,113,0.6); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46,204,113,0.5); } 70% { box-shadow: 0 0 0 6px rgba(46,204,113,0); } 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0); } }
+.presence { color: var(--cyan); font-weight: 600; }
+.newpill { display: block; width: fit-content; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #fff; border: none; border-radius: 999px; padding: 0.55rem 1.2rem; font-weight: 700; font-size: 0.9rem; box-shadow: var(--shadow); animation: fadeup 0.25s ease; }
+.breaking-form { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; }
+.breaking-form input { flex: 1; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; color: var(--text); padding: 0.6rem 0.9rem; }
+
 /* ---------- Moderation ---------- */
 .modlist { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.6rem; }
 .modrow { display: flex; justify-content: space-between; align-items: center; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1rem; }

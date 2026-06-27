@@ -11,6 +11,7 @@ import { ThemeToggle } from './ThemeToggle'
 import { NotificationCenter } from './NotificationCenter'
 import { AuthMenu } from './AuthMenu'
 import { useAuth } from '../context/AuthContext'
+import { useRealtime } from '../context/RealtimeContext'
 
 export function Header() {
   const { t } = useI18n()
@@ -19,6 +20,7 @@ export function Header() {
   const [params] = useSearchParams()
   const { articles } = useArticles()
   const { hasRole } = useAuth()
+  const { connected, online } = useRealtime()
 
   const [q, setQ] = useState(params.get('q') ?? '')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -98,6 +100,12 @@ export function Header() {
         </div>
 
         <div className="site-header__tools">
+          {connected && (
+            <span className="online" title="Aktuell online">
+              <span className="online__dot" aria-hidden="true" />
+              {online}
+            </span>
+          )}
           <AuthMenu />
           <NotificationCenter />
           <ThemeToggle />

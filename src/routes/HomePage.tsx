@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Seo } from '../components/Seo'
 import { Countdown } from '../components/Countdown'
@@ -11,6 +11,7 @@ import { Poll } from '../components/Poll'
 import { useArticles } from '../hooks/useArticles'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { usePreferences } from '../context/PreferencesContext'
+import { useRealtime } from '../context/RealtimeContext'
 import { useI18n } from '../i18n/I18nContext'
 import { fallbackSuggestions, filterArticles, type SortKey } from '../lib/filterArticles'
 import { polls } from '../services/pollsService'
@@ -19,8 +20,13 @@ import type { CategoryId } from '../types'
 export function HomePage() {
   const { t } = useI18n()
   const { prefs } = usePreferences()
-  const { articles, loading } = useArticles()
+  const { articles, loading, reload } = useArticles()
+  const { subscribe } = useRealtime()
   const [params, setParams] = useSearchParams()
+  const [hasNew, setHasNew] = useState(false)
+
+  // Live: neue/aktualisierte Artikel signalisieren (ohne Auto-Reload zu erzwingen).
+  useEffect(() => subscribe('article', () => setHasNew(true)), [subscribe])
 
   const query = params.get('q') ?? ''
   const tag = params.get('tag') ?? undefined
@@ -102,6 +108,19 @@ export function HomePage() {
         activeTag={tag}
         onClearTag={() => update({ tag: undefined })}
       />
+
+      {hasNew && (
+        <button
+          type="button"
+          className="newpill"
+          onClick={() => {
+            reload()
+            setHasNew(false)
+          }}
+        >
+          ↻ Neue News verfügbar — aktualisieren
+        </button>
+      )}
 
       <section className="feed" aria-live="polite">
         <div className="feed__meta">
