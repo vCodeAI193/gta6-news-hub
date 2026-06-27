@@ -142,3 +142,9 @@ sind so weit umgesetzt, wie es ein reines Frontend erlaubt — sie sind mit
 - [x] **Test-Coverage-Report** — Coverage messen und Schwelle erzwingen.
 - [x] **Pre-Commit-Hooks** — Lint/Format/Test automatisch vor jedem Commit (husky).
 - [x] **Fehler-Monitoring** — Laufzeitfehler erfassen (z. B. Sentry). *(lokal/inert — Sentry-ErrorBoundary verdrahtet, ohne DSN inaktiv)*
+
+---
+
+➡️ **Nächste Ausbaustufe:** 100 weitere Features (echtes Backend, Konten,
+Moderation, KI, Echtzeit, Monetarisierung, native Apps) im Backlog
+[FEATURES-2.md](./FEATURES-2.md).
