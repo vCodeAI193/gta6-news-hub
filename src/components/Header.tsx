@@ -9,6 +9,7 @@ import { pushSearchHistory } from '../services/miscServices'
 import { SearchBar } from './SearchBar'
 import { ThemeToggle } from './ThemeToggle'
 import { NotificationCenter } from './NotificationCenter'
+import { AuthMenu } from './AuthMenu'
 
 export function Header() {
   const { t } = useI18n()
@@ -90,6 +91,7 @@ export function Header() {
         </div>
 
         <div className="site-header__tools">
+          <AuthMenu />
           <NotificationCenter />
           <ThemeToggle />
           <NavLink to="/settings" className="icon-btn" aria-label={t('nav.settings')} title={t('nav.settings')}>

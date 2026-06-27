@@ -21,7 +21,8 @@ import { useArticles } from '../hooks/useArticles'
 import { useI18n } from '../i18n/I18nContext'
 import { formatDate } from '../lib/filterArticles'
 import { readingTimeLabel } from '../lib/readingTime'
-import { getById, getRelated } from '../services/articlesService'
+import { getRelated } from '../services/articlesService'
+import { fetchArticle } from '../services/articlesRepo'
 import { isReadLater, markRead, toggleReadLater } from '../services/userDataService'
 import type { Article } from '../types'
 import { NotFoundPage } from './NotFoundPage'
@@ -37,7 +38,7 @@ export function ArticlePage() {
   useEffect(() => {
     let active = true
     setArticle(undefined)
-    getById(id).then((found) => {
+    fetchArticle(id).then((found) => {
       if (!active) return
       setArticle(found ?? null)
       if (found) {

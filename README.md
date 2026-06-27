@@ -55,14 +55,29 @@ Die Plattform setzt alle 100 Punkte aus [FEATURES.md](./FEATURES.md) um — u. a
 
 ## 🚀 Setup
 
-Voraussetzung: **Node.js ≥ 18**.
+Voraussetzung: **Node.js ≥ 18** (Backend: ≥ 22 wegen `node:sqlite`).
 
 ```bash
 npm install        # Abhängigkeiten installieren
-npm run dev        # Dev-Server (http://localhost:5173)
+npm run dev        # Frontend-Dev-Server (http://localhost:5173)
 npm run build      # Produktions-Build (inkl. Sitemap/Feed + PWA)
 npm run preview    # Build lokal prüfen
 ```
+
+### Optional: echtes Backend (Ausbaustufe 2)
+
+Es gibt einen produktiven **API-Server mit SQLite** (`server/`). Ohne ihn läuft
+die App rein lokal (localStorage). Mit ihm kommen Konten, Rollen und echte
+Persistenz dazu:
+
+```bash
+npm run server                              # API auf http://localhost:8787
+VITE_API_URL=http://localhost:8787 npm run dev   # Frontend gegen die API
+npm run test:server                         # 16 Backend-Tests
+```
+
+Details & Endpunkte: [server/README.md](./server/README.md). Der erste
+registrierte Nutzer wird automatisch Admin.
 
 ## 🧪 Tests & Qualität
 

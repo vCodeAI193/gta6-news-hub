@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getPublished } from '../services/articlesService'
+import { fetchArticles } from '../services/articlesRepo'
 import type { Article } from '../types'
 
 interface ArticlesState {
@@ -20,7 +20,7 @@ export function useArticles(): ArticlesState & { reload: () => void } {
   useEffect(() => {
     let active = true
     setState((s) => ({ ...s, loading: true }))
-    getPublished()
+    fetchArticles()
       .then((articles) => {
         if (active) setState({ articles, loading: false, error: null })
       })

@@ -34,3 +34,8 @@ public/feed.xml
 
 # PWA service worker output (generated)
 dev-dist/
+
+# Backend SQLite database files
+server/*.sqlite
+server/*.sqlite-*
+*.db

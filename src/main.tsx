@@ -6,6 +6,7 @@ import App from './App'
 import { ThemeProvider } from './context/ThemeContext'
 import { PreferencesProvider } from './context/PreferencesContext'
 import { ToastProvider } from './context/ToastContext'
+import { AuthProvider } from './context/AuthContext'
 import { I18nProvider } from './i18n/I18nContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { initMonitoring } from './lib/monitoring'
@@ -23,9 +24,11 @@ createRoot(document.getElementById('root')!).render(
           <ThemeProvider>
             <PreferencesProvider>
               <ToastProvider>
-                <BrowserRouter>
-                  <App />
-                </BrowserRouter>
+                <AuthProvider>
+                  <BrowserRouter>
+                    <App />
+                  </BrowserRouter>
+                </AuthProvider>
               </ToastProvider>
             </PreferencesProvider>
           </ThemeProvider>

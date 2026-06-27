@@ -13,33 +13,46 @@ Dienste.
 > Konvention: pro Kategorie grob nach Priorität/Aufwand sortiert. Beim Erledigen
 > `[ ]` → `[x]` setzen.
 
+### ✅ Welle 1 umgesetzt — Echtes Backend & Konten
+
+Ein produktiver **Node/Express-Server mit SQLite** (`server/`) ist live und
+ersetzt die Mock-Schicht, wenn `VITE_API_URL` gesetzt ist:
+
+- Registrierung/Login (JWT + bcrypt), Rollen (reader→admin), Sessions/Widerruf
+- REST-API für Artikel/Kommentare/Reaktionen/Votes/Reports, Auth-Middleware,
+  Rate-Limiting, Schema-Migrationen + Seed
+- Frontend lädt Artikel & Auth über die API (mit localStorage-Fallback offline)
+- 16 Backend-Tests (`npm run test:server`), 40 Frontend-Tests — alle grün
+
+Details: [server/README.md](./server/README.md).
+
 ---
 
 ## 11. Konten & Identität
 
-- [ ] **Registrierung & Login** — Echte Nutzerkonten mit E-Mail/Passwort.
+- [x] **Registrierung & Login** — Echte Nutzerkonten mit E-Mail/Passwort.
 - [ ] **OAuth-Login** — Anmeldung via Google, Discord, Apple.
 - [ ] **Magic-Link-Login** — Passwortlose Anmeldung per E-Mail-Link.
 - [ ] **Öffentliche Profilseiten** — Avatar, Bio, Aktivität, Kommentare eines Nutzers.
 - [ ] **2-Faktor-Authentifizierung** — TOTP/Authenticator-App-Support.
 - [ ] **Server-seitige Sync** — Lesezeichen/Einstellungen geräteübergreifend synchronisieren.
-- [ ] **Rollen & Berechtigungen** — Leser, Autor, Moderator, Admin.
+- [x] **Rollen & Berechtigungen** — Leser, Autor, Moderator, Admin.
 - [ ] **Konto-Einstellungen** — E-Mail ändern, Passwort zurücksetzen, Konto löschen (DSGVO).
-- [ ] **Sitzungsverwaltung** — Aktive Geräte/Sessions anzeigen & abmelden.
+- [x] **Sitzungsverwaltung** — Aktive Geräte/Sessions anzeigen & abmelden. *(API — Sessions auflisten/widerrufen)*
 - [ ] **Datenexport** — Nutzerdaten als JSON exportieren (DSGVO-Auskunft).
 
 ## 12. Echtes Backend & API
 
-- [ ] **REST/GraphQL-API** — Produktiver Server (z. B. Node/Nest oder Hono).
-- [ ] **Datenbank** — Persistente Speicherung (PostgreSQL/Prisma).
-- [ ] **Auth-Middleware** — JWT/Session-basierte API-Absicherung.
-- [ ] **Rate-Limiting** — Schutz vor Missbrauch & Spam.
+- [x] **REST/GraphQL-API** — Produktiver Server (z. B. Node/Nest oder Hono).
+- [x] **Datenbank** — Persistente Speicherung (PostgreSQL/Prisma). *(SQLite via node:sqlite)*
+- [x] **Auth-Middleware** — JWT/Session-basierte API-Absicherung.
+- [x] **Rate-Limiting** — Schutz vor Missbrauch & Spam.
 - [ ] **Server-seitige Suche** — Algolia/Meilisearch-Index statt Client-Fuse.
 - [ ] **Bild-Upload zu CDN** — Objektspeicher (S3) + Bild-CDN statt DataURL.
 - [ ] **Server-seitiges Rendering** — SSR/SSG (Next.js/Remix) für SEO & Speed.
 - [ ] **API-Versionierung** — `/v1`-Namespacing & Deprecation-Strategie.
 - [ ] **OpenAPI-Spezifikation** — Dokumentierte, typsichere API (Swagger).
-- [ ] **Datenbank-Migrationen** — Versionierte Schema-Migrationen & Seeds.
+- [x] **Datenbank-Migrationen** — Versionierte Schema-Migrationen & Seeds.
 
 ## 13. Redaktion & Moderation
 

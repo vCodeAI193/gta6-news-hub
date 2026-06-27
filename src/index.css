@@ -380,6 +380,24 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .site-footer nav a:hover { color: var(--text); }
 .site-footer__bottom { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
 
+/* ---------- Auth ---------- */
+.authmenu { position: relative; }
+.authmenu__avatar { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff; font-weight: 800; font-size: 0.78rem; }
+.authmenu__panel { position: absolute; right: 0; top: 120%; min-width: 200px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); z-index: 40; padding: 0.4rem; }
+.authmenu__head { display: flex; flex-direction: column; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); margin-bottom: 0.3rem; }
+.authmenu__role { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.authmenu__item { display: block; width: 100%; text-align: left; background: none; border: none; color: var(--text); padding: 0.5rem 0.6rem; border-radius: 8px; font-size: 0.88rem; }
+.authmenu__item:hover { background: var(--bg-elevated); }
+.authmenu__item--danger { color: var(--red); }
+.auth-page { display: grid; place-items: center; padding: 3rem 1rem; }
+.auth-card { width: 100%; max-width: 400px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.6rem; }
+.auth-card__title { margin: 0 0 1rem; letter-spacing: -0.02em; }
+.auth-card__notice { background: rgba(245, 166, 35, 0.12); border: 1px solid var(--amber); border-radius: 10px; padding: 0.7rem 0.9rem; font-size: 0.82rem; color: var(--text-muted); }
+.auth-form { display: grid; gap: 0.8rem; margin: 1rem 0; }
+.auth-form label { display: grid; gap: 0.3rem; font-size: 0.85rem; color: var(--text-muted); }
+.auth-form input { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.6rem 0.7rem; font-size: 0.95rem; }
+.auth-card__switch { font-size: 0.88rem; color: var(--text-muted); text-align: center; }
+
 /* ---------- Page transition ---------- */
 .page-transition { animation: fadeup 0.25s ease; }
 @keyframes fadeup { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }

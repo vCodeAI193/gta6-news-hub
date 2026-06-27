@@ -59,8 +59,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: false,
-    // E2E-Tests laufen über Playwright, nicht Vitest.
-    exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+    // E2E-Tests laufen über Playwright, Server-Tests über vitest.server.config.
+    exclude: ['e2e/**', 'server/**', 'node_modules/**', 'dist/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

@@ -5,6 +5,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import { ThemeProvider } from '../context/ThemeContext'
 import { PreferencesProvider } from '../context/PreferencesContext'
 import { ToastProvider } from '../context/ToastContext'
+import { AuthProvider } from '../context/AuthContext'
 import { I18nProvider } from '../i18n/I18nContext'
 
 interface Options extends Omit<RenderOptions, 'wrapper'> {
@@ -19,7 +20,9 @@ export function renderWithProviders(ui: ReactElement, { route = '/', ...options 
         <ThemeProvider>
           <PreferencesProvider>
             <ToastProvider>
-              <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+              <AuthProvider>
+                <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+              </AuthProvider>
             </ToastProvider>
           </PreferencesProvider>
         </ThemeProvider>
