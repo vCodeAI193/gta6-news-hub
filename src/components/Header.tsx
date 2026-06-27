@@ -10,6 +10,7 @@ import { SearchBar } from './SearchBar'
 import { ThemeToggle } from './ThemeToggle'
 import { NotificationCenter } from './NotificationCenter'
 import { AuthMenu } from './AuthMenu'
+import { useAuth } from '../context/AuthContext'
 
 export function Header() {
   const { t } = useI18n()
@@ -17,6 +18,7 @@ export function Header() {
   const location = useLocation()
   const [params] = useSearchParams()
   const { articles } = useArticles()
+  const { hasRole } = useAuth()
 
   const [q, setQ] = useState(params.get('q') ?? '')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -84,6 +86,11 @@ export function Header() {
           <NavLink to="/admin" className="mainnav__link" onClick={closeMenu}>
             {t('nav.admin')}
           </NavLink>
+          {hasRole('moderator') && (
+            <NavLink to="/moderation" className="mainnav__link" onClick={closeMenu}>
+              🛡️ Moderation
+            </NavLink>
+          )}
         </nav>
 
         <div className="site-header__search">

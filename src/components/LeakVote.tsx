@@ -1,20 +1,46 @@
-import { useState } from 'react'
-import { castVote, getMyVote, getVotes, type Vote } from '../services/votesService'
+import { useEffect, useState } from 'react'
+import { type Vote } from '../services/votesService'
+import { castVote, loadVotes } from '../services/engagementRepo'
+import { ApiError, isApiEnabled } from '../services/api'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n/I18nContext'
 
 /** Glaubwürdigkeits-Voting, nur für Leak-Artikel sinnvoll. */
 export function LeakVote({ articleId }: { articleId: string }) {
   const { t } = useI18n()
-  const [counts, setCounts] = useState(() => getVotes(articleId))
-  const [mine, setMine] = useState<Vote | undefined>(() => getMyVote(articleId))
+  const { user } = useAuth()
+  const { notify } = useToast()
+  const [counts, setCounts] = useState({ credible: 0, fake: 0 })
+  const [mine, setMine] = useState<Vote | undefined>()
+
+  useEffect(() => {
+    let active = true
+    loadVotes(articleId).then((s) => {
+      if (!active) return
+      setCounts(s.counts)
+      setMine(s.mine)
+    })
+    return () => {
+      active = false
+    }
+  }, [articleId])
 
   const total = counts.credible + counts.fake
   const pct = (n: number) => (total === 0 ? 0 : Math.round((n / total) * 100))
 
-  const handle = (vote: Vote) => {
-    const state = castVote(articleId, vote)
-    setCounts({ ...(state.counts[articleId] ?? { credible: 0, fake: 0 }) })
-    setMine(state.mine[articleId])
+  const handle = async (vote: Vote) => {
+    if (isApiEnabled() && !user) {
+      notify('Bitte melde dich an, um abzustimmen.', 'info')
+      return
+    }
+    try {
+      const s = await castVote(articleId, vote)
+      setCounts(s.counts)
+      setMine(s.mine)
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : 'Aktion fehlgeschlagen', 'error')
+    }
   }
 
   return (

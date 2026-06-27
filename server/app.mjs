@@ -1,7 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import { randomUUID } from 'node:crypto'
-import { createDb, rowToArticle } from './db.mjs'
+import { createDb, logAudit, rowToArticle } from './db.mjs'
+import { classifyComment } from './moderation.mjs'
 import {
   authenticate,
   hashPassword,
@@ -159,14 +160,26 @@ export function createApp({ dbPath = ':memory:' } = {}) {
   })
 
   app.post('/api/articles/:id/comments', requireAuth(db), (req, res) => {
+    if (req.auth.user.banned) return res.status(403).json({ error: 'Konto gesperrt' })
     const { text, parentId } = req.body ?? {}
     if (!text || !text.trim()) return res.status(400).json({ error: 'Text nötig' })
+
+    // Spam-/Blocklist-Prüfung.
+    const verdict = classifyComment(text.trim())
+    if (verdict.status === 'rejected')
+      return res.status(400).json({ error: 'Kommentar abgelehnt: ' + verdict.reason })
+
     const id = randomUUID()
     const now = new Date().toISOString()
     db.prepare(
-      'INSERT INTO comments (id, article_id, user_id, author, text, parent_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    ).run(id, req.params.id, req.auth.user.id, req.auth.user.display_name, text.trim(), parentId ?? null, now)
-    res.status(201).json({ comment: { id, articleId: req.params.id, author: req.auth.user.display_name, text: text.trim(), parentId: parentId ?? null, createdAt: now } })
+      'INSERT INTO comments (id, article_id, user_id, author, text, parent_id, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    ).run(id, req.params.id, req.auth.user.id, req.auth.user.display_name, text.trim(), parentId ?? null, verdict.status, now)
+
+    res.status(201).json({
+      comment: { id, articleId: req.params.id, author: req.auth.user.display_name, text: text.trim(), parentId: parentId ?? null, createdAt: now },
+      // 'pending' bedeutet: erst nach Freigabe öffentlich sichtbar.
+      moderation: verdict.status === 'pending' ? verdict.reason : null,
+    })
   })
 
   app.delete('/api/comments/:id', requireAuth(db), (req, res) => {
@@ -200,6 +213,10 @@ export function createApp({ dbPath = ':memory:' } = {}) {
     res.json({ counts: reactionCounts(db, req.params.id) })
   })
 
+  app.get('/api/articles/:id/votes', (req, res) => {
+    res.json({ counts: voteCounts(db, req.params.id) })
+  })
+
   app.post('/api/articles/:id/votes', requireAuth(db), (req, res) => {
     const { vote } = req.body ?? {}
     if (!['credible', 'fake'].includes(vote)) return res.status(400).json({ error: 'Ungültige Stimme' })
@@ -229,6 +246,70 @@ export function createApp({ dbPath = ':memory:' } = {}) {
 
   app.get('/api/reports', requireAuth(db, 'moderator'), (_req, res) => {
     res.json({ reports: db.prepare("SELECT * FROM reports WHERE status = 'open' ORDER BY created_at DESC").all() })
+  })
+
+  app.post('/api/reports/:id/resolve', requireAuth(db, 'moderator'), (req, res) => {
+    db.prepare("UPDATE reports SET status = 'resolved' WHERE id = ?").run(req.params.id)
+    logAudit(db, req.auth.user, 'report.resolve', 'report', req.params.id)
+    res.json({ ok: true })
+  })
+
+  // Moderations-Queue: zur Prüfung markierte Kommentare.
+  app.get('/api/moderation/comments', requireAuth(db, 'moderator'), (_req, res) => {
+    const rows = db
+      .prepare("SELECT * FROM comments WHERE status = 'pending' ORDER BY created_at DESC")
+      .all()
+    res.json({ comments: rows.map((c) => ({
+      id: c.id, articleId: c.article_id, author: c.author, text: c.text,
+      status: c.status, createdAt: c.created_at,
+    })) })
+  })
+
+  app.post('/api/comments/:id/approve', requireAuth(db, 'moderator'), (req, res) => {
+    db.prepare("UPDATE comments SET status = 'visible' WHERE id = ?").run(req.params.id)
+    logAudit(db, req.auth.user, 'comment.approve', 'comment', req.params.id)
+    res.json({ ok: true })
+  })
+
+  app.post('/api/comments/:id/reject', requireAuth(db, 'moderator'), (req, res) => {
+    db.prepare("UPDATE comments SET status = 'rejected' WHERE id = ?").run(req.params.id)
+    logAudit(db, req.auth.user, 'comment.reject', 'comment', req.params.id, req.body?.reason ?? '')
+    res.json({ ok: true })
+  })
+
+  // Nutzer sperren/entsperren.
+  app.post('/api/users/:id/ban', requireAuth(db, 'moderator'), (req, res) => {
+    const target = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id)
+    if (!target) return res.status(404).json({ error: 'Nutzer nicht gefunden' })
+    if (target.role === 'admin') return res.status(403).json({ error: 'Admins können nicht gesperrt werden' })
+    const banned = req.body?.banned ? 1 : 0
+    db.prepare('UPDATE users SET banned = ? WHERE id = ?').run(banned, req.params.id)
+    logAudit(db, req.auth.user, banned ? 'user.ban' : 'user.unban', 'user', req.params.id, target.display_name)
+    res.json({ ok: true, banned: Boolean(banned) })
+  })
+
+  app.get('/api/moderation/users', requireAuth(db, 'moderator'), (_req, res) => {
+    const rows = db.prepare('SELECT id, email, display_name, role, banned, created_at FROM users ORDER BY created_at DESC').all()
+    res.json({ users: rows.map((u) => ({ ...u, banned: Boolean(u.banned) })) })
+  })
+
+  // Faktencheck: Verlässlichkeit eines (Leak-)Artikels setzen.
+  app.patch('/api/articles/:id/verify', requireAuth(db, 'moderator'), (req, res) => {
+    const { reliability } = req.body ?? {}
+    if (!['confirmed', 'rumor', 'unconfirmed'].includes(reliability))
+      return res.status(400).json({ error: 'Ungültiger Status' })
+    const row = db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)
+    if (!row) return res.status(404).json({ error: 'Nicht gefunden' })
+    db.prepare('UPDATE articles SET reliability = ?, updated_at = ? WHERE id = ?').run(
+      reliability, new Date().toISOString(), req.params.id,
+    )
+    logAudit(db, req.auth.user, 'article.verify', 'article', req.params.id, reliability)
+    res.json({ article: rowToArticle(db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)) })
+  })
+
+  // Audit-Log.
+  app.get('/api/moderation/audit', requireAuth(db, 'moderator'), (_req, res) => {
+    res.json({ entries: db.prepare('SELECT * FROM audit_log ORDER BY created_at DESC LIMIT 100').all() })
   })
 
   // ------------------------------------------------------------- not found

@@ -135,6 +135,94 @@ describe('Comments & Reactions', () => {
   })
 })
 
+async function registerSecond(over = {}) {
+  return request(app)
+    .post('/api/auth/register')
+    .send({ email: 'leser@b.de', password: 'password123', displayName: 'Leser', ...over })
+}
+
+describe('Moderation', () => {
+  it('lehnt Kommentare mit gesperrten Begriffen ab', async () => {
+    const { body } = await register()
+    const res = await request(app)
+      .post('/api/articles/release-date-confirmed/comments')
+      .set('Authorization', `Bearer ${body.token}`)
+      .send({ text: 'Kauf jetzt viagra hier!' })
+    assert.equal(res.status, 400)
+  })
+
+  it('markiert verdächtige Kommentare als pending und hält sie aus der Öffentlichkeit', async () => {
+    await register() // admin
+    const reader = await registerSecond()
+    const auth = `Bearer ${reader.body.token}`
+    const spammy = 'Schaut https://a.com https://b.com https://c.com an'
+    const posted = await request(app)
+      .post('/api/articles/release-date-confirmed/comments')
+      .set('Authorization', auth)
+      .send({ text: spammy })
+    assert.equal(posted.status, 201)
+    assert.ok(posted.body.moderation) // als pending markiert
+
+    const publicList = await request(app).get('/api/articles/release-date-confirmed/comments')
+    assert.equal(publicList.body.comments.length, 0)
+  })
+
+  it('Moderator kann pending-Kommentare freigeben', async () => {
+    const admin = await register()
+    const reader = await registerSecond()
+    await request(app)
+      .post('/api/articles/release-date-confirmed/comments')
+      .set('Authorization', `Bearer ${reader.body.token}`)
+      .send({ text: 'Spam https://a.com https://b.com https://c.com' })
+
+    const adminAuth = `Bearer ${admin.body.token}`
+    const queue = await request(app).get('/api/moderation/comments').set('Authorization', adminAuth)
+    assert.equal(queue.status, 200)
+    assert.equal(queue.body.comments.length, 1)
+
+    const id = queue.body.comments[0].id
+    await request(app).post(`/api/comments/${id}/approve`).set('Authorization', adminAuth)
+    const publicList = await request(app).get('/api/articles/release-date-confirmed/comments')
+    assert.equal(publicList.body.comments.length, 1)
+  })
+
+  it('verweigert die Queue für normale Nutzer', async () => {
+    await register()
+    const reader = await registerSecond()
+    const res = await request(app).get('/api/moderation/comments').set('Authorization', `Bearer ${reader.body.token}`)
+    assert.equal(res.status, 403)
+  })
+
+  it('Moderator kann einen Nutzer sperren; gesperrte können nicht kommentieren', async () => {
+    const admin = await register()
+    const reader = await registerSecond()
+    const ban = await request(app)
+      .post(`/api/users/${reader.body.user.id}/ban`)
+      .set('Authorization', `Bearer ${admin.body.token}`)
+      .send({ banned: true })
+    assert.equal(ban.body.banned, true)
+
+    const res = await request(app)
+      .post('/api/articles/release-date-confirmed/comments')
+      .set('Authorization', `Bearer ${reader.body.token}`)
+      .send({ text: 'Hallo' })
+    assert.equal(res.status, 403)
+  })
+
+  it('Faktencheck setzt die Verlässlichkeit + schreibt Audit-Log', async () => {
+    const admin = await register()
+    const auth = `Bearer ${admin.body.token}`
+    const res = await request(app)
+      .patch('/api/articles/map-leak-vice-city/verify')
+      .set('Authorization', auth)
+      .send({ reliability: 'confirmed' })
+    assert.equal(res.body.article.reliability, 'confirmed')
+
+    const audit = await request(app).get('/api/moderation/audit').set('Authorization', auth)
+    assert.ok(audit.body.entries.some((e) => e.action === 'article.verify'))
+  })
+})
+
 describe('Rate limiting', () => {
   it('greift nach vielen Auth-Anfragen', async () => {
     let limited = false

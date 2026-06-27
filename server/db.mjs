@@ -1,4 +1,5 @@
 import { DatabaseSync } from 'node:sqlite'
+import { randomUUID } from 'node:crypto'
 
 /**
  * Echte SQLite-Datenbank über das eingebaute `node:sqlite`-Modul (keine native
@@ -76,6 +77,17 @@ const MIGRATIONS = [
     password_hash TEXT NOT NULL,
     display_name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'reader',
+    banned INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS audit_log (
+    id TEXT PRIMARY KEY,
+    actor_id TEXT,
+    actor_name TEXT,
+    action TEXT NOT NULL,
+    target_type TEXT,
+    target_id TEXT,
+    detail TEXT,
     created_at TEXT NOT NULL
   )`,
   `CREATE TABLE IF NOT EXISTS sessions (
@@ -142,8 +154,33 @@ export function createDb(path = ':memory:') {
   db.exec('PRAGMA journal_mode = WAL')
   db.exec('PRAGMA foreign_keys = ON')
   for (const sql of MIGRATIONS) db.exec(sql)
+  ensureColumn(db, 'users', 'banned', 'INTEGER NOT NULL DEFAULT 0')
   seedArticles(db)
   return db
+}
+
+/** Fügt eine Spalte hinzu, falls sie in einer älteren DB noch fehlt. */
+function ensureColumn(db, table, column, definition) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all()
+  if (!cols.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+  }
+}
+
+/** Schreibt einen Eintrag ins Audit-Log (Moderations-Nachvollziehbarkeit). */
+export function logAudit(db, actor, action, targetType, targetId, detail = '') {
+  db.prepare(
+    'INSERT INTO audit_log (id, actor_id, actor_name, action, target_type, target_id, detail, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  ).run(
+    randomUUID(),
+    actor?.id ?? null,
+    actor?.display_name ?? null,
+    action,
+    targetType,
+    targetId,
+    detail,
+    new Date().toISOString(),
+  )
 }
 
 function seedArticles(db) {

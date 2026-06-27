@@ -1,20 +1,40 @@
-import { useState } from 'react'
-import {
-  getMyReaction,
-  getReactions,
-  REACTIONS,
-  toggleReaction,
-  type ReactionEmoji,
-} from '../services/reactionsService'
+import { useEffect, useState } from 'react'
+import { REACTIONS, type ReactionEmoji } from '../services/reactionsService'
+import { loadReactions, toggleReaction } from '../services/engagementRepo'
+import { isApiEnabled, ApiError } from '../services/api'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 
 export function ReactionBar({ articleId }: { articleId: string }) {
-  const [counts, setCounts] = useState(() => getReactions(articleId))
-  const [mine, setMine] = useState<ReactionEmoji | undefined>(() => getMyReaction(articleId))
+  const [counts, setCounts] = useState<Record<string, number>>({})
+  const [mine, setMine] = useState<ReactionEmoji | undefined>()
+  const { user } = useAuth()
+  const { notify } = useToast()
 
-  const handle = (emoji: ReactionEmoji) => {
-    const state = toggleReaction(articleId, emoji)
-    setCounts({ ...(state.counts[articleId] ?? {}) })
-    setMine(state.mine[articleId])
+  useEffect(() => {
+    let active = true
+    loadReactions(articleId).then((s) => {
+      if (!active) return
+      setCounts(s.counts)
+      setMine(s.mine)
+    })
+    return () => {
+      active = false
+    }
+  }, [articleId])
+
+  const handle = async (emoji: ReactionEmoji) => {
+    if (isApiEnabled() && !user) {
+      notify('Bitte melde dich an, um zu reagieren.', 'info')
+      return
+    }
+    try {
+      const s = await toggleReaction(articleId, emoji)
+      setCounts(s.counts)
+      setMine(s.mine)
+    } catch (err) {
+      notify(err instanceof ApiError ? err.message : 'Aktion fehlgeschlagen', 'error')
+    }
   }
 
   return (

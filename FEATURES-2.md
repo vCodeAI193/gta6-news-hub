@@ -26,6 +26,17 @@ ersetzt die Mock-Schicht, wenn `VITE_API_URL` gesetzt ist:
 
 Details: [server/README.md](./server/README.md).
 
+### ✅ Welle 2 umgesetzt — Community ans Backend & Moderation
+
+- Kommentare, Reaktionen und Leak-Votes laufen jetzt über das echte Backend
+  (mit localStorage-Fallback offline); Kommentieren erfordert Login
+- **Spam-Filter & Blocklisten** (serverseitig): verdächtige Kommentare landen in
+  der Moderations-Queue, gesperrte Begriffe werden abgewiesen
+- **Moderations-Seite** (`/moderation`, ab Rolle Moderator): Queue freigeben/
+  ablehnen, Meldungen erledigen, Nutzer sperren/entsperren, Audit-Log
+- **Faktencheck**: Moderator setzt die Verlässlichkeit eines Leaks (mit Audit)
+- 22 Backend-Tests (inkl. 6 Moderationstests) — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -57,15 +68,15 @@ Details: [server/README.md](./server/README.md).
 ## 13. Redaktion & Moderation
 
 - [ ] **Redaktioneller Workflow** — Entwurf → Review → Freigabe → Veröffentlichung.
-- [ ] **Moderations-Queue** — Gemeldete Kommentare/Artikel zentral prüfen.
-- [ ] **Spam-Filter** — Automatische Erkennung & Quarantäne von Spam.
-- [ ] **Wort-/Blocklisten** — Konfigurierbare Filter für Kommentare.
+- [x] **Moderations-Queue** — Gemeldete Kommentare/Artikel zentral prüfen. *(Pending-Kommentare + Meldungen, /moderation)*
+- [x] **Spam-Filter** — Automatische Erkennung & Quarantäne von Spam. *(Heuristik: Links/CAPS/Wiederholungen → Queue)*
+- [x] **Wort-/Blocklisten** — Konfigurierbare Filter für Kommentare. *(serverseitig, via COMMENT_BLOCKLIST erweiterbar)*
 - [ ] **Versionshistorie** — Änderungsverlauf je Artikel mit Diff & Rollback.
 - [ ] **Mehrere Autoren** — Co-Authoring & Zuweisung von Beiträgen.
-- [ ] **Audit-Log** — Nachvollziehbare Protokollierung aller Redaktions-Aktionen.
+- [x] **Audit-Log** — Nachvollziehbare Protokollierung aller Redaktions-Aktionen.
 - [ ] **Geplanter Redaktionskalender** — Kalender-Ansicht für geplante Beiträge.
-- [ ] **Bann-/Mute-System** — Nutzer temporär oder dauerhaft sperren.
-- [ ] **Faktencheck-Workflow** — Leak-Verifizierung mit Status-Updates.
+- [x] **Bann-/Mute-System** — Nutzer temporär oder dauerhaft sperren.
+- [x] **Faktencheck-Workflow** — Leak-Verifizierung mit Status-Updates. *(Moderator setzt Verlässlichkeit + Audit)*
 
 ## 14. KI & Automatisierung
 

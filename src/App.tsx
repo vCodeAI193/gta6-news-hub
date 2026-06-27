@@ -11,6 +11,7 @@ const BookmarksPage = lazy(() => import('./routes/BookmarksPage').then((m) => ({
 const SettingsPage = lazy(() => import('./routes/SettingsPage').then((m) => ({ default: m.SettingsPage })))
 const AdminPage = lazy(() => import('./routes/AdminPage').then((m) => ({ default: m.AdminPage })))
 const AuthPage = lazy(() => import('./routes/AuthPage').then((m) => ({ default: m.AuthPage })))
+const ModerationPage = lazy(() => import('./routes/ModerationPage').then((m) => ({ default: m.ModerationPage })))
 const AboutPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.AboutPage })))
 const PrivacyPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.PrivacyPage })))
 const ImprintPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.ImprintPage })))
@@ -62,6 +63,7 @@ export default function App() {
           }
         />
         <Route path="login" element={<Suspense fallback={null}><AuthPage /></Suspense>} />
+        <Route path="moderation" element={<Suspense fallback={<SkeletonGrid count={2} />}><ModerationPage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />
