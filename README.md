@@ -8,121 +8,118 @@ Ort. **Release: 19. November 2026.**
 
 ## ✨ Features
 
-- **Nachrichtenkategorien** — Offizielle News, Trailer, Leaks und Release
-- **Volltextsuche** über Titel, Teaser, Inhalt und Quelle
-- **Kategorie-Filter** als Chips, kombinierbar mit der Suche
-- **Artikel-Detailansicht** als Modal mit Datum, Quelle, Bild und Originallink
-- **Live-Countdown** bis zum Release
-- **Dark Mode als Standard** (passend zum GTA-Stil)
-- **Mobile-first & responsive** (1 → 2 → 3 Spalten je nach Viewport)
-- **Barrierearm** — Skip-Link, ARIA-Rollen, Tastatur- und Reduced-Motion-Support
+Die Plattform setzt alle 100 Punkte aus [FEATURES.md](./FEATURES.md) um — u. a.:
+
+- **Inhalte**: Markdown-Artikel mit Tags, Autor, Mehrfach-Quellen, Galerie +
+  Lightbox, Video-Embeds, Lesezeit, Verlässlichkeits-Badge und verwandten Artikeln
+- **Suche & Filter**: Fuzzy-Suche (Fuse.js), Autocomplete, Suchhistorie, Sortierung,
+  Mehrfach-Kategorie-, Tag- und Datums-Filter — alles in der URL gespiegelt
+- **Navigation**: echtes Routing mit Permalinks, Kategorie-Seiten, Breadcrumbs,
+  Pagination, 404-Seite, Mobile-Burger-Menü
+- **Community**: Kommentare (mit Threads), Reaktionen, Leak-Voting, Polls, Teilen,
+  Melden, Newsletter — persistiert lokal über eine Service-Schicht
+- **Personalisierung**: Favoriten, „Später lesen", gelesen-Markierung, Themen-Abos,
+  personalisierter Feed, Onboarding, Benachrichtigungs-Center
+- **Redaktion/CMS**: Admin-Editor (`/admin`) zum Anlegen, Bearbeiten, Terminieren,
+  Bild-Upload und RSS-Import
+- **Darstellung**: **Dark Mode als Standard** + Light-Mode & System-Theme,
+  Schriftgrößen-Regler, Featured-Karussell, Skeleton-Loading, Countdown
+- **PWA & Performance**: Service Worker, Manifest, Offline-Caching, Code-Splitting,
+  Lazy-Loading, Prefetching, Web-Vitals
+- **SEO**: dynamische Meta-/OG-/Twitter-Tags, Canonical, JSON-LD, Sitemap, RSS-Feed,
+  Cookie-Consent, Datenschutz/Impressum
+- **Mobile-first & barrierearm**: Skip-Link, ARIA-Rollen, Tastatur-Support,
+  `prefers-reduced-motion`, jsx-a11y- und axe-geprüft
+
+> Backend-/Community-Features nutzen eine **localStorage-Service-Schicht**
+> (`src/services/`), die sich 1:1 gegen eine echte API/CMS austauschen lässt.
+> Punkte, die zwingend Server/Keys brauchen (Push-Server, Analytics, Sentry,
+> ausgehende Webhooks), sind verdrahtet, aber ohne Konfiguration inaktiv —
+> siehe Markierungen in [FEATURES.md](./FEATURES.md).
 
 ## 🧱 Tech-Stack
 
-| Bereich   | Wahl                                |
-| --------- | ----------------------------------- |
-| Framework | React 18 + TypeScript               |
-| Build/Dev | Vite 5                              |
-| Tests     | Vitest + Testing Library (jsdom)    |
-| Styling   | CSS (Design-Tokens, kein Framework) |
-| Linting   | ESLint 9 (Flat Config)              |
-
-Bewusst leichtgewichtig gehalten: schnelle Ladezeiten, keine schwere
-Runtime-Abhängigkeit, einfach wartbar.
+| Bereich   | Wahl                                          |
+| --------- | --------------------------------------------- |
+| Framework | React 18 + TypeScript                         |
+| Routing   | React Router                                  |
+| Build/Dev | Vite 5 + `vite-plugin-pwa`                     |
+| Suche     | Fuse.js                                        |
+| Inhalte   | react-markdown + remark-gfm                    |
+| SEO       | react-helmet-async                            |
+| Tests     | Vitest + Testing Library + jest-axe, Playwright (E2E) |
+| Styling   | CSS (Design-Tokens, Light/Dark, kein Framework) |
+| Qualität  | ESLint 9 (+ jsx-a11y), Husky, Storybook, GitHub Actions |
 
 ## 🚀 Setup
 
 Voraussetzung: **Node.js ≥ 18**.
 
 ```bash
-# 1. Abhängigkeiten installieren
-npm install
-
-# 2. Dev-Server starten (http://localhost:5173)
-npm run dev
-
-# 3. Produktions-Build erzeugen
-npm run build
-
-# 4. Build lokal prüfen
-npm run preview
+npm install        # Abhängigkeiten installieren
+npm run dev        # Dev-Server (http://localhost:5173)
+npm run build      # Produktions-Build (inkl. Sitemap/Feed + PWA)
+npm run preview    # Build lokal prüfen
 ```
 
 ## 🧪 Tests & Qualität
 
 ```bash
-npm test           # Testsuite einmalig ausführen
-npm run test:watch # Tests im Watch-Modus
-npm run lint       # ESLint
-npm run build      # inkl. TypeScript-Typecheck (tsc -b)
+npm test            # Unit-/Komponententests (Vitest)
+npm run test:coverage # mit Coverage-Schwelle
+npm run test:e2e    # End-to-End (Playwright)
+npm run lint        # ESLint inkl. jsx-a11y
+npm run build       # TypeScript-Typecheck (tsc) + Vite-Build
+npm run storybook   # Komponenten-Katalog (http://localhost:6006)
 ```
 
-Getestet werden:
+Ein **Husky pre-commit Hook** führt vor jedem Commit `lint` + `test` aus.
+Die **CI** (`.github/workflows/ci.yml`) prüft Lint, Tests und Build bei jedem Push.
 
-- die reine Filter-/Suchlogik (`filterArticles`, `formatDate`),
-- die Countdown-Berechnung (`getTimeLeft`),
-- das Zusammenspiel in der UI (Suche, Kategoriefilter, Modal, Empty-State).
+> E2E lokal: läuft gegen den Preview-Build. In Umgebungen mit vorinstalliertem
+> Chromium kann der Pfad via `PW_CHROMIUM_PATH` gesetzt werden.
 
-> Vor jedem Commit gilt: `npm run lint`, `npm test` und `npm run build` müssen
-> grün sein.
+## ⚙️ Konfiguration (optional, `.env`)
+
+Alle externen Dienste sind ohne diese Werte inaktiv:
+
+```bash
+VITE_ANALYTICS_DOMAIN=deine-domain.de   # aktiviert (Plausible-)Analytics
+VITE_SENTRY_DSN=...                      # aktiviert Fehler-Monitoring
+```
 
 ## 📁 Projektstruktur
 
 ```
 gta6-news-hub/
-├── index.html              # Einstiegspunkt, Dark Mode default (<html class="dark">)
-├── public/
-│   └── favicon.svg
+├── public/                 # statische Assets, robots.txt, PWA-Icons
+├── scripts/                # Sitemap- & RSS-Feed-Generatoren (Build-Zeit)
+├── e2e/                    # Playwright-Tests
+├── .storybook/             # Storybook-Konfiguration
+├── .github/workflows/      # CI + Deploy (GitHub Pages)
 ├── src/
-│   ├── main.tsx            # React-Bootstrap
-│   ├── App.tsx             # Seiten-Layout & State (Suche/Filter/Modal)
-│   ├── index.css           # Design-Tokens & Styles (Dark Theme)
-│   ├── types.ts            # Zentrale Typen (Article, Category)
-│   ├── components/         # UI-Bausteine
-│   │   ├── SearchBar.tsx
-│   │   ├── CategoryFilter.tsx
-│   │   ├── Countdown.tsx
-│   │   ├── ArticleCard.tsx
-│   │   └── ArticleModal.tsx
-│   ├── data/               # Inhalte (Artikel & Kategorien)
-│   │   ├── articles.ts
-│   │   └── categories.ts
-│   ├── lib/                # Reine, testbare Logik
-│   │   ├── filterArticles.ts
-│   │   └── countdown.ts
-│   └── test/
-│       └── setup.ts
-└── vite.config.ts
+│   ├── main.tsx            # Bootstrap: Router + Provider + Monitoring
+│   ├── App.tsx             # Routen (Code-Splitting via React.lazy)
+│   ├── index.css           # Design-Tokens & Styles (Light/Dark)
+│   ├── types.ts            # Zentrale Typen
+│   ├── routes/             # Seiten (Home, Article, Category, Admin, …)
+│   ├── components/         # UI-Bausteine (+ *.stories.tsx)
+│   ├── context/            # Theme, Preferences, Toasts
+│   ├── i18n/               # DE/EN-Übersetzungen
+│   ├── hooks/              # useArticles, useDebounce, useInfiniteScroll, …
+│   ├── lib/                # reine Logik: Suche, Lesezeit, SEO, Analytics
+│   ├── services/           # localStorage-Service-Schicht (Mock-„Backend")
+│   └── test/               # Test-Setup & -Utilities
+└── vite.config.ts          # Vite, PWA, Vitest, Coverage
 ```
 
 ## 📰 Inhalte pflegen
 
-Artikel liegen typisiert in `src/data/articles.ts`. Ein Eintrag hat folgende
-Felder:
-
-```ts
-{
-  id: 'eindeutige-id',
-  title: 'Titel',
-  excerpt: 'Kurzer Teaser für die Karte',
-  body: 'Volltext.\n\nAbsätze werden mit Leerzeilen getrennt.',
-  category: 'official' | 'trailer' | 'leak' | 'release',
-  date: '2026-11-19',          // ISO 8601
-  source: 'Quelle',
-  sourceUrl: 'https://…',       // optional
-  image: 'https://…/bild.jpg',
-  featured: true,               // optional: Hero-Hervorhebung
-}
-```
-
-Neue Artikel werden automatisch nach Datum (neueste zuerst) sortiert und sind
-sofort durch- und filterbar. In einem Produktivsystem ließe sich dieses Modul
-problemlos durch ein CMS oder eine API ersetzen.
-
-## 🗺️ Roadmap
-
-Geplante Features für den weiteren Ausbau stehen als abhakbares Backlog in
-[FEATURES.md](./FEATURES.md) — 100 Features in 10 Themenbereichen.
+Seed-Artikel liegen typisiert in `src/data/articles.ts`. Zusätzlich lassen sich
+Artikel direkt im Browser über die **Redaktion** (`/admin`) anlegen, bearbeiten,
+als Entwurf speichern, terminieren oder per RSS importieren — gespeichert wird
+lokal über `src/services/articlesService.ts`. In Produktion ersetzt man diese
+Service-Schicht durch eine echte API oder ein Headless-CMS.
 
 ## 📄 Lizenz
 

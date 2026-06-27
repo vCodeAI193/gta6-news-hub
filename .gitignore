@@ -22,3 +22,15 @@ pnpm-debug.log*
 
 # Test / coverage
 coverage/
+playwright-report/
+test-results/
+
+# Storybook
+storybook-static/
+
+# Generated artifacts (created at build time by scripts/)
+public/sitemap.xml
+public/feed.xml
+
+# PWA service worker output (generated)
+dev-dist/

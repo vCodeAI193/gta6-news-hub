@@ -1,63 +1,55 @@
-import { describe, expect, it } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { describe, expect, it, beforeEach } from 'vitest'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
+import { renderWithProviders } from './test/utils'
 
-describe('<App />', () => {
-  it('renders the hero and the full feed by default', () => {
-    render(<App />)
+// Onboarding-Overlay deaktivieren, damit es Klicks nicht abfängt.
+beforeEach(() => {
+  localStorage.setItem('gta6hub:preferences', JSON.stringify({ onboarded: true, consent: false }))
+})
+
+describe('<App /> — Startseite', () => {
+  it('zeigt den Hero', async () => {
+    renderWithProviders(<App />)
     expect(
       screen.getByRole('heading', { name: /grand theft auto vi/i }),
     ).toBeInTheDocument()
-    // 8 sample articles ship with the app.
-    expect(screen.getByText('8 Artikel')).toBeInTheDocument()
   })
 
-  it('filters articles by category', async () => {
+  it('lädt alle 8 Artikel', async () => {
+    renderWithProviders(<App />)
+    expect(await screen.findByText('8 Artikel')).toBeInTheDocument()
+  })
+
+  it('filtert per Volltextsuche', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    renderWithProviders(<App />)
+    await screen.findByText('8 Artikel')
+    await user.type(screen.getByRole('searchbox'), 'soundtrack')
+    expect(await screen.findByText('1 Artikel')).toBeInTheDocument()
+  })
+
+  it('zeigt einen Empty-State ohne Treffer', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<App />)
+    await screen.findByText('8 Artikel')
+    await user.type(screen.getByRole('searchbox'), 'xyzzy-nichts')
+    expect(await screen.findByText('Keine Treffer')).toBeInTheDocument()
+  })
+
+  it('filtert über die Kategorie-Chips', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<App />)
+    await screen.findByText('8 Artikel')
     await user.click(screen.getByRole('button', { name: 'Leaks' }))
-    expect(screen.getByText('2 Artikel')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /Map zeigt Bundesstaat Leonida/i }),
-    ).toBeInTheDocument()
+    expect(await screen.findByText('2 Artikel')).toBeInTheDocument()
   })
 
-  it('searches articles by free text', async () => {
+  it('wechselt das Theme auf hell', async () => {
     const user = userEvent.setup()
-    render(<App />)
-    await user.type(
-      screen.getByRole('searchbox', { name: /durchsuchen/i }),
-      'soundtrack',
-    )
-    expect(screen.getByText('1 Artikel')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /Radiosender-Partner/i }),
-    ).toBeInTheDocument()
-  })
-
-  it('shows an empty state when nothing matches', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await user.type(
-      screen.getByRole('searchbox', { name: /durchsuchen/i }),
-      'xyzzy-nichts',
-    )
-    expect(screen.getByText('Keine Treffer')).toBeInTheDocument()
-  })
-
-  it('opens an article in a modal dialog and closes it', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-    await user.click(
-      screen.getByRole('button', { name: /Artikel öffnen: Trailer 2/i }),
-    )
-    const dialog = screen.getByRole('dialog')
-    expect(
-      within(dialog).getByRole('heading', { name: /Trailer 2 ist da/i }),
-    ).toBeInTheDocument()
-
-    await user.click(within(dialog).getByRole('button', { name: 'Schließen' }))
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    renderWithProviders(<App />)
+    await user.click(screen.getByRole('button', { name: /Theme wechseln/i }))
+    await waitFor(() => expect(document.documentElement).toHaveClass('light'))
   })
 })

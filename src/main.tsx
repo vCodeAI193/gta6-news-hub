@@ -1,10 +1,36 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import App from './App'
+import { ThemeProvider } from './context/ThemeContext'
+import { PreferencesProvider } from './context/PreferencesContext'
+import { ToastProvider } from './context/ToastContext'
+import { I18nProvider } from './i18n/I18nContext'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { initMonitoring } from './lib/monitoring'
+import { reportWebVitals } from './lib/webVitals'
 import './index.css'
+
+initMonitoring()
+reportWebVitals()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <HelmetProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <PreferencesProvider>
+              <ToastProvider>
+                <BrowserRouter>
+                  <App />
+                </BrowserRouter>
+              </ToastProvider>
+            </PreferencesProvider>
+          </ThemeProvider>
+        </I18nProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
