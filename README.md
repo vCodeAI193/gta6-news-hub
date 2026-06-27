@@ -119,6 +119,11 @@ Neue Artikel werden automatisch nach Datum (neueste zuerst) sortiert und sind
 sofort durch- und filterbar. In einem Produktivsystem ließe sich dieses Modul
 problemlos durch ein CMS oder eine API ersetzen.
 
+## 🗺️ Roadmap
+
+Geplante Features für den weiteren Ausbau stehen als abhakbares Backlog in
+[FEATURES.md](./FEATURES.md) — 100 Features in 10 Themenbereichen.
+
 ## 📄 Lizenz
 
 MIT — siehe [LICENSE](./LICENSE).
