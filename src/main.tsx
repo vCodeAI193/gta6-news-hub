@@ -8,6 +8,7 @@ import { PreferencesProvider } from './context/PreferencesContext'
 import { ToastProvider } from './context/ToastContext'
 import { AuthProvider } from './context/AuthContext'
 import { RealtimeProvider } from './context/RealtimeContext'
+import { FlagsProvider } from './context/FlagsContext'
 import { I18nProvider } from './i18n/I18nContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { initMonitoring } from './lib/monitoring'
@@ -26,11 +27,13 @@ createRoot(document.getElementById('root')!).render(
             <PreferencesProvider>
               <ToastProvider>
                 <AuthProvider>
-                  <RealtimeProvider>
-                    <BrowserRouter>
-                      <App />
-                    </BrowserRouter>
-                  </RealtimeProvider>
+                  <FlagsProvider>
+                    <RealtimeProvider>
+                      <BrowserRouter>
+                        <App />
+                      </BrowserRouter>
+                    </RealtimeProvider>
+                  </FlagsProvider>
                 </AuthProvider>
               </ToastProvider>
             </PreferencesProvider>

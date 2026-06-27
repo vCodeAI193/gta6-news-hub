@@ -1,9 +1,12 @@
 import express from 'express'
 import cors from 'cors'
 import { randomUUID } from 'node:crypto'
-import { createDb, logAudit, rowToArticle } from './db.mjs'
+import { createDb, dumpTables, logAudit, restoreTables, rowToArticle } from './db.mjs'
 import { classifyComment } from './moderation.mjs'
 import { awardReputation, badgesFor, levelFor, POINTS } from './gamification.mjs'
+import { createMetrics } from './metrics.mjs'
+import { createFlags } from './flags.mjs'
+import { API_VERSION, openapiSpec } from './openapi.mjs'
 import {
   authenticate,
   hashPassword,
@@ -26,15 +29,51 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
   const db = createDb(dbPath)
   const publish = (type, payload) => hub?.publish(type, payload)
   const app = express()
+  const metrics = createMetrics()
+  const flags = createFlags()
   app.use(cors())
-  app.use(express.json({ limit: '1mb' }))
+  app.use(express.json({ limit: '5mb' }))
+  app.use(metrics.middleware)
+
+  // API-Versionierung: /api/v1/* wird intern auf /api/* abgebildet (Alias + Back-Compat).
+  app.use((req, _res, next) => {
+    if (req.url === '/api/v1') req.url = '/api'
+    else if (req.url.startsWith('/api/v1/')) req.url = '/api/' + req.url.slice('/api/v1/'.length)
+    next()
+  })
 
   const isPublished = (a) =>
     a.status === 'published' && (!a.publish_at || new Date(a.publish_at) <= new Date())
   const canEdit = (req) => ['author', 'admin'].includes(req.auth?.user?.role)
 
-  // ---------------------------------------------------------------- health
-  app.get('/api/health', (_req, res) => res.json({ ok: true, time: new Date().toISOString() }))
+  // ---------------------------------------------------- system & observability
+  app.get('/api/health', (_req, res) =>
+    res.json({ ok: true, version: API_VERSION, time: new Date().toISOString(), ...metrics.snapshot() }),
+  )
+  app.get('/api/metrics', (_req, res) => res.json(metrics.snapshot()))
+  app.get('/api/flags', (_req, res) => res.json({ flags: flags.all() }))
+  app.post('/api/flags/:key', requireAuth(db, 'admin'), (req, res) => {
+    const updated = flags.set(req.params.key, req.body?.value)
+    if (!updated) return res.status(404).json({ error: 'Unbekanntes Flag' })
+    logAudit(db, req.auth.user, 'flag.set', 'flag', req.params.key, String(req.body?.value))
+    res.json({ flags: updated })
+  })
+  app.get('/api/openapi.json', (_req, res) => res.json(openapiSpec))
+
+  // Inhalts-Backup & -Restore (admin).
+  app.get('/api/admin/backup', requireAuth(db, 'admin'), (_req, res) => {
+    res.json({ version: API_VERSION, exportedAt: new Date().toISOString(), data: dumpTables(db) })
+  })
+  app.post('/api/admin/restore', requireAuth(db, 'admin'), (req, res) => {
+    if (!req.body?.data) return res.status(400).json({ error: 'data fehlt' })
+    try {
+      restoreTables(db, req.body.data)
+      logAudit(db, req.auth.user, 'admin.restore', 'system', 'backup')
+      res.json({ ok: true })
+    } catch {
+      res.status(500).json({ error: 'Restore fehlgeschlagen' })
+    }
+  })
 
   // ------------------------------------------------------------------ auth
   const authLimiter = rateLimit({ windowMs: 60_000, max: 20 })

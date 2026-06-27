@@ -70,6 +70,17 @@ Details: [server/README.md](./server/README.md).
 - **Vorlesen (TTS)** für Artikel & Lore über die Web-Speech-API
 - 45 Frontend-Tests (inkl. Timeline-/Galerie-Unit-Tests) — alle grün
 
+### ✅ Welle 6 umgesetzt — Plattform & Betrieb
+
+- **API-Versionierung** (`/api/v1` als Alias) + **OpenAPI-Spezifikation**
+  (`/api/openapi.json`) mit Doku-Seite (`/api-docs`)
+- **Feature-Flags**: serverseitig, Admin-Toggle, im UI ausgewertet (Footer/Nav)
+- **Observability**: Request-Metriken & Uptime (`/api/metrics`)
+- **Backup & Restore** der Inhalts-Tabellen (admin)
+- **Status-Seite** (`/status`): API, Echtzeit, Uptime, Flags live
+- **WCAG-Audit** (axe über mehrere Kernkomponenten) + **k6-Lasttest-Script**
+- 44 Backend-Tests (inkl. Plattform-Tests) + 48 Frontend-Tests — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -94,8 +105,8 @@ Details: [server/README.md](./server/README.md).
 - [ ] **Server-seitige Suche** — Algolia/Meilisearch-Index statt Client-Fuse.
 - [ ] **Bild-Upload zu CDN** — Objektspeicher (S3) + Bild-CDN statt DataURL.
 - [ ] **Server-seitiges Rendering** — SSR/SSG (Next.js/Remix) für SEO & Speed.
-- [ ] **API-Versionierung** — `/v1`-Namespacing & Deprecation-Strategie.
-- [ ] **OpenAPI-Spezifikation** — Dokumentierte, typsichere API (Swagger).
+- [x] **API-Versionierung** — `/v1`-Namespacing & Deprecation-Strategie. *(/api/v1 als Alias)*
+- [x] **OpenAPI-Spezifikation** — Dokumentierte, typsichere API (Swagger). *(/api/openapi.json + /api-docs)*
 - [x] **Datenbank-Migrationen** — Versionierte Schema-Migrationen & Seeds.
 
 ## 13. Redaktion & Moderation
@@ -193,11 +204,11 @@ Details: [server/README.md](./server/README.md).
 
 - [ ] **Native Mobile-App** — iOS/Android via React Native/Expo.
 - [ ] **Erweiterte Lokalisierung** — Mehr Sprachen + RTL-Support.
-- [ ] **Feature-Flags** — Funktionen gezielt ausrollen (Canary/Beta).
-- [ ] **Observability** — Logging, Tracing, Metriken (OpenTelemetry).
+- [x] **Feature-Flags** — Funktionen gezielt ausrollen (Canary/Beta). *(GET /api/flags, Admin-Toggle, gated im UI)*
+- [x] **Observability** — Logging, Tracing, Metriken (OpenTelemetry). *(Request-Metriken + Uptime, /api/metrics)*
 - [ ] **Echtes Fehler-Monitoring** — Sentry mit Source-Maps in Produktion.
-- [ ] **Backup & Restore** — Automatisierte DB-Backups & Wiederherstellung.
+- [x] **Backup & Restore** — Automatisierte DB-Backups & Wiederherstellung. *(Inhalts-Export/-Import, admin)*
 - [ ] **CDN & Edge-Caching** — Globale Auslieferung mit Edge-Funktionen.
-- [ ] **Status-Seite** — Öffentliche Uptime-/Incident-Seite.
-- [ ] **Lasttests** — Performance unter Last (k6) automatisiert.
-- [ ] **Barrierefreiheit nach WCAG 2.2 AA** — Vollständiges Audit & Zertifizierung.
+- [x] **Status-Seite** — Öffentliche Uptime-/Incident-Seite. *(/status — API, Echtzeit, Flags)*
+- [x] **Lasttests** — Performance unter Last (k6) automatisiert. *(k6-Script scripts/loadtest.js)*
+- [x] **Barrierefreiheit nach WCAG 2.2 AA** — Vollständiges Audit & Zertifizierung. *(axe-Audit über Kernkomponenten in CI)*

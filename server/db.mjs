@@ -175,6 +175,38 @@ function ensureColumn(db, table, column, definition) {
   }
 }
 
+/** Inhalts-Tabellen, die ins Backup gehören (keine Konten/Sessions). */
+export const CONTENT_TABLES = ['articles', 'comments', 'reactions', 'votes', 'comment_votes', 'reports', 'audit_log']
+
+/** Exportiert die Inhalts-Tabellen als JSON-Objekt. */
+export function dumpTables(db, tables = CONTENT_TABLES) {
+  const data = {}
+  for (const t of tables) data[t] = db.prepare(`SELECT * FROM ${t}`).all()
+  return data
+}
+
+/** Ersetzt die Inhalts-Tabellen aus einem Backup (transaktional). */
+export function restoreTables(db, data) {
+  db.exec('BEGIN')
+  try {
+    for (const table of CONTENT_TABLES) {
+      const rows = data[table]
+      if (!Array.isArray(rows)) continue
+      db.exec(`DELETE FROM ${table}`)
+      for (const row of rows) {
+        const cols = Object.keys(row)
+        if (cols.length === 0) continue
+        const placeholders = cols.map(() => '?').join(', ')
+        db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${placeholders})`).run(...cols.map((c) => row[c]))
+      }
+    }
+    db.exec('COMMIT')
+  } catch (err) {
+    db.exec('ROLLBACK')
+    throw err
+  }
+}
+
 /** Schreibt einen Eintrag ins Audit-Log (Moderations-Nachvollziehbarkeit). */
 export function logAudit(db, actor, action, targetType, targetId, detail = '') {
   db.prepare(

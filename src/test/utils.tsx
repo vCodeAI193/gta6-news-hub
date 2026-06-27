@@ -7,6 +7,7 @@ import { PreferencesProvider } from '../context/PreferencesContext'
 import { ToastProvider } from '../context/ToastContext'
 import { AuthProvider } from '../context/AuthContext'
 import { RealtimeProvider } from '../context/RealtimeContext'
+import { FlagsProvider } from '../context/FlagsContext'
 import { I18nProvider } from '../i18n/I18nContext'
 
 interface Options extends Omit<RenderOptions, 'wrapper'> {
@@ -22,9 +23,11 @@ export function renderWithProviders(ui: ReactElement, { route = '/', ...options 
           <PreferencesProvider>
             <ToastProvider>
               <AuthProvider>
-                <RealtimeProvider>
-                  <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
-                </RealtimeProvider>
+                <FlagsProvider>
+                  <RealtimeProvider>
+                    <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+                  </RealtimeProvider>
+                </FlagsProvider>
               </AuthProvider>
             </ToastProvider>
           </PreferencesProvider>

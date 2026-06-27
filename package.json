@@ -19,6 +19,7 @@
     "server": "node server/index.mjs",
     "server:dev": "node --watch server/index.mjs",
     "test:server": "node --test 'server/**/*.test.mjs'",
+    "loadtest": "k6 run scripts/loadtest.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky"

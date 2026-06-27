@@ -293,6 +293,66 @@ describe('Gamification', () => {
   })
 })
 
+describe('Platform & API', () => {
+  it('Health liefert Version & Uptime', async () => {
+    const res = await request(app).get('/api/health')
+    assert.equal(res.status, 200)
+    assert.ok(res.body.version)
+    assert.ok(typeof res.body.uptimeSec === 'number')
+  })
+
+  it('API-Versionierung: /api/v1 ist ein Alias', async () => {
+    const v1 = await request(app).get('/api/v1/articles')
+    assert.equal(v1.status, 200)
+    assert.ok(v1.body.articles.length >= 4)
+  })
+
+  it('liefert die OpenAPI-Spezifikation', async () => {
+    const res = await request(app).get('/api/openapi.json')
+    assert.equal(res.body.openapi, '3.0.3')
+    assert.ok(res.body.paths['/articles'])
+  })
+
+  it('Feature-Flags lesen und (als Admin) umschalten', async () => {
+    const pub = await request(app).get('/api/flags')
+    assert.equal(pub.body.flags.media, true)
+    const { body } = await register()
+    const res = await request(app).post('/api/flags/media').set('Authorization', `Bearer ${body.token}`).send({ value: false })
+    assert.equal(res.body.flags.media, false)
+  })
+
+  it('verweigert Flag-Umschalten ohne Admin', async () => {
+    await register() // admin
+    const reader = await registerSecond()
+    const res = await request(app).post('/api/flags/media').set('Authorization', `Bearer ${reader.body.token}`).send({ value: false })
+    assert.equal(res.status, 403)
+  })
+
+  it('Metrics zählt Requests', async () => {
+    await request(app).get('/api/health')
+    const res = await request(app).get('/api/metrics')
+    assert.ok(res.body.requests >= 1)
+  })
+
+  it('Backup → Restore stellt gelöschte Inhalte wieder her', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const backup = await request(app).get('/api/admin/backup').set('Authorization', auth)
+    assert.ok(backup.body.data.articles.length >= 4)
+
+    // Einen Artikel löschen …
+    await request(app).delete('/api/articles/release-date-confirmed').set('Authorization', auth)
+    const afterDelete = await request(app).get('/api/articles/release-date-confirmed')
+    assert.equal(afterDelete.status, 404)
+
+    // … und per Restore zurückholen.
+    const restore = await request(app).post('/api/admin/restore').set('Authorization', auth).send({ data: backup.body.data })
+    assert.equal(restore.status, 200)
+    const restored = await request(app).get('/api/articles/release-date-confirmed')
+    assert.equal(restored.status, 200)
+  })
+})
+
 describe('Rate limiting', () => {
   it('greift nach vielen Auth-Anfragen', async () => {
     let limited = false
