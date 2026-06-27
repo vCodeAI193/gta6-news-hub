@@ -15,6 +15,7 @@ import { Comments } from '../components/Comments'
 import { Gallery, Lightbox } from '../components/Lightbox'
 import { VideoEmbed } from '../components/VideoEmbed'
 import { RelatedArticles } from '../components/RelatedArticles'
+import { TextToSpeech } from '../components/TextToSpeech'
 import { SkeletonGrid } from '../components/Skeleton'
 import { categoryMap } from '../data/categories'
 import { useArticles } from '../hooks/useArticles'
@@ -131,6 +132,7 @@ export function ArticlePage() {
           {readLater ? '✓ ' : '🕮 '}
           {t('common.readLater')}
         </button>
+        <TextToSpeech text={`${article.title}. ${article.body}`} />
         <ReportButton articleId={article.id} />
       </div>
 

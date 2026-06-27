@@ -59,6 +59,17 @@ Details: [server/README.md](./server/README.md).
   (`/rangliste`)
 - 37 Backend-Tests (inkl. Gamification + Level/Badge-Unit-Tests) — alle grün
 
+### ✅ Welle 5 umgesetzt — Medien & Interaktiv (reines Frontend)
+
+- **Interaktive Vice-City-Karte** (`/karte`): zoom-/verschiebbare SVG-Karte mit
+  klickbaren POIs und Lore-Verlinkung
+- **Release-Timeline** (`/timeline`) inkl. Trailer-Analyse: **Before/After-Slider**
+  und annotierte **Frame-Hotspots**; DSGVO-Social-Embed mit Klick-Schutz
+- **Galerie-/Screenshot-Hub** (`/galerie`): durchsuchbare Medienbibliothek + Lightbox
+- **Charakter-/Lore-Wiki** (`/lore`, `/lore/:id`) mit Fakten & Markdown
+- **Vorlesen (TTS)** für Artikel & Lore über die Web-Speech-API
+- 45 Frontend-Tests (inkl. Timeline-/Galerie-Unit-Tests) — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -142,14 +153,14 @@ Details: [server/README.md](./server/README.md).
 ## 17. Medien & Interaktiv
 
 - [ ] **Eigenes Video-Hosting** — Trailer/Clips selbst hosten & streamen (HLS).
-- [ ] **Interaktive Vice-City-Karte** — Zoombare Map mit Points of Interest.
-- [ ] **Release-Timeline** — Interaktive Chronologie aller Ankündigungen.
-- [ ] **Bildvergleich (Before/After)** — Slider für Trailer-Vergleiche.
-- [ ] **Galerie-/Screenshot-Hub** — Durchsuchbare Medienbibliothek.
-- [ ] **Eingebettete Tweets/Posts** — Social-Embeds mit Datenschutz-Klick-Schutz.
-- [ ] **Audio-Version (TTS)** — Artikel als Audio vorlesen lassen.
-- [ ] **Charakter-/Lore-Datenbank** — Strukturierte Wiki-Einträge zu Figuren/Orten.
-- [ ] **Trailer-Frame-Analyse** — Annotierte Standbilder mit Hotspots.
+- [x] **Interaktive Vice-City-Karte** — Zoombare Map mit Points of Interest.
+- [x] **Release-Timeline** — Interaktive Chronologie aller Ankündigungen.
+- [x] **Bildvergleich (Before/After)** — Slider für Trailer-Vergleiche.
+- [x] **Galerie-/Screenshot-Hub** — Durchsuchbare Medienbibliothek.
+- [x] **Eingebettete Tweets/Posts** — Social-Embeds mit Datenschutz-Klick-Schutz. *(Klick-Schutz/DSGVO)*
+- [x] **Audio-Version (TTS)** — Artikel als Audio vorlesen lassen. *(Web-Speech-API, kein externer Dienst)*
+- [x] **Charakter-/Lore-Datenbank** — Strukturierte Wiki-Einträge zu Figuren/Orten. *(/lore)*
+- [x] **Trailer-Frame-Analyse** — Annotierte Standbilder mit Hotspots. *(annotierte Standbilder mit Hotspots)*
 - [ ] **360°-/Panorama-Viewer** — Interaktive Vice-City-Ansichten.
 
 ## 18. Monetarisierung & Wachstum

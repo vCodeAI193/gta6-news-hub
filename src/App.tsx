@@ -15,6 +15,11 @@ const ModerationPage = lazy(() => import('./routes/ModerationPage').then((m) => 
 const ProfilePage = lazy(() => import('./routes/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 const LeaderboardPage = lazy(() => import('./routes/LeaderboardPage').then((m) => ({ default: m.LeaderboardPage })))
 const SubmitPage = lazy(() => import('./routes/SubmitPage').then((m) => ({ default: m.SubmitPage })))
+const TimelinePage = lazy(() => import('./routes/TimelinePage').then((m) => ({ default: m.TimelinePage })))
+const MapPage = lazy(() => import('./routes/MapPage').then((m) => ({ default: m.MapPage })))
+const GalleryPage = lazy(() => import('./routes/GalleryPage').then((m) => ({ default: m.GalleryPage })))
+const LorePage = lazy(() => import('./routes/LorePage').then((m) => ({ default: m.LorePage })))
+const LoreDetailPage = lazy(() => import('./routes/LorePage').then((m) => ({ default: m.LoreDetailPage })))
 const AboutPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.AboutPage })))
 const PrivacyPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.PrivacyPage })))
 const ImprintPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.ImprintPage })))
@@ -70,6 +75,11 @@ export default function App() {
         <Route path="u/:id" element={<Suspense fallback={<SkeletonGrid count={2} />}><ProfilePage /></Suspense>} />
         <Route path="rangliste" element={<Suspense fallback={null}><LeaderboardPage /></Suspense>} />
         <Route path="einreichen" element={<Suspense fallback={null}><SubmitPage /></Suspense>} />
+        <Route path="timeline" element={<Suspense fallback={<SkeletonGrid count={2} />}><TimelinePage /></Suspense>} />
+        <Route path="karte" element={<Suspense fallback={<SkeletonGrid count={2} />}><MapPage /></Suspense>} />
+        <Route path="galerie" element={<Suspense fallback={<SkeletonGrid />}><GalleryPage /></Suspense>} />
+        <Route path="lore" element={<Suspense fallback={<SkeletonGrid />}><LorePage /></Suspense>} />
+        <Route path="lore/:id" element={<Suspense fallback={<SkeletonGrid count={2} />}><LoreDetailPage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />

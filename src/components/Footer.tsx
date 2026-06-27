@@ -40,6 +40,16 @@ export function Footer() {
           </ul>
         </nav>
 
+        <nav aria-label="Entdecken">
+          <h4 className="site-footer__h">Entdecken</h4>
+          <ul>
+            <li><Link to="/timeline">Timeline</Link></li>
+            <li><Link to="/karte">Vice-City-Karte</Link></li>
+            <li><Link to="/galerie">Galerie</Link></li>
+            <li><Link to="/lore">Lore-Wiki</Link></li>
+          </ul>
+        </nav>
+
         <nav aria-label="Rechtliches">
           <h4 className="site-footer__h">Rechtliches</h4>
           <ul>
