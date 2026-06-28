@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2025-06-28",
+    "timestamp": "2025-06-28T00:00:00Z",
+    "commit": "baseline",
+    "branch": "main",
+    "main_js_raw": 185000,
+    "main_js": 180000,
+    "vendor_raw": 82000,
+    "vendor": 80000,
+    "main_css_raw": 26000,
+    "main_css": 25000,
+    "total_raw": 293000,
+    "total": 285000,
+    "phase": "1-baseline",
+    "notes": "Phase 1 baseline metrics"
+  }
+]
