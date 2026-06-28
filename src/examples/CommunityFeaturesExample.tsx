@@ -13,7 +13,6 @@ import {
   canUserManageMembers,
   promoteUserToModerator,
   getAllGroupMembers,
-  getExtendedGroup,
 
   // Feature 2: Private Groups
   inviteUserToGroup,
@@ -33,16 +32,14 @@ import {
   voteThreadedComment,
   deleteThreadedComment,
   editThreadedComment,
+  type ThreadedComment,
 
   // Feature 5: Friend Statistics
-  trackArticleRead,
   getArticleReaders,
   getUserReadStats,
   getSocialStatsForFriend,
   getFriends,
   addFriend,
-  followUser,
-  unfollowUser,
 } from '../services/groupPermissionsService'
 
 // Component imports
@@ -224,7 +221,7 @@ export function PinnedMessagesExample() {
 }
 
 function PinnedMessagesDisplay({ groupId }: { groupId: string }) {
-  const [pinned, setPinned] = React.useState(() => getPinnedMessages(groupId))
+  const [pinned] = React.useState(() => getPinnedMessages(groupId))
 
   return (
     <div className="pinned-display">
@@ -259,18 +256,6 @@ export function CommentThreadingExample({ articleId = 'article-1' }) {
 
     console.log('Root comment created:', comment)
     return comment.id
-  }
-
-  const handleCreateReply = (parentCommentId: string) => {
-    // Reply to a comment
-    const reply = createThreadedComment(
-      'g-example-4',
-      articleId,
-      'I totally agree! Did you notice the easter egg at 2:45?',
-      parentCommentId,
-    )
-
-    console.log('Reply created:', reply)
   }
 
   const handleViewThread = () => {
@@ -331,7 +316,7 @@ export function CommentThreadingExample({ articleId = 'article-1' }) {
   )
 }
 
-function printThread(thread: any[], depth = 0) {
+function printThread(thread: ThreadedComment[], depth = 0) {
   thread.forEach((comment) => {
     console.log(
       `${'  '.repeat(depth)}└─ ${comment.author}: "${comment.text}" (score: ${comment.score})`,
@@ -496,6 +481,7 @@ export function CommunityFeaturesDemo() {
 // Helper styles (would go in CSS file)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const styles = `
   .community-demo {
     max-width: 1200px;

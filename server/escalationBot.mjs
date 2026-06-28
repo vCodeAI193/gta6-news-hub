@@ -35,11 +35,11 @@ const KEYWORD_PATTERNS = {
     /free money|earn fast|work from home/gi,
   ],
   harassment: [
-    /kill yourself|kys|f\*\*\* off|go die/gi,
-    /idiot|stupid|retard|moron/gi,
+    /kill yourself|go die/gi,
+    /idiot|stupid|moron/gi,
   ],
   hateSpeech: [
-    /n-word|racial slurs|ethnic insults/gi,
+    /racial|ethnic|discriminat/gi,
   ],
   misinformation: [
     /fake news|hoax|conspiracy|illuminati/gi,
