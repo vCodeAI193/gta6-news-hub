@@ -398,6 +398,24 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .auth-form input { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.6rem 0.7rem; font-size: 0.95rem; }
 .auth-card__switch { font-size: 0.88rem; color: var(--text-muted); text-align: center; }
 
+/* ---------- Welle 11: challenge, panorama, A/B ---------- */
+.hero__cta { margin-top: 1.2rem; }
+.challenge { background: linear-gradient(135deg, rgba(33,212,253,0.1), rgba(139,92,246,0.12)); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin: 2rem 0; }
+.challenge__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.challenge__title { margin: 0; font-size: 1.1rem; }
+.challenge__reward { background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px; padding: 0.2rem 0.7rem; font-weight: 700; font-size: 0.8rem; }
+.challenge__desc { color: var(--text-muted); margin: 0.4rem 0 0.8rem; }
+.challenge__bar { position: relative; height: 26px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin-bottom: 0.8rem; }
+.challenge__fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width 0.4s ease; }
+.challenge__label { position: relative; z-index: 1; display: block; text-align: center; line-height: 26px; font-size: 0.8rem; font-weight: 700; }
+.challenge__done { color: var(--green); font-weight: 600; margin: 0; }
+.panorama-section { margin: 2rem 0; }
+.panorama__stage { position: relative; aspect-ratio: 24/7; border-radius: var(--radius); border: 1px solid var(--border); background-size: auto 100%; background-repeat: no-repeat; cursor: grab; }
+.panorama__stage:active { cursor: grabbing; }
+.panorama__hint { position: absolute; bottom: 0.6rem; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; padding: 0.2rem 0.7rem; border-radius: 999px; }
+.abtest { margin-bottom: 1.4rem; }
+.abtest__desc { color: var(--text-muted); margin: 0 0 0.5rem; }
+
 /* ---------- Account & social ---------- */
 .twofa { display: grid; gap: 0.5rem; }
 .twofa__secret { display: inline-block; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.8rem; font-family: ui-monospace, monospace; letter-spacing: 0.15em; word-break: break-all; }

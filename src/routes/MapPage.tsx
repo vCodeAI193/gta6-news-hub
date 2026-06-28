@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
+import { PanoramaViewer } from '../components/PanoramaViewer'
 import { mapPois, type MapPoi } from '../data/map'
 
 export function MapPage() {
@@ -115,6 +116,14 @@ export function MapPage() {
           )}
         </aside>
       </div>
+
+      <section className="panorama-section">
+        <h2 className="section-title">🌆 360°-Panorama: Skyline bei Nacht</h2>
+        <PanoramaViewer
+          src="https://picsum.photos/seed/gta6-panorama/2400/600"
+          caption="Ziehe horizontal, um die Vice-City-Skyline zu schwenken (illustrativ)."
+        />
+      </section>
     </>
   )
 }

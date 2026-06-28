@@ -114,6 +114,16 @@ Details: [server/README.md](./server/README.md).
 - **Echtzeit-Besucherzähler** (Online-Zähler + Präsenz, bereits via WebSocket)
 - 68 Backend-Tests (inkl. TOTP-Unit + RFC-Vektor) + 48 Frontend-Tests — alle grün
 
+### ✅ Welle 11 umgesetzt — Analytics+ & Community-Engagement
+
+- **A/B-Testing-Framework**: deterministische Varianten-Zuweisung (Hero-CTA),
+  View/Conversion-Tracking, Auswertung im Dashboard
+- **Kohorten-Analyse** (Registrierungswochen + Retention) und **Trend-Erkennung**
+  (Trend-Suchen & -Tags) im Dashboard
+- **Wöchentliche Community-Challenge** mit Fortschrittsbalken & Reputations-Belohnung
+- **360°-/Panorama-Viewer** (Drag-Schwenk) auf der Karten-Seite
+- 74 Backend-Tests (inkl. A/B/Challenge/Kohorten/Trends) + 48 Frontend-Tests — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -188,7 +198,7 @@ Details: [server/README.md](./server/README.md).
 - [x] **Level & Fortschritt** — Sichtbarer Community-Rang.
 - [x] **Nutzer-Einreichungen** — Leser reichen News/Leaks zur Prüfung ein. *(→ Moderations-Queue, +Rep bei Freigabe)*
 - [x] **Upvote/Downvote für Kommentare** — Beste Kommentare nach oben.
-- [ ] **Wöchentliche Community-Challenges** — Themen-Aktionen mit Belohnung.
+- [x] **Wöchentliche Community-Challenges** — Themen-Aktionen mit Belohnung. *(Fortschritt + Belohnung)*
 - [x] **Tippspiel zum Release** — Wetten auf Termin/Details, Bestenliste. *(/tippspiel — Tipps + Tally)*
 - [x] **Folgen & Feed** — Autoren/Themen folgen, personalisierter Aktivitäts-Feed. *(Profile folgen → /feed)*
 - [x] **Nutzer-Erwähnungen** — `@mention` in Kommentaren mit Benachrichtigung. *(@mention → Benachrichtigung)*
@@ -205,7 +215,7 @@ Details: [server/README.md](./server/README.md).
 - [x] **Audio-Version (TTS)** — Artikel als Audio vorlesen lassen. *(Web-Speech-API, kein externer Dienst)*
 - [x] **Charakter-/Lore-Datenbank** — Strukturierte Wiki-Einträge zu Figuren/Orten. *(/lore)*
 - [x] **Trailer-Frame-Analyse** — Annotierte Standbilder mit Hotspots. *(annotierte Standbilder mit Hotspots)*
-- [ ] **360°-/Panorama-Viewer** — Interaktive Vice-City-Ansichten.
+- [x] **360°-/Panorama-Viewer** — Interaktive Vice-City-Ansichten. *(Drag-Schwenk auf der Karte)*
 
 ## 18. Monetarisierung & Wachstum
 
@@ -223,13 +233,13 @@ Details: [server/README.md](./server/README.md).
 ## 19. Analytics & Insights
 
 - [x] **Redaktions-Dashboard** — Aufrufe, Verweildauer, Top-Artikel. *(/dashboard — Aufrufe, Top-Artikel)*
-- [ ] **A/B-Testing-Framework** — Überschriften/Layouts experimentell testen.
+- [x] **A/B-Testing-Framework** — Überschriften/Layouts experimentell testen. *(Varianten + Conversion-Tracking, Dashboard)*
 - [ ] **Funnel-Analyse** — Conversion vom Besuch zum Abo nachverfolgen.
 - [ ] **Heatmaps** — Klick-/Scroll-Verhalten visualisieren.
 - [x] **Echtzeit-Besucherzähler** — Live-Traffic im Dashboard. *(Online-Zähler + Präsenz via WebSocket)*
 - [x] **Such-Analytics** — Häufige Suchbegriffe & Null-Treffer auswerten. *(Top-Begriffe + Null-Treffer)*
-- [ ] **Kohorten-Analyse** — Nutzerbindung über die Zeit.
-- [ ] **Trend-Erkennung** — Aufkommende Themen automatisch erkennen.
+- [x] **Kohorten-Analyse** — Nutzerbindung über die Zeit. *(Registrierungswochen + Retention)*
+- [x] **Trend-Erkennung** — Aufkommende Themen automatisch erkennen. *(Trend-Suchen & -Tags)*
 - [x] **Export & Reports** — Geplante CSV/PDF-Berichte. *(CSV-Export)*
 - [ ] **Performance-Budget-Monitoring** — Web-Vitals-Alarme bei Regression.
 

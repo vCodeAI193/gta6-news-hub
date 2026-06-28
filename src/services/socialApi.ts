@@ -23,7 +23,16 @@ export interface PredictionQuestion {
   mine: string | null
 }
 
+export interface ChallengeState {
+  challenge: { id: string; title: string; description: string; goal: number; reward: number }
+  progress: number
+  completed: boolean
+  claimed: boolean
+}
+
 export const socialApi = {
+  challenges: () => api<ChallengeState>('/api/challenges'),
+  claimChallenge: (id: string) => api<{ reward: number }>(`/api/challenges/${id}/claim`, { method: 'POST' }),
   followStatus: (id: string) => api<FollowStatus>(`/api/users/${id}/follow-status`, { auth: true }),
   follow: (id: string) => api<{ following: boolean }>(`/api/users/${id}/follow`, { method: 'POST' }),
   unfollow: (id: string) => api<{ following: boolean }>(`/api/users/${id}/follow`, { method: 'DELETE' }),

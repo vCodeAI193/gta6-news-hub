@@ -3,6 +3,9 @@ import assert from 'node:assert/strict'
 import request from 'supertest'
 import { createApp } from './app.mjs'
 import { totpCode } from './totp.mjs'
+import { weeklyChallenge } from './challenges.mjs'
+
+const weeklyChallengeReward = weeklyChallenge.reward
 
 function currentCode(secret) {
   return totpCode(secret, Math.floor(Date.now() / 1000 / 30))
@@ -505,6 +508,64 @@ describe('Editorial & Analytics', () => {
     assert.equal(res.status, 200)
     assert.match(res.headers['content-type'], /csv/)
     assert.match(res.text, /id,title,category,date,status,views/)
+  })
+})
+
+describe('A/B, Challenges, Cohorts & Trends', () => {
+  it('weist Experiment-Varianten deterministisch zu', async () => {
+    const r1 = await request(app).get('/api/experiments?clientId=abc')
+    const r2 = await request(app).get('/api/experiments?clientId=abc')
+    assert.ok(r1.body.assignments['home-hero-cta'])
+    assert.equal(r1.body.assignments['home-hero-cta'], r2.body.assignments['home-hero-cta'])
+  })
+
+  it('trackt A/B-Events und aggregiert Conversion-Raten', async () => {
+    const variant = (await request(app).get('/api/experiments?clientId=c1')).body.assignments['home-hero-cta']
+    await request(app).post('/api/ab/track').send({ experiment: 'home-hero-cta', variant, type: 'view', clientId: 'c1' })
+    await request(app).post('/api/ab/track').send({ experiment: 'home-hero-cta', variant, type: 'convert', clientId: 'c1' })
+    const { body } = await register()
+    const ab = await request(app).get('/api/analytics/ab').set('Authorization', `Bearer ${body.token}`)
+    const exp = ab.body.experiments.find((e) => e.id === 'home-hero-cta')
+    const v = exp.variants.find((x) => x.variant === variant)
+    assert.equal(v.views, 1)
+    assert.equal(v.conversions, 1)
+    assert.equal(v.rate, 100)
+  })
+
+  it('lehnt ungültige A/B-Events ab', async () => {
+    assert.equal((await request(app).post('/api/ab/track').send({ experiment: 'home-hero-cta', variant: 'X', type: 'view' })).status, 400)
+  })
+
+  it('Challenge: Fortschritt zählt und Belohnung gibt es einmalig', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    for (let i = 0; i < 3; i++) {
+      await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', auth).send({ text: `Kommentar ${i}` })
+    }
+    const ch = await request(app).get('/api/challenges').set('Authorization', auth)
+    assert.equal(ch.body.completed, true)
+    assert.equal(ch.body.progress, 3)
+
+    const claim = await request(app).post('/api/challenges/week-comments/claim').set('Authorization', auth)
+    assert.equal(claim.body.reward, weeklyChallengeReward)
+    // Zweimal abholen → 409
+    assert.equal((await request(app).post('/api/challenges/week-comments/claim').set('Authorization', auth)).status, 409)
+  })
+
+  it('Kohorten-Analyse gruppiert Nutzer nach Woche', async () => {
+    const { body } = await register()
+    const res = await request(app).get('/api/analytics/cohorts').set('Authorization', `Bearer ${body.token}`)
+    assert.ok(res.body.cohorts.length >= 1)
+    assert.ok(res.body.cohorts[0].total >= 1)
+  })
+
+  it('Trend-Erkennung liefert Such- und Tag-Trends', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    await request(app).post('/api/analytics/search').send({ term: 'vice city', results: 2 })
+    const res = await request(app).get('/api/analytics/trends').set('Authorization', auth)
+    assert.ok(res.body.searchTrends.some((s) => s.term === 'vice city'))
+    assert.ok(Array.isArray(res.body.tagTrends))
   })
 })
 

@@ -4,15 +4,29 @@ import { Seo } from '../components/Seo'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { isApiEnabled } from '../services/api'
-import { editorialApi, type Dashboard } from '../services/editorialApi'
+import {
+  editorialApi,
+  type AbExperiment,
+  type Cohort,
+  type Dashboard,
+  type Trends,
+} from '../services/editorialApi'
 
 export function DashboardPage() {
   const { user, loading, hasRole } = useAuth()
   const { notify } = useToast()
   const [data, setData] = useState<Dashboard | null>(null)
+  const [ab, setAb] = useState<AbExperiment[]>([])
+  const [cohorts, setCohorts] = useState<Cohort[]>([])
+  const [trends, setTrends] = useState<Trends | null>(null)
 
   useEffect(() => {
-    if (user && hasRole('author')) editorialApi.dashboard().then(setData, () => notify('Dashboard nicht ladbar', 'error'))
+    if (user && hasRole('author')) {
+      editorialApi.dashboard().then(setData, () => notify('Dashboard nicht ladbar', 'error'))
+      editorialApi.abResults().then(setAb, () => {})
+      editorialApi.cohorts().then(setCohorts, () => {})
+      editorialApi.trends().then(setTrends, () => {})
+    }
   }, [user, hasRole, notify])
 
   if (loading) return null
@@ -86,6 +100,68 @@ export function DashboardPage() {
               )}
             </div>
           </section>
+
+          {trends && (trends.searchTrends.length > 0 || trends.tagTrends.length > 0) && (
+            <section className="dash-cols">
+              <div>
+                <h2 className="section-title">📈 Trend-Suchen (7 Tage)</h2>
+                {trends.searchTrends.length === 0 ? (
+                  <p className="comments__empty">Keine.</p>
+                ) : (
+                  <ul className="taglist">
+                    {trends.searchTrends.map((s) => (
+                      <li key={s.term}><span className="tag-chip">{s.term} · {s.count}</span></li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div>
+                <h2 className="section-title">🏷️ Trend-Tags</h2>
+                <ul className="taglist">
+                  {trends.tagTrends.map((t) => (
+                    <li key={t.tag}><span className="tag-chip">#{t.tag} · {t.count}</span></li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          )}
+
+          {ab.length > 0 && (
+            <section>
+              <h2 className="section-title">🧪 A/B-Tests</h2>
+              {ab.map((exp) => (
+                <div key={exp.id} className="abtest">
+                  <p className="abtest__desc">{exp.description}</p>
+                  <table className="admin-table">
+                    <thead><tr><th>Variante</th><th>Ansichten</th><th>Conversions</th><th>Rate</th></tr></thead>
+                    <tbody>
+                      {exp.variants.map((v) => (
+                        <tr key={v.variant}>
+                          <td>{v.variant}</td><td>{v.views}</td><td>{v.conversions}</td><td><strong>{v.rate}%</strong></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </section>
+          )}
+
+          {cohorts.length > 0 && (
+            <section>
+              <h2 className="section-title">👥 Kohorten (Registrierungswoche)</h2>
+              <table className="admin-table">
+                <thead><tr><th>Woche</th><th>Neu</th><th>Aktiviert</th><th>Retention</th></tr></thead>
+                <tbody>
+                  {cohorts.map((c) => (
+                    <tr key={c.week}>
+                      <td>{c.week}</td><td>{c.total}</td><td>{c.activated}</td><td><strong>{c.retention}%</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          )}
         </>
       )}
     </>

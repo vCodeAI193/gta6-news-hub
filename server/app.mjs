@@ -9,6 +9,8 @@ import { createFlags } from './flags.mjs'
 import { API_VERSION, openapiSpec } from './openapi.mjs'
 import { predictionById, predictionQuestions } from './predictions.mjs'
 import { generateSecret, otpauthUrl, verifyTotp } from './totp.mjs'
+import { assignVariant, experiments } from './experiments.mjs'
+import { startOfWeek, weeklyChallenge } from './challenges.mjs'
 import {
   authenticate,
   hashPassword,
@@ -738,6 +740,85 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     res.send(csv)
   })
 
+  // ---------------------------------------------------------- A/B-Testing
+  app.get('/api/experiments', (req, res) => {
+    const clientId = String(req.query.clientId ?? 'anon')
+    const assignments = {}
+    for (const id of Object.keys(experiments)) assignments[id] = assignVariant(id, clientId)
+    res.json({ experiments, assignments })
+  })
+
+  app.post('/api/ab/track', (req, res) => {
+    const { experiment, variant, type, clientId } = req.body ?? {}
+    const exp = experiments[experiment]
+    if (!exp || !exp.variants.includes(variant) || !['view', 'convert'].includes(type))
+      return res.status(400).json({ error: 'Ungültiges Event' })
+    db.prepare('INSERT INTO ab_events (id, experiment, variant, type, client_id, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(randomUUID(), experiment, variant, type, String(clientId ?? 'anon'), new Date().toISOString())
+    res.status(201).json({ ok: true })
+  })
+
+  app.get('/api/analytics/ab', requireAuth(db, 'author'), (_req, res) => {
+    const result = Object.values(experiments).map((exp) => ({
+      id: exp.id,
+      description: exp.description,
+      variants: exp.variants.map((variant) => {
+        const views = db.prepare("SELECT COUNT(DISTINCT client_id) AS n FROM ab_events WHERE experiment = ? AND variant = ? AND type = 'view'").get(exp.id, variant).n
+        const conversions = db.prepare("SELECT COUNT(DISTINCT client_id) AS n FROM ab_events WHERE experiment = ? AND variant = ? AND type = 'convert'").get(exp.id, variant).n
+        return { variant, views, conversions, rate: views ? Math.round((conversions / views) * 100) : 0 }
+      }),
+    }))
+    res.json({ experiments: result })
+  })
+
+  // ------------------------------------------------------ community challenge
+  app.get('/api/challenges', requireAuth(db, 'reader'), (req, res) => {
+    const weekStart = startOfWeek()
+    const progress = db.prepare('SELECT COUNT(*) AS n FROM comments WHERE user_id = ? AND created_at >= ?').get(req.auth.user.id, weekStart).n
+    const claimed = !!db.prepare('SELECT 1 FROM challenge_claims WHERE user_id = ? AND challenge_id = ?').get(req.auth.user.id, weeklyChallenge.id)
+    res.json({ challenge: weeklyChallenge, progress: Math.min(progress, weeklyChallenge.goal), completed: progress >= weeklyChallenge.goal, claimed })
+  })
+
+  app.post('/api/challenges/:id/claim', requireAuth(db, 'reader'), (req, res) => {
+    if (req.params.id !== weeklyChallenge.id) return res.status(404).json({ error: 'Unbekannte Challenge' })
+    const progress = db.prepare('SELECT COUNT(*) AS n FROM comments WHERE user_id = ? AND created_at >= ?').get(req.auth.user.id, startOfWeek()).n
+    if (progress < weeklyChallenge.goal) return res.status(400).json({ error: 'Noch nicht abgeschlossen' })
+    const already = db.prepare('SELECT 1 FROM challenge_claims WHERE user_id = ? AND challenge_id = ?').get(req.auth.user.id, weeklyChallenge.id)
+    if (already) return res.status(409).json({ error: 'Belohnung bereits abgeholt' })
+    db.prepare('INSERT INTO challenge_claims (user_id, challenge_id, claimed_at) VALUES (?, ?, ?)').run(req.auth.user.id, weeklyChallenge.id, new Date().toISOString())
+    awardReputation(db, req.auth.user.id, weeklyChallenge.reward)
+    res.json({ ok: true, reward: weeklyChallenge.reward })
+  })
+
+  // ------------------------------------------------- cohorts & trend analysis
+  app.get('/api/analytics/cohorts', requireAuth(db, 'author'), (_req, res) => {
+    const users = db.prepare('SELECT id, created_at FROM users').all()
+    const buckets = new Map()
+    for (const u of users) {
+      const week = isoWeek(u.created_at)
+      if (!buckets.has(week)) buckets.set(week, { week, total: 0, activated: 0 })
+      const b = buckets.get(week)
+      b.total += 1
+      const active = db.prepare('SELECT 1 FROM comments WHERE user_id = ? LIMIT 1').get(u.id)
+      if (active) b.activated += 1
+    }
+    const cohorts = [...buckets.values()].sort((a, b) => a.week.localeCompare(b.week)).map((c) => ({
+      ...c, retention: c.total ? Math.round((c.activated / c.total) * 100) : 0,
+    }))
+    res.json({ cohorts })
+  })
+
+  app.get('/api/analytics/trends', requireAuth(db, 'author'), (_req, res) => {
+    const since = new Date(Date.now() - 7 * 86400_000).toISOString()
+    const searchTrends = db.prepare('SELECT term, COUNT(*) AS count FROM search_log WHERE created_at >= ? GROUP BY term ORDER BY count DESC LIMIT 6').all(since)
+    // Trend-Tags aus jüngsten Artikeln.
+    const recent = db.prepare("SELECT tags FROM articles WHERE status = 'published' ORDER BY date DESC LIMIT 6").all()
+    const tagCounts = {}
+    for (const r of recent) for (const t of JSON.parse(r.tags || '[]')) tagCounts[t] = (tagCounts[t] ?? 0) + 1
+    const tagTrends = Object.entries(tagCounts).map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count).slice(0, 8)
+    res.json({ searchTrends, tagTrends })
+  })
+
   // ------------------------------------------------------------- not found
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Route nicht gefunden' }))
 
@@ -783,6 +864,17 @@ function snapshotRevision(db, row, user) {
   db.prepare(
     'INSERT INTO article_revisions (id, article_id, snapshot, edited_by, edited_at) VALUES (?, ?, ?, ?, ?)',
   ).run(randomUUID(), row.id, JSON.stringify(row), user?.display_name ?? null, new Date().toISOString())
+}
+
+/** ISO-Wochen-Label (YYYY-Www) für die Kohorten-Gruppierung. */
+function isoWeek(iso) {
+  const d = new Date(iso)
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+  const dayNum = (date.getUTCDay() + 6) % 7
+  date.setUTCDate(date.getUTCDate() - dayNum + 3)
+  const firstThursday = new Date(Date.UTC(date.getUTCFullYear(), 0, 4))
+  const week = 1 + Math.round(((date - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7)
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, '0')}`
 }
 
 function commentScore(db, commentId) {

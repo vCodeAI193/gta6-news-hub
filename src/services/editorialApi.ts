@@ -14,8 +14,27 @@ export interface Revision {
   edited_at: string
 }
 
+export interface AbExperiment {
+  id: string
+  description: string
+  variants: Array<{ variant: string; views: number; conversions: number; rate: number }>
+}
+export interface Cohort {
+  week: string
+  total: number
+  activated: number
+  retention: number
+}
+export interface Trends {
+  searchTrends: Array<{ term: string; count: number }>
+  tagTrends: Array<{ tag: string; count: number }>
+}
+
 export const editorialApi = {
   dashboard: () => api<Dashboard>('/api/analytics/dashboard'),
+  abResults: () => api<{ experiments: AbExperiment[] }>('/api/analytics/ab').then((r) => r.experiments),
+  cohorts: () => api<{ cohorts: Cohort[] }>('/api/analytics/cohorts').then((r) => r.cohorts),
+  trends: () => api<Trends>('/api/analytics/trends'),
   exportCsv: () => apiDownload('/api/analytics/export.csv', 'artikel-report.csv'),
   /** Suchbegriff fürs Analytics protokollieren (nur wenn Backend aktiv). */
   logSearch: (term: string, results: number) => {

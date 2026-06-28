@@ -193,6 +193,20 @@ const MIGRATIONS = [
     read INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS ab_events (
+    id TEXT PRIMARY KEY,
+    experiment TEXT NOT NULL,
+    variant TEXT NOT NULL,
+    type TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS challenge_claims (
+    user_id TEXT NOT NULL,
+    challenge_id TEXT NOT NULL,
+    claimed_at TEXT NOT NULL,
+    PRIMARY KEY (user_id, challenge_id)
+  )`,
 ]
 
 export function createDb(path = ':memory:') {

@@ -8,9 +8,11 @@ import { ArticleGrid } from '../components/ArticleGrid'
 import { SkeletonGrid } from '../components/Skeleton'
 import { Newsletter } from '../components/Newsletter'
 import { Poll } from '../components/Poll'
+import { ChallengeWidget } from '../components/ChallengeWidget'
 import { useArticles } from '../hooks/useArticles'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
 import { useDebounce } from '../hooks/useDebounce'
+import { useExperiment } from '../hooks/useExperiment'
 import { editorialApi } from '../services/editorialApi'
 import { usePreferences } from '../context/PreferencesContext'
 import { useRealtime } from '../context/RealtimeContext'
@@ -24,6 +26,7 @@ export function HomePage() {
   const { prefs } = usePreferences()
   const { articles, loading, reload } = useArticles()
   const { subscribe } = useRealtime()
+  const heroCta = useExperiment('home-hero-cta')
   const [params, setParams] = useSearchParams()
   const [hasNew, setHasNew] = useState(false)
 
@@ -103,6 +106,20 @@ export function HomePage() {
           einem Ort, sortiert nach Aktualität.
         </p>
         <Countdown />
+        {heroCta.variant && (
+          <p className="hero__cta">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                heroCta.convert()
+                document.querySelector('.feed')?.scrollIntoView({ behavior: 'smooth' })
+              }}
+            >
+              {heroCta.variant} →
+            </button>
+          </p>
+        )}
       </section>
 
       {!hasActiveFilter && featured.length > 0 && <FeaturedCarousel articles={featured} />}
@@ -169,6 +186,8 @@ export function HomePage() {
           </>
         )}
       </section>
+
+      <ChallengeWidget />
 
       <Newsletter />
 
