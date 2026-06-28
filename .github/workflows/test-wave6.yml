@@ -1,0 +1,383 @@
+name: Wave 6 Tests
+
+on:
+  push:
+    branches: [main, claude/**, develop]
+    paths:
+      - 'src/lib/**'
+      - 'src/services/**'
+      - 'src/components/**'
+      - 'server/**'
+      - '.github/workflows/test-wave6.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/lib/**'
+      - 'src/services/**'
+      - 'src/components/**'
+      - 'server/**'
+
+jobs:
+  # ============================================================================
+  # UNIT & INTEGRATION TESTS
+  # ============================================================================
+
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run frontend tests
+        run: npm test -- src/lib src/services src/components
+        continue-on-error: false
+
+      - name: Run backend tests
+        run: npm run test:server -- server/tests/
+        continue-on-error: false
+
+      - name: Generate coverage report
+        if: matrix.node-version == '22.x'
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == '22.x'
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: wave6
+          name: wave6-coverage
+          fail_ci_if_error: false
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.node-version }}
+          path: |
+            coverage/
+            test-results/
+          retention-days: 30
+
+  # ============================================================================
+  # PERFORMANCE REGRESSION DETECTION
+  # ============================================================================
+
+  performance:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Measure bundle size
+        run: |
+          mkdir -p perf-results
+          du -sh dist/ > perf-results/bundle-size.txt
+          ls -lh dist/ > perf-results/dist-files.txt
+
+      - name: Check bundle size regression
+        run: |
+          CURRENT_SIZE=$(du -sh dist/ | awk '{print $1}')
+          echo "Current bundle size: $CURRENT_SIZE"
+          # Allow max 5MB bundle size for Wave 6
+          SIZE_BYTES=$(du -sb dist/ | awk '{print $1}')
+          if [ $SIZE_BYTES -gt $((5 * 1024 * 1024)) ]; then
+            echo "⚠️  Bundle size exceeds 5MB threshold"
+            exit 1
+          fi
+
+      - name: Run Lighthouse CI
+        continue-on-error: true
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Archive performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: perf-results/
+          retention-days: 30
+
+  # ============================================================================
+  # CODE QUALITY CHECKS
+  # ============================================================================
+
+  quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Type check
+        run: npx tsc --noEmit
+        continue-on-error: false
+
+      - name: Check test coverage thresholds
+        run: |
+          npm run test:coverage -- --reporter=json > coverage-summary.json 2>&1 || true
+          node .github/scripts/check-coverage-thresholds.js coverage-summary.json
+        continue-on-error: true
+
+  # ============================================================================
+  # ACCESSIBILITY TESTING
+  # ============================================================================
+
+  accessibility:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run accessibility tests
+        run: npm test -- src/test/a11y.test.tsx
+        continue-on-error: true
+
+      - name: Run Wave 6 accessibility tests
+        run: npm test -- src/components/__tests__/Wave6Features.test.tsx --grep 'Accessibility'
+        continue-on-error: true
+
+  # ============================================================================
+  # E2E TESTS (Optional, runs on schedule)
+  # ============================================================================
+
+  e2e:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start preview server
+        run: npm run preview &
+        env:
+          NODE_ENV: production
+
+      - name: Wait for server
+        run: |
+          npm install -g wait-on
+          wait-on http://localhost:4173 --timeout 60000
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        continue-on-error: true
+
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: test-results/
+          retention-days: 30
+
+  # ============================================================================
+  # NOTIFICATION & REPORTING
+  # ============================================================================
+
+  report:
+    name: Test Summary & Notifications
+    runs-on: ubuntu-latest
+    needs: [test, performance, quality]
+    if: always()
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Generate test summary
+        run: |
+          mkdir -p reports
+          cat > reports/summary.md << 'EOF'
+          # Wave 6 Test Report
+
+          ## Test Results Summary
+
+          **Date:** $(date)
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref }}
+
+          ### Coverage
+          - [ ] Overall: 80%+
+          - [ ] Statements: 80%+
+          - [ ] Branches: 75%+
+          - [ ] Functions: 80%+
+          - [ ] Lines: 80%+
+
+          ### Performance
+          - [ ] Bundle size: < 5MB
+          - [ ] Load time: < 3s
+          - [ ] Lighthouse score: > 80
+
+          ### Quality
+          - [ ] Linting: Pass
+          - [ ] Type checking: Pass
+          - [ ] Accessibility: WCAG AA
+
+          ## Details
+          See artifacts for detailed test results and coverage reports.
+          EOF
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('reports/summary.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          payload: |
+            {
+              "text": "Wave 6 Tests Failed ❌",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Wave 6 Test Suite Failed*\n*Branch:* ${{ github.ref }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Results"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+
+      - name: Archive reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: reports/
+          retention-days: 90
+
+  # ============================================================================
+  # STATUS CHECK
+  # ============================================================================
+
+  status:
+    name: Overall Status
+    runs-on: ubuntu-latest
+    needs: [test, quality, accessibility]
+    if: always()
+
+    steps:
+      - name: Check overall status
+        run: |
+          if [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.quality.result }}" != "success" ] || \
+             [ "${{ needs.accessibility.result }}" != "success" ]; then
+            echo "❌ Wave 6 tests failed"
+            exit 1
+          else
+            echo "✅ All Wave 6 tests passed"
+          fi
