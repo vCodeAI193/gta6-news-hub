@@ -299,3 +299,84 @@
   so conditions can be checked at the call site without reading all stats.
 - Add a `pityCounter` to `openLootbox`: after N commons in a row, guarantee
   at least a rare drop (standard gacha fair-play mechanism).
+
+---
+
+## Wave 6 — Moderation, Trust & Security (`src/services/moderationService.ts`, `/moderation`, `/sicherheit`)
+
+### Decisions
+- **All moderation is localStorage-only.** Shadow bans, trust scores, warning
+  levels, audit logs, and GDPR operations all persist client-side. The same
+  service interface drops into a real backend without changing callers.
+- **Trust score is additive heuristic.** Starts at 50, gains points for
+  activity/age/no-reports, loses for warnings/reports/shadow-ban. No ML —
+  but the `computeTrustScore` signature accepts any stats object so a real
+  backend can supply them.
+- **Spam detection uses pattern matching.** Repeated chars (6+), >70% caps,
+  and a short keyword list. Deliberately simple — real spam is more varied.
+- **GDPR export/delete are stub implementations.** `exportUserData` only
+  returns moderation-related data (warnings, ban status). A real DSGVO
+  implementation must cover ALL namespaced localStorage keys for that user.
+- **2FA UI is a placeholder.** The TOTP backend (`server/auth.mjs`) is real,
+  but the SecurityPage shows a setup flow without a live QR generator —
+  requires an actual TOTP library (e.g. `otpauth`) to compute the URI.
+
+### Critique
+- **Trust score is not cross-feature.** Comments, votes, and reads do not
+  automatically call `computeTrustScore`; the caller must supply stats manually.
+- **Shadow ban only hides from other users conceptually.** Since the app is a
+  frontend SPA, shadow-banned content is not actually withheld from the feed —
+  it requires a server-side filter on the comments/posts endpoints.
+- **GDPR delete is incomplete.** Only clears moderation keys; does not iterate
+  all `gta6hub_*` namespaced keys owned by the user.
+
+### Improvement suggestions
+- Integrate `computeTrustScore` as a computed property served by `/api/users/:id`
+  so it aggregates real activity data from the SQLite backend.
+- Wire shadow-ban into comment fetch: filter `getShadowBanned()` in
+  `commentsService.getComments` so banned users' posts are invisible.
+- Implement full GDPR export by scanning all `gta6hub_*` localStorage keys and
+  returning values matching the user ID.
+- Replace the 2FA placeholder with a real `otpauth` URI + a QR rendering
+  library (e.g. `qrcode`) to complete the setup flow end-to-end.
+
+---
+
+## Wave 7 — Editorial & CMS (`src/lib/cms.ts`, enhanced `/admin`)
+
+### Decisions
+- **CMS enhancements are all client-side.** TOC generation, SEO analyzer,
+  duplicate checker, template picker, media library, infobox builder, and
+  AI writing suggestions all run in the browser using `src/lib/cms.ts`.
+- **Markdown preview uses existing `react-markdown`.** No new dependency;
+  the side-by-side editor/preview toggle reuses the component already used
+  in `ArticlePage`.
+- **Media library stores data URLs in localStorage.** Easy, zero-config.
+  Impractical for production (localStorage limit ~5–10 MB), but the service
+  interface is the same as a real upload endpoint.
+- **Duplicate detection uses Jaccard similarity on word tokens.** Fast and
+  dependency-free. Threshold 0.5 for warning. Same limitation as all
+  bag-of-words approaches: paraphrases score near zero.
+- **Writing suggestions are fully deterministic.** Based on simple keyword
+  detection in the partial text, not an LLM call. With `ANTHROPIC_API_KEY`
+  the same function could call the AI layer instead.
+
+### Critique
+- **SEO analyzer is rule-based.** No real keyword density analysis, no
+  readability score, no structured data validation. The score is directional.
+- **Revisions are not diff-based.** Full article body is stored per revision,
+  not a diff patch. Storage cost grows linearly with edits.
+- **Content calendar is a list, not a grid.** A real editorial calendar
+  would show a monthly grid; this is a sorted list of scheduled articles.
+- **Collaborative writing lock is not enforced.** The "lock" concept exists
+  in `editorialApi` but the AdminPage does not prevent two tabs from editing
+  simultaneously.
+
+### Improvement suggestions
+- Integrate `src/lib/aiLocal.ts` `summarize` into `writingSuggestions` for
+  richer deterministic suggestions; swap for Claude when key is present.
+- Replace full-body revision storage with a Myers diff patch (e.g. `diff`
+  npm package) to reduce localStorage footprint.
+- Add a real monthly grid to `ContentCalendar` using CSS grid with 7 columns.
+- Wire duplicate detection into the publish flow: block publish (not just warn)
+  if `duplicateScore > 0.7` and no override flag is set.

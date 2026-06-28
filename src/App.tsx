@@ -38,6 +38,8 @@ const CommunityPage = lazy(() => import('./routes/CommunityPage').then((m) => ({
 const GamificationPage = lazy(() => import('./routes/GamificationPage').then((m) => ({ default: m.GamificationPage })))
 const MessagesPage = lazy(() => import('./routes/MessagesPage').then((m) => ({ default: m.MessagesPage })))
 const UserProfilePage = lazy(() => import('./routes/UserProfilePage').then((m) => ({ default: m.UserProfilePage })))
+const SecurityPage = lazy(() => import('./routes/SecurityPage').then((m) => ({ default: m.SecurityPage })))
+const ModerationQueuePage = lazy(() => import('./routes/ModerationQueuePage').then((m) => ({ default: m.ModerationQueuePage })))
 
 export default function App() {
   return (
@@ -108,6 +110,8 @@ export default function App() {
         <Route path="spielen" element={<Suspense fallback={<SkeletonGrid count={2} />}><GamificationPage /></Suspense>} />
         <Route path="nachrichten" element={<Suspense fallback={null}><MessagesPage /></Suspense>} />
         <Route path="profil" element={<Suspense fallback={<SkeletonGrid count={2} />}><UserProfilePage /></Suspense>} />
+        <Route path="sicherheit" element={<Suspense fallback={<SkeletonGrid count={2} />}><SecurityPage /></Suspense>} />
+        <Route path="moderation-queue" element={<Suspense fallback={<SkeletonGrid count={2} />}><ModerationQueuePage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />

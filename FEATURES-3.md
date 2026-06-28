@@ -179,49 +179,49 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
 ## 6. Moderation, Vertrauen & Sicherheit
 
-- [ ] **Mehrstufige Meldegründe** — Differenzierte Report-Kategorien.
-- [ ] **Auto-Eskalation** — Häufig gemeldete Inhalte priorisieren.
-- [ ] **Shadow-Banning** — Stille Sichtbarkeitsreduktion.
-- [ ] **Rate-Limits pro Aktion** — Kommentar-/Vote-Spamschutz.
-- [ ] **CAPTCHA/Bot-Schutz** — Schutz bei Registrierung/Kommentaren.
-- [ ] **Wortfilter mit Regex** — Konfigurierbare Filtermuster.
-- [ ] **Bild-Moderation** — NSFW-Erkennung für Uploads.
-- [ ] **Moderations-Warteschlangen-SLAs** — Bearbeitungszeit-Ziele.
-- [ ] **Appeals-Workflow** — Einspruch gegen Moderationsentscheidungen.
-- [ ] **Trust-Score pro Nutzer** — Verhalten in Vertrauensstufen abbilden.
-- [ ] **IP-/Geräte-Fingerprinting** — Mehrfachkonten erkennen.
-- [ ] **Moderations-Audit-Export** — Nachvollziehbarkeit für Compliance.
-- [ ] **Automatische Quarantäne neuer Konten** — Erst nach Schwelle posten.
-- [ ] **Community-Moderation (Voting)** — Vertrauenswürdige Nutzer moderieren mit.
-- [ ] **Verifizierte-Quellen-Register** — Whitelist offizieller Kanäle.
-- [ ] **Phishing-/Scam-Link-Scanner** — Gefährliche Links blocken.
-- [ ] **Massen-Moderationswerkzeuge** — Bulk-Aktionen.
-- [ ] **Transparenzbericht** — Öffentliche Moderationsstatistiken.
-- [ ] **Sicherheits-Center für Nutzer** — Login-Historie, Warnungen.
-- [ ] **Wortlisten-Import/Export** — Blocklisten teilen/versionieren.
+- [x] **Mehrstufige Meldegründe** — Differenzierte Report-Kategorien.
+- [x] **Auto-Eskalation** — Häufig gemeldete Inhalte priorisieren.
+- [x] **Shadow-Banning** — Stille Sichtbarkeitsreduktion.
+- [x] **Rate-Limits pro Aktion** — Kommentar-/Vote-Spamschutz.
+- [x] **CAPTCHA/Bot-Schutz** — Schutz bei Registrierung/Kommentaren.
+- [x] **Wortfilter mit Regex** — Konfigurierbare Filtermuster.
+- [x] **Bild-Moderation** — NSFW-Erkennung für Uploads.
+- [x] **Moderations-Warteschlangen-SLAs** — Bearbeitungszeit-Ziele.
+- [x] **Appeals-Workflow** — Einspruch gegen Moderationsentscheidungen.
+- [x] **Trust-Score pro Nutzer** — Verhalten in Vertrauensstufen abbilden.
+- [x] **IP-/Geräte-Fingerprinting** — Mehrfachkonten erkennen.
+- [x] **Moderations-Audit-Export** — Nachvollziehbarkeit für Compliance.
+- [x] **Automatische Quarantäne neuer Konten** — Erst nach Schwelle posten.
+- [x] **Community-Moderation (Voting)** — Vertrauenswürdige Nutzer moderieren mit.
+- [x] **Verifizierte-Quellen-Register** — Whitelist offizieller Kanäle.
+- [x] **Phishing-/Scam-Link-Scanner** — Gefährliche Links blocken.
+- [x] **Massen-Moderationswerkzeuge** — Bulk-Aktionen.
+- [x] **Transparenzbericht** — Öffentliche Moderationsstatistiken.
+- [x] **Sicherheits-Center für Nutzer** — Login-Historie, Warnungen.
+- [x] **Wortlisten-Import/Export** — Blocklisten teilen/versionieren.
 
 ## 7. Redaktion & Content-Management
 
-- [ ] **WYSIWYG-Editor** — Rich-Text mit Live-Vorschau.
-- [ ] **Block-basierter Editor** — Modularer Aufbau (wie Notion).
-- [ ] **Geplante Mehrfach-Veröffentlichung** — Redaktionspläne pro Kanal.
-- [ ] **Redaktionelle Rollen feingranular** — Custom Permissions.
-- [ ] **Co-Editing in Echtzeit** — Gleichzeitiges Bearbeiten (CRDT).
-- [ ] **Kommentar-/Review-Notizen** — Inline-Anmerkungen im Entwurf.
-- [ ] **Content-Vorlagen** — Wiederverwendbare Artikel-Templates.
-- [ ] **Auto-Speichern & Wiederherstellung** — Entwurf nie verlieren.
-- [ ] **Verknüpfte Inhalte** — Artikel mit Lore/Map/Events verbinden.
-- [ ] **Embargo-Verwaltung** — Sperrfristen pro Artikel.
-- [ ] **Mehrsprachige Inhalte** — Übersetzungen pro Artikel verwalten.
-- [ ] **Bild-Editor (Crop/Filter)** — Direkt im CMS bearbeiten.
-- [ ] **Asset-Bibliothek** — Zentrale Medienverwaltung mit Tags.
-- [ ] **Serien/Dossiers** — Artikel zu Serien gruppieren.
-- [ ] **Redaktioneller Workflow-Builder** — Eigene Statusketten.
-- [ ] **SEO-Vorschau** — Google/Social-Preview im Editor.
-- [ ] **Broken-Link-Checker** — Tote Links automatisch finden.
-- [ ] **Content-Score** — Qualitäts-/Vollständigkeitsbewertung.
-- [ ] **Auto-Verschlagwortung mit Vorschlag** — Tag-Empfehlungen.
-- [ ] **Versionsvergleich (Diff-Viewer)** — Visuelle Änderungsansicht.
+- [x] **WYSIWYG-Editor** — Rich-Text mit Live-Vorschau.
+- [x] **Block-basierter Editor** — Modularer Aufbau (wie Notion).
+- [x] **Geplante Mehrfach-Veröffentlichung** — Redaktionspläne pro Kanal.
+- [x] **Redaktionelle Rollen feingranular** — Custom Permissions.
+- [x] **Co-Editing in Echtzeit** — Gleichzeitiges Bearbeiten (CRDT).
+- [x] **Kommentar-/Review-Notizen** — Inline-Anmerkungen im Entwurf.
+- [x] **Content-Vorlagen** — Wiederverwendbare Artikel-Templates.
+- [x] **Auto-Speichern & Wiederherstellung** — Entwurf nie verlieren.
+- [x] **Verknüpfte Inhalte** — Artikel mit Lore/Map/Events verbinden.
+- [x] **Embargo-Verwaltung** — Sperrfristen pro Artikel.
+- [x] **Mehrsprachige Inhalte** — Übersetzungen pro Artikel verwalten.
+- [x] **Bild-Editor (Crop/Filter)** — Direkt im CMS bearbeiten.
+- [x] **Asset-Bibliothek** — Zentrale Medienverwaltung mit Tags.
+- [x] **Serien/Dossiers** — Artikel zu Serien gruppieren.
+- [x] **Redaktioneller Workflow-Builder** — Eigene Statusketten.
+- [x] **SEO-Vorschau** — Google/Social-Preview im Editor.
+- [x] **Broken-Link-Checker** — Tote Links automatisch finden.
+- [x] **Content-Score** — Qualitäts-/Vollständigkeitsbewertung.
+- [x] **Auto-Verschlagwortung mit Vorschlag** — Tag-Empfehlungen.
+- [x] **Versionsvergleich (Diff-Viewer)** — Visuelle Änderungsansicht.
 
 ## 8. Medien (Video, Bild, Audio)
 

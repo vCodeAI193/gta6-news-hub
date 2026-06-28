@@ -14,6 +14,11 @@ import {
   type ArticleInput,
 } from '../services/articlesService'
 import type { Article } from '../types'
+import { SeoAnalyzer } from '../components/SeoAnalyzer'
+import { TocWidget } from '../components/TocWidget'
+import { MediaLibrary } from '../components/MediaLibrary'
+import { ArticleRevisions, saveRevision } from '../components/ArticleRevisions'
+import { ARTICLE_TEMPLATES, generateToc, writingSuggestions, markdownToHtml } from '../lib/cms'
 
 const EMPTY: ArticleInput = {
   title: '',
@@ -33,6 +38,10 @@ export function AdminPage() {
   const [breaking, setBreaking] = useState('')
   const [revisions, setRevisions] = useState<Revision[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [showCmsTools, setShowCmsTools] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState('')
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
 
   const sendBreaking = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,11 +66,30 @@ export function AdminPage() {
       notify('Titel und Quelle sind Pflicht', 'error')
       return
     }
+    // Save local revision before upsert
+    if (form.id) {
+      saveRevision(form.id, form.title, form.body)
+    }
     const saved = upsertArticle(form)
     emitWebhook('article.upserted', { id: saved.id, title: saved.title })
     notify(form.id ? 'Artikel aktualisiert' : 'Artikel angelegt', 'success')
     setForm(EMPTY)
     refresh()
+  }
+
+  const applyTemplate = (templateId: string) => {
+    const tpl = ARTICLE_TEMPLATES.find(t => t.id === templateId)
+    if (tpl) {
+      set('body', tpl.body)
+      setSelectedTemplate(templateId)
+    }
+  }
+
+  const handleBodyChange = (value: string) => {
+    set('body', value)
+    if (value.length > 10) {
+      setAiSuggestions(writingSuggestions(value))
+    }
   }
 
   const edit = (a: Article) => {
@@ -217,7 +245,7 @@ export function AdminPage() {
         </label>
         <label>
           Inhalt (Markdown)
-          <textarea value={form.body} onChange={(e) => set('body', e.target.value)} rows={6} />
+          <textarea value={form.body} onChange={(e) => handleBodyChange(e.target.value)} rows={6} />
         </label>
         <div className="admin-form__actions">
           <button type="submit" className="btn">
@@ -231,7 +259,86 @@ export function AdminPage() {
           <button type="button" className="btn btn--ghost" onClick={importFeed}>
             ⤓ RSS importieren
           </button>
+          <button type="button" className="btn btn--ghost" onClick={() => setShowPreview(p => !p)}>
+            {showPreview ? 'Vorschau aus' : 'Vorschau ein'}
+          </button>
+          <button type="button" className="btn btn--ghost" onClick={() => setShowCmsTools(p => !p)}>
+            CMS-Tools
+          </button>
         </div>
+
+        {showPreview && form.body && (
+          <div className="admin-preview" style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: 8, marginTop: '1rem' }}>
+            <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', color: 'var(--text-muted)' }}>Live-Vorschau</h3>
+            <div className="cms-preview-content" dangerouslySetInnerHTML={{ __html: markdownToHtml(form.body) }} />
+          </div>
+        )}
+
+        {showCmsTools && (
+          <div className="admin-cms-tools" style={{ marginTop: '1rem', display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+            {/* Template selector */}
+            <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: 8, gridColumn: '1 / -1' }}>
+              <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>Artikel-Vorlage</h4>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {ARTICLE_TEMPLATES.map(t => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    className={`chip${selectedTemplate === t.id ? ' chip--active' : ''}`}
+                    onClick={() => applyTemplate(t.id)}
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SEO analyzer */}
+            <SeoAnalyzer title={form.title} body={form.body} tags={form.tags ?? []} />
+
+            {/* TOC widget */}
+            <TocWidget entries={generateToc(form.body)} />
+
+            {/* AI Writing suggestions */}
+            {aiSuggestions.length > 0 && (
+              <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: 8 }}>
+                <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>Schreib-Vorschläge</h4>
+                <ul style={{ margin: 0, padding: '0 0 0 1.2rem', fontSize: '0.85rem' }}>
+                  {aiSuggestions.map((s, i) => (
+                    <li key={i} style={{ marginBottom: '0.25rem' }}>
+                      <button
+                        type="button"
+                        className="linkbtn"
+                        onClick={() => set('title', s)}
+                        style={{ textAlign: 'left' }}
+                      >
+                        {s}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Media library */}
+            <MediaLibrary onInsert={(url) => set('image', url)} />
+
+            {/* Local revisions */}
+            {form.id && (
+              <div style={{ background: 'var(--surface)', padding: '1rem', borderRadius: 8, gridColumn: '1 / -1' }}>
+                <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>Lokale Revisionen</h4>
+                <ArticleRevisions
+                  articleId={form.id}
+                  onRestore={(rev) => {
+                    set('title', rev.title)
+                    set('body', rev.body)
+                    notify('Revision wiederhergestellt', 'success')
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {form.id && isApiEnabled() && (
           <div className="revisions">

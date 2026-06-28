@@ -974,3 +974,37 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .user-profile__color-swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
 .user-profile__color-swatch--active { border-color: var(--cyan); }
 .verified-badge { background: var(--cyan); color: #000; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; }
+
+/* Welle 6 — Moderation & Security */
+.spoiler-wrapper { display: inline; }
+.spoiler-blur { position: relative; cursor: pointer; }
+.spoiler-content { filter: blur(4px); user-select: none; pointer-events: none; }
+.spoiler-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; }
+.moderation-badge { font-size: 0.8rem; }
+.password-strength { margin-top: 0.5rem; }
+.password-strength__bar { display: flex; gap: 4px; margin-bottom: 0.25rem; }
+.password-strength__segment { flex: 1; height: 6px; border-radius: 3px; transition: background-color 0.2s; }
+.password-strength__label { font-size: 0.8rem; font-weight: 600; }
+.password-strength__tips { margin-top: 0.4rem; font-size: 0.78rem; color: var(--text-muted); }
+.password-strength__tips .tip { line-height: 1.6; }
+.moderation-card { transition: box-shadow 0.2s; }
+.moderation-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.tab-bar { border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tab { padding: 0.4rem 0.8rem; border: none; border-bottom: 2px solid transparent; background: none; color: var(--text-muted); cursor: pointer; font: inherit; font-size: 0.9rem; transition: color 0.15s, border-color 0.15s; }
+.tab:hover { color: var(--text); }
+.tab--active { color: var(--accent, var(--cyan)); border-bottom-color: var(--accent, var(--cyan)); }
+
+/* Welle 7 — CMS & Redaktion */
+.toc-widget ol { counter-reset: toc; }
+.toc-widget a:hover { text-decoration: underline; }
+.seo-analyzer ul { list-style: disc; }
+.media-library img { display: block; }
+.article-revisions { max-height: 200px; overflow-y: auto; }
+.content-calendar div[title] { cursor: help; }
+.admin-preview h1, .admin-preview h2, .admin-preview h3 { margin: 0.8rem 0 0.4rem; }
+.admin-preview p { margin: 0.4rem 0; line-height: 1.6; }
+.admin-preview blockquote { border-left: 3px solid var(--accent, var(--cyan)); padding-left: 0.75rem; color: var(--text-muted); margin: 0.5rem 0; }
+.admin-preview li { margin-left: 1.2rem; }
+.admin-preview code { background: var(--bg-elevated, var(--bg)); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85em; }
+.admin-cms-tools .chip { cursor: pointer; transition: background 0.15s; }
+.cms-preview-content { line-height: 1.7; }
