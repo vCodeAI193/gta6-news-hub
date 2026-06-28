@@ -9,8 +9,9 @@ Ort. **Release: 19. November 2026.**
 ## ✨ Features
 
 Die Plattform setzt alle 100 Punkte aus [FEATURES.md](./FEATURES.md) um — u. a.
-(weitere 100 geplante Features für Ausbaustufe 2 stehen in
-[FEATURES-2.md](./FEATURES-2.md)):
+(weitere 100 Features für Ausbaustufe 2 stehen in
+[FEATURES-2.md](./FEATURES-2.md), und ein offenes Backlog mit 500 weiteren Ideen
+für künftige Ausbaustufen in [FEATURES-3.md](./FEATURES-3.md)):
 
 - **Inhalte**: Markdown-Artikel mit Tags, Autor, Mehrfach-Quellen, Galerie +
   Lightbox, Video-Embeds, Lesezeit, Verlässlichkeits-Badge und verwandten Artikeln
