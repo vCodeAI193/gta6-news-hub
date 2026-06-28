@@ -88,6 +88,9 @@ export function Header() {
               {c.label}
             </NavLink>
           ))}
+          <NavLink to="/fuer-dich" className="mainnav__link" onClick={closeMenu}>
+            ⭐ Für dich
+          </NavLink>
           <NavLink to="/entdecken" className="mainnav__link" onClick={closeMenu}>
             ✨ Entdecken
           </NavLink>

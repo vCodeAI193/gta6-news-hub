@@ -33,6 +33,7 @@ const AboutPage = lazy(() => import('./routes/StaticPages').then((m) => ({ defau
 const PrivacyPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.PrivacyPage })))
 const ImprintPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.ImprintPage })))
 const NotFoundPage = lazy(() => import('./routes/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
+const ForYouPage = lazy(() => import('./routes/ForYouPage').then((m) => ({ default: m.ForYouPage })))
 
 export default function App() {
   return (
@@ -98,6 +99,7 @@ export default function App() {
         <Route path="suche" element={<Suspense fallback={<SkeletonGrid count={3} />}><SearchPage /></Suspense>} />
         <Route path="entdecken" element={<Suspense fallback={<SkeletonGrid count={3} />}><DiscoverPage /></Suspense>} />
         <Route path="thema/:tag" element={<Suspense fallback={<SkeletonGrid count={3} />}><TopicHubPage /></Suspense>} />
+        <Route path="fuer-dich" element={<Suspense fallback={<SkeletonGrid count={3} />}><ForYouPage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />

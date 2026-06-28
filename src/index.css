@@ -691,3 +691,61 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .tagcloud__label { color: var(--text-muted); font-size: 0.85rem; }
 .tagcloud__tag { text-decoration: none; color: var(--cyan); line-height: 1.2; }
 .tagcloud__tag:hover { color: var(--pink); }
+
+/* ---------- Welle 3: Personalisierung & Empfehlungen ---------- */
+/* Reading Streak */
+.streak-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
+.streak-card__flame { display: flex; align-items: center; gap: 0.5rem; font-size: 1.6rem; margin-bottom: 0.8rem; }
+.streak-card__count { font-size: 2rem; font-weight: 900; line-height: 1; }
+.streak-card__label { font-size: 0.82rem; color: var(--text-muted); }
+.streak-card__goal { margin-top: 0.6rem; }
+.streak-card__goal-label { font-size: 0.85rem; margin-bottom: 0.4rem; color: var(--text-muted); }
+.streak-card__done { color: var(--green); font-weight: 700; }
+.streak-card__bar { position: relative; height: 10px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.streak-card__fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width 0.4s ease; }
+.streak-card__hint { font-size: 0.82rem; color: var(--text-muted); margin: 0.6rem 0 0; }
+
+/* Weekly Digest */
+.digest-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; }
+.digest-card__title { margin: 0 0 0.7rem; font-size: 1rem; }
+.digest-card__empty { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+.digest-card__stats { list-style: none; padding: 0; margin: 0 0 0.8rem; display: grid; gap: 0.35rem; font-size: 0.88rem; color: var(--text-muted); }
+.digest-card__stats strong { color: var(--text); }
+
+/* Hidden Topics */
+.hidden-topics { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; }
+.hidden-topics__title { margin: 0 0 0.8rem; font-size: 1rem; }
+.hidden-topics__add { display: grid; gap: 0.5rem; margin-bottom: 0.8rem; }
+.hidden-topics__row { display: flex; gap: 0.5rem; }
+.hidden-topics__input { flex: 1; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.4rem 0.7rem; font: inherit; font-size: 0.88rem; }
+.hidden-topics__empty { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
+.hidden-topics__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
+.hidden-topics__item { display: flex; align-items: center; gap: 0.6rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.6rem; }
+.hidden-topics__name { flex: 1; font-size: 0.88rem; }
+
+/* For You Feed */
+.for-you-feed__filters { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.for-you-feed__empty { color: var(--text-muted); }
+.for-you-feed__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.8rem; }
+.for-you-feed__item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.for-you-feed__link { display: flex; gap: 0.8rem; padding: 0.8rem; color: inherit; text-decoration: none; }
+.for-you-feed__link:hover { border-color: var(--accent, var(--pink)); }
+.for-you-feed__thumb { width: 120px; height: 68px; object-fit: cover; border-radius: 8px; flex: none; }
+.for-you-feed__body { flex: 1; min-width: 0; }
+.for-you-feed__why { display: block; font-size: 0.75rem; color: var(--cyan); font-weight: 600; margin-bottom: 0.25rem; }
+.for-you-feed__title { display: block; font-weight: 700; font-size: 0.95rem; line-height: 1.35; margin-bottom: 0.25rem; }
+.for-you-feed__excerpt { margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* For You Page */
+.for-you-page__title { margin-bottom: 1rem; }
+.for-you-page__onboarding { background: rgba(245,166,35,0.1); border: 1px solid var(--amber,#f5a623); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 1.2rem; font-size: 0.9rem; }
+.for-you-page__layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media (min-width: 860px) { .for-you-page__layout { grid-template-columns: 1fr 300px; } }
+.for-you-page__main {}
+.for-you-page__sidebar { display: grid; gap: 0; align-content: start; }
+
+/* Article — continue reading & personal recs */
+.article__continue { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.9rem; margin: 1rem 0; font-size: 0.88rem; color: var(--text-muted); }
+.article__continue a { color: var(--cyan); }
+.article__personal-recs { margin: 1.5rem 0; }
+.article__personal-recs h3 { font-size: 1rem; margin: 0 0 0.7rem; }

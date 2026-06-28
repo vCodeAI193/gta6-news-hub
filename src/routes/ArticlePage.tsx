@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -30,6 +30,11 @@ import { fetchArticle } from '../services/articlesRepo'
 import { isReadLater, markRead, toggleReadLater } from '../services/userDataService'
 import type { Article } from '../types'
 import { NotFoundPage } from './NotFoundPage'
+import { savePosition, getLastPosition, recordRead } from '../services/readingHistoryService'
+import { usePreferences } from '../context/PreferencesContext'
+import { getHiddenSources, getHiddenTags } from '../services/hiddenTopicsService'
+import { getHistory } from '../services/readingHistoryService'
+import { recommendFeed, explainRecommendation } from '../lib/recommendation'
 
 export function ArticlePage() {
   const { id = '' } = useParams()
@@ -40,6 +45,9 @@ export function ArticlePage() {
   const [lightbox, setLightbox] = useState<string | null>(null)
   const [readLater, setReadLater] = useState(false)
   const [presence, setPresence] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const articleRef = useRef<HTMLElement>(null)
+  const { prefs } = usePreferences()
 
   // Präsenz: diesen Artikel als „betrachtet" melden und Zähler empfangen.
   useEffect(() => {
@@ -62,7 +70,19 @@ export function ArticlePage() {
       setArticle(found ?? null)
       if (found) {
         markRead(found.id)
+        recordRead(found.id)
         setReadLater(isReadLater(found.id))
+        // Restore last scroll position
+        const lastPos = getLastPosition(found.id)
+        if (lastPos > 10) {
+          setTimeout(() => {
+            const el = articleRef.current
+            if (el) {
+              const scrollY = (lastPos / 100) * (document.documentElement.scrollHeight - window.innerHeight)
+              window.scrollTo({ top: scrollY, behavior: 'smooth' })
+            }
+          }, 300)
+        }
       }
     })
     return () => {
@@ -70,10 +90,47 @@ export function ArticlePage() {
     }
   }, [id])
 
+  // Track scroll progress and save position on scroll/unmount
+  useEffect(() => {
+    if (!article) return
+    const handleScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight
+      if (total <= 0) return
+      const pct = Math.round((window.scrollY / total) * 100)
+      setScrollProgress(pct)
+      savePosition(article.id, pct)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      // Save final position on unmount
+      if (article) {
+        const total = document.documentElement.scrollHeight - window.innerHeight
+        if (total > 0) {
+          savePosition(article.id, Math.round((window.scrollY / total) * 100))
+        }
+      }
+    }
+  }, [article])
+
   const related = useMemo(
     () => (article ? getRelated(article, articles) : []),
     [article, articles],
   )
+
+  const personalRecommendations = useMemo(() => {
+    if (!article) return []
+    const history = getHistory()
+    const hiddenTags = getHiddenTags()
+    const hiddenSources = getHiddenSources()
+    return recommendFeed(
+      articles.filter((a) => a.id !== article.id),
+      prefs.interests,
+      history,
+      hiddenTags,
+      hiddenSources,
+    ).slice(0, 3)
+  }, [article, articles, prefs.interests])
 
   if (article === undefined) return <SkeletonGrid count={3} />
   if (article === null) return <NotFoundPage />
@@ -82,7 +139,7 @@ export function ArticlePage() {
   const sources = article.sources ?? [{ name: article.source, url: article.sourceUrl }]
 
   return (
-    <article className="article">
+    <article className="article" ref={articleRef}>
       <Seo
         title={article.title}
         description={article.excerpt}
@@ -196,6 +253,34 @@ export function ArticlePage() {
       <RelatedArticles articles={related} />
 
       <Comments articleId={article.id} live={article.category === 'trailer'} />
+
+      {scrollProgress > 10 && scrollProgress < 90 && (
+        <div className="article__continue">
+          <span>📖 Du hast {scrollProgress}% gelesen. </span>
+          <Link to={`/fuer-dich`}>Weiterlesen — Für dich</Link>
+        </div>
+      )}
+
+      {personalRecommendations.length > 0 && (
+        <section className="article__personal-recs">
+          <h3>Empfohlen für dich</h3>
+          <ul className="related__list">
+            {personalRecommendations.map((rec) => (
+              <li key={rec.id} className="related__item">
+                <img className="related__thumb" src={rec.image} alt="" width={84} height={56} />
+                <div>
+                  <Link to={`/news/${rec.id}`} className="related__headline">
+                    {rec.title}
+                  </Link>
+                  <span className="related__date">
+                    {explainRecommendation(rec, prefs.interests, getHistory())}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <p className="article__back">
         <Link to="/">← {t('article.back')}</Link>

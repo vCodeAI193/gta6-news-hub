@@ -32,6 +32,12 @@ function systemPrefersDark(): boolean {
     : true
 }
 
+/** Returns true if the current hour is outside daytime (6–20). */
+function isNightTime(): boolean {
+  const hour = new Date().getHours()
+  return hour < 6 || hour >= 20
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   // Dark Mode ist bewusst der Standard (GTA-Stil).
   const [mode, setModeState] = useState<ThemeMode>(() => readJSON<ThemeMode>(MODE_KEY, 'dark'))
@@ -47,7 +53,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const resolved: 'dark' | 'light' = mode === 'system' ? (systemDark ? 'dark' : 'light') : mode
+  // When mode is 'system', also apply time-of-day heuristic (6–20 = light, else dark).
+  const resolved: 'dark' | 'light' =
+    mode === 'system' ? (systemDark || isNightTime() ? 'dark' : 'light') : mode
 
   // Theme & Schriftgröße auf <html> anwenden.
   useEffect(() => {
