@@ -476,3 +476,101 @@
 - Implement server-side push via the existing WebSocket hub: on `broadcast`
   event, call the Notifications API (already wired in `miscServices.ts`).
 - Export/import notification preferences as part of the GDPR data export.
+
+---
+
+## Wave 11 — Monetisation & Commerce (`src/services/subscriptionService.ts`, `/premium`)
+
+### Decisions
+- **No real payment processing.** `upgradePlan` stores the new plan in
+  localStorage and records a mock payment. Stripe, crypto, and dunning workflow
+  are documented stubs — they require external credentials and server endpoints.
+- **Three-tier plan model.** Free / Plus / Pro with static feature lists in
+  `PLANS`. Simple to extend: add a tier to the array, no code change elsewhere.
+- **Coupon codes are hardcoded.** Three codes (`LAUNCH20`, `FANS10`, `VICE30`)
+  give 20–30 % discounts. A real system would query a discount table.
+- **Gift codes use a simple prefix check.** Any code starting with `GTA6-`
+  activates Plus. Real codes need a cryptographically unique redemption flow.
+
+### Critique
+- **All subscription logic is client-side.** Nothing prevents the user from
+  opening DevTools and writing `'pro'` directly to localStorage.
+- **No real paywall enforcement.** The `isPremium()` guard is a suggestion;
+  premium content is not actually withheld without a server-side check.
+- **Refund flow is immediate.** Real dunning requires retry logic, webhook
+  events from Stripe, and a grace period.
+
+### Improvement suggestions
+- Move subscription state to the JWT claims served by `/api/auth`; verify
+  on each API call so the paywall is enforced server-side.
+- Add a `POST /api/billing/portal` redirect to a Stripe Customer Portal for
+  real subscription management.
+- Generate unique gift codes server-side with expiry dates and redemption
+  tracking, stored in the `billing` SQLite table.
+
+---
+
+## Wave 12 — Accounts, Identity & Privacy (`src/services/privacyService.ts`, `/datenschutz-dashboard`)
+
+### Decisions
+- **GDPR export iterates `gta6hub_*` localStorage keys.** This is the actual
+  full export — all data in localStorage with our prefix — not a curated subset.
+- **Consent is logged per purpose.** `recordConsent` appends an immutable log
+  entry on each toggle; the log accumulates over time for audit purposes.
+- **Age verification is honour-based.** The year field is unvalidated beyond
+  computing `currentYear - birthYear >= 18`. Real age verification requires a
+  third-party provider.
+- **OAuth/Magic Link/Passkeys/SSO** are UI stubs — the backend (`server/auth.mjs`)
+  already has JWT + 2FA (TOTP); extending it to social providers is a future
+  integration task.
+
+### Critique
+- **Privacy dashboard controls are not enforced.** `showBookmarks: false` does
+  not actually hide bookmarks from other users' views (no backend filter).
+- **Cookie inventory is hardcoded.** A real scanner would enumerate all first-
+  and third-party cookies at runtime. The list will rot as services are added.
+- **Import is not validated.** `importUserData` writes any key starting with
+  `gta6hub_` without schema validation, allowing corrupted data to overwrite
+  valid state.
+
+### Improvement suggestions
+- Enforce privacy settings server-side: pass `profilePublic` in `/api/users/:id`
+  response and filter accordingly in the social routes.
+- Replace the hardcoded cookie list with a runtime scanner using
+  `document.cookie` + known key prefixes.
+- Validate imported data against Zod schemas before writing to localStorage.
+
+---
+
+## Wave 13 — Localisation & Accessibility (`src/lib/a11y.ts`, `/barrierefreiheit`)
+
+### Decisions
+- **Font family is applied via a CSS custom property.** `--font-family` is set
+  on `<html>` element; all components inherit it. No class toggle needed.
+- **High-contrast and reduced-motion** are applied via class toggles on `<html>`
+  so CSS can target them with `html.high-contrast` and
+  `html.force-reduced-motion` selectors. Separate from `prefers-reduced-motion`
+  media query to allow explicit user override.
+- **Locale formatting uses `Intl` APIs.** No date/number formatting library
+  added — `Intl.DateTimeFormat` / `Intl.NumberFormat` cover all needs and are
+  available in all target browsers.
+- **Additional languages (ES/FR/PT/JP)** are infrastructure stubs. The i18n
+  `DE/EN` translation system exists; extending it requires translation files
+  which are not authored here.
+
+### Critique
+- **OpenDyslexic font is not bundled.** The dyslexia-friendly font falls back
+  to Comic Sans MS if OpenDyslexic is not installed. A real implementation would
+  self-host the font.
+- **High-contrast CSS variables** are not defined in `index.css` yet; the class
+  toggle works but has no visual effect without CSS rules targeting it.
+- **Locale auto-detection** reads `navigator.language` once at startup; it does
+  not react to language changes (which is fine for SSR but not for in-session
+  switching).
+
+### Improvement suggestions
+- Add `@font-face` for OpenDyslexic from a self-hosted source.
+- Define `html.high-contrast` CSS overrides: white background, black text,
+  thick borders, no gradients.
+- Extend the i18n system with at least partial ES and FR translations to make
+  the multi-language support tangible rather than structural.

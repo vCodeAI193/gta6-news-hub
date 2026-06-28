@@ -43,6 +43,9 @@ const ModerationQueuePage = lazy(() => import('./routes/ModerationQueuePage').th
 const DatabasePage = lazy(() => import('./routes/DatabasePage').then((m) => ({ default: m.DatabasePage })))
 const SoundtrackPage = lazy(() => import('./routes/SoundtrackPage').then((m) => ({ default: m.SoundtrackPage })))
 const NotificationsPage = lazy(() => import('./routes/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
+const PricingPage = lazy(() => import('./routes/PricingPage').then((m) => ({ default: m.PricingPage })))
+const PrivacyDashboardPage = lazy(() => import('./routes/PrivacyDashboardPage').then((m) => ({ default: m.PrivacyDashboardPage })))
+const AccessibilityPage = lazy(() => import('./routes/AccessibilityPage').then((m) => ({ default: m.AccessibilityPage })))
 
 export default function App() {
   return (
@@ -115,6 +118,9 @@ export default function App() {
         <Route path="profil" element={<Suspense fallback={<SkeletonGrid count={2} />}><UserProfilePage /></Suspense>} />
         <Route path="sicherheit" element={<Suspense fallback={<SkeletonGrid count={2} />}><SecurityPage /></Suspense>} />
         <Route path="moderation-queue" element={<Suspense fallback={<SkeletonGrid count={2} />}><ModerationQueuePage /></Suspense>} />
+        <Route path="premium" element={<Suspense fallback={<SkeletonGrid count={2} />}><PricingPage /></Suspense>} />
+        <Route path="datenschutz-dashboard" element={<Suspense fallback={null}><PrivacyDashboardPage /></Suspense>} />
+        <Route path="barrierefreiheit" element={<Suspense fallback={null}><AccessibilityPage /></Suspense>} />
         <Route path="datenbank" element={<Suspense fallback={<SkeletonGrid count={3} />}><DatabasePage /></Suspense>} />
         <Route path="soundtrack" element={<Suspense fallback={<SkeletonGrid count={3} />}><SoundtrackPage /></Suspense>} />
         <Route path="benachrichtigungen" element={<Suspense fallback={null}><NotificationsPage /></Suspense>} />

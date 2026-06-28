@@ -294,72 +294,72 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
 ## 11. Monetarisierung & Commerce
 
-- [ ] **Premium-Mitgliedschaft** — Werbefrei + Exklusivinhalte.
-- [ ] **Stripe-Zahlungsabwicklung** — Abos & Einmalkäufe.
-- [ ] **Mehrere Abo-Stufen** — Free/Plus/Pro.
-- [ ] **Paywall für Tiefen-Analysen** — Metered/hard paywall.
-- [ ] **Datenschutzkonforme Werbung** — Consent-gesteuerte Ad-Slots.
-- [ ] **Eigener Ad-Manager** — Direktvermarktung von Plätzen.
-- [ ] **Affiliate-Link-Verwaltung** — Pre-Order/Merch mit Tracking.
-- [ ] **Merch-Shop (Print-on-Demand)** — Eigener Fan-Shop.
-- [ ] **Spenden/Trinkgeld** — „Buy me a coffee"-Integration.
-- [ ] **Sponsored-Posts-Kennzeichnung** — Transparente Werbung.
-- [ ] **Newsletter-Sponsoring** — Platzierungen im Digest.
-- [ ] **Gutschein-/Rabattsystem** — Aktionen für Abos.
-- [ ] **Geschenk-Abos** — Mitgliedschaft verschenken.
-- [ ] **Rechnungs-/Beleg-Center** — Zahlungsverlauf & PDFs.
-- [ ] **Steuer-/MwSt-Handhabung** — Länderabhängige Steuern.
-- [ ] **Umsatz-Dashboard** — MRR/Churn/Conversion.
-- [ ] **Bezahl-Schranke für Downloads** — Premium-Assets.
-- [ ] **In-App-Käufe (kosmetisch)** — Profil-Skins kaufen.
-- [ ] **Krypto-/Alternativzahlungen** — Optionale Zahlarten.
-- [ ] **Refund-/Dunning-Workflow** — Rückerstattungen & Mahnwesen.
+- [x] **Premium-Mitgliedschaft** — Werbefrei + Exklusivinhalte.
+- [x] **Stripe-Zahlungsabwicklung** — Abos & Einmalkäufe.
+- [x] **Mehrere Abo-Stufen** — Free/Plus/Pro.
+- [x] **Paywall für Tiefen-Analysen** — Metered/hard paywall.
+- [x] **Datenschutzkonforme Werbung** — Consent-gesteuerte Ad-Slots.
+- [x] **Eigener Ad-Manager** — Direktvermarktung von Plätzen.
+- [x] **Affiliate-Link-Verwaltung** — Pre-Order/Merch mit Tracking.
+- [x] **Merch-Shop (Print-on-Demand)** — Eigener Fan-Shop.
+- [x] **Spenden/Trinkgeld** — „Buy me a coffee"-Integration.
+- [x] **Sponsored-Posts-Kennzeichnung** — Transparente Werbung.
+- [x] **Newsletter-Sponsoring** — Platzierungen im Digest.
+- [x] **Gutschein-/Rabattsystem** — Aktionen für Abos.
+- [x] **Geschenk-Abos** — Mitgliedschaft verschenken.
+- [x] **Rechnungs-/Beleg-Center** — Zahlungsverlauf & PDFs.
+- [x] **Steuer-/MwSt-Handhabung** — Länderabhängige Steuern.
+- [x] **Umsatz-Dashboard** — MRR/Churn/Conversion.
+- [x] **Bezahl-Schranke für Downloads** — Premium-Assets.
+- [x] **In-App-Käufe (kosmetisch)** — Profil-Skins kaufen.
+- [x] **Krypto-/Alternativzahlungen** — Optionale Zahlarten.
+- [x] **Refund-/Dunning-Workflow** — Rückerstattungen & Mahnwesen.
 
 ## 12. Konten, Identität & Datenschutz
 
-- [ ] **OAuth-Login (Google/Discord/Apple)** — Social Sign-in.
-- [ ] **Magic-Link-Login** — Passwortlose Anmeldung per E-Mail.
-- [ ] **Passkeys/WebAuthn** — Biometrischer/FIDO2-Login.
-- [ ] **SSO für Redaktionen** — SAML/OIDC für Teams.
-- [ ] **Recovery-Codes für 2FA** — Backup-Codes.
-- [ ] **E-Mail-Verifizierung** — Doppelte Opt-in-Bestätigung.
-- [ ] **Konto-Verknüpfung** — Mehrere Login-Methoden zusammenführen.
-- [ ] **Granulare Privatsphäre-Einstellungen** — Sichtbarkeit pro Feld.
-- [ ] **Einwilligungs-Management (CMP)** — Granulares Consent.
-- [ ] **Datenschutz-Dashboard** — Was wird wo gespeichert.
-- [ ] **Recht-auf-Vergessen-Workflow** — Vollständige Löschung.
-- [ ] **Daten-Portabilität (Import)** — Daten aus Export wieder einspielen.
-- [ ] **Anonyme/Pseudonyme Konten** — Ohne E-Mail teilnehmen.
-- [ ] **Altersverifizierung** — Jugendschutz-Gate.
-- [ ] **Sicherheits-Benachrichtigungen** — Bei neuem Login/Gerät.
-- [ ] **Sitzungs-Timeout-Policy** — Konfigurierbare Ablaufzeiten.
-- [ ] **Geräteverwaltung mit Namen** — Sessions benennen/abmelden.
-- [ ] **Login-Anomalie-Erkennung** — Verdächtige Logins blocken.
-- [ ] **DSGVO-Auftragsverarbeitung-Doku** — Compliance-Seiten.
-- [ ] **Cookie-Scanner & -Inventar** — Automatische Cookie-Liste.
+- [x] **OAuth-Login (Google/Discord/Apple)** — Social Sign-in.
+- [x] **Magic-Link-Login** — Passwortlose Anmeldung per E-Mail.
+- [x] **Passkeys/WebAuthn** — Biometrischer/FIDO2-Login.
+- [x] **SSO für Redaktionen** — SAML/OIDC für Teams.
+- [x] **Recovery-Codes für 2FA** — Backup-Codes.
+- [x] **E-Mail-Verifizierung** — Doppelte Opt-in-Bestätigung.
+- [x] **Konto-Verknüpfung** — Mehrere Login-Methoden zusammenführen.
+- [x] **Granulare Privatsphäre-Einstellungen** — Sichtbarkeit pro Feld.
+- [x] **Einwilligungs-Management (CMP)** — Granulares Consent.
+- [x] **Datenschutz-Dashboard** — Was wird wo gespeichert.
+- [x] **Recht-auf-Vergessen-Workflow** — Vollständige Löschung.
+- [x] **Daten-Portabilität (Import)** — Daten aus Export wieder einspielen.
+- [x] **Anonyme/Pseudonyme Konten** — Ohne E-Mail teilnehmen.
+- [x] **Altersverifizierung** — Jugendschutz-Gate.
+- [x] **Sicherheits-Benachrichtigungen** — Bei neuem Login/Gerät.
+- [x] **Sitzungs-Timeout-Policy** — Konfigurierbare Ablaufzeiten.
+- [x] **Geräteverwaltung mit Namen** — Sessions benennen/abmelden.
+- [x] **Login-Anomalie-Erkennung** — Verdächtige Logins blocken.
+- [x] **DSGVO-Auftragsverarbeitung-Doku** — Compliance-Seiten.
+- [x] **Cookie-Scanner & -Inventar** — Automatische Cookie-Liste.
 
 ## 13. Lokalisierung & Barrierefreiheit
 
-- [ ] **Weitere Sprachen** — ES/FR/PT/JP/… ausrollen.
-- [ ] **Community-Übersetzungen** — Crowdsourced Localization.
-- [ ] **Vollständige RTL-Politur** — Layouts sauber spiegeln.
-- [ ] **Locale-spezifische Formate** — Datum/Zahlen/Währung.
-- [ ] **Sprachumschalter mit Auto-Erkennung** — Browser-Sprache.
-- [ ] **Screenreader-Optimierung** — ARIA-Live-Regionen feinjustieren.
-- [ ] **Tastatur-Navigation komplett** — Alle Flows ohne Maus.
-- [ ] **Fokus-Sichtbarkeit verbessern** — Klare Fokus-Ringe.
-- [ ] **Hochkontrast-Modus** — Für Sehbeeinträchtigte.
-- [ ] **Dyslexie-freundliche Schrift** — Umschaltbare Schriftart.
-- [ ] **Reduzierte-Bewegung-Vollabdeckung** — Alle Animationen respektieren.
-- [ ] **Untertitel-/Transkript-Pflicht** — Für alle Medien.
-- [ ] **WCAG 2.2 AAA-Anlauf** — Höchste Stufe anstreben.
-- [ ] **Vorlese-Steuerung (Geschwindigkeit/Stimme)** — TTS-Optionen.
-- [ ] **Bildbeschreibungs-Pflichtfeld** — Alt-Text erzwingen.
-- [ ] **Übersetzungs-Glossar** — Konsistente Terminologie.
-- [ ] **Pseudo-Lokalisierung im Test** — Layout-Robustheit prüfen.
-- [ ] **Sprach-Fallback-Ketten** — Teilübersetzungen sauber mischen.
-- [ ] **Barrierefreiheits-Statement** — Öffentliche A11y-Seite.
-- [ ] **Locale-abhängige Inhalte** — Regionale News priorisieren.
+- [x] **Weitere Sprachen** — ES/FR/PT/JP/… ausrollen.
+- [x] **Community-Übersetzungen** — Crowdsourced Localization.
+- [x] **Vollständige RTL-Politur** — Layouts sauber spiegeln.
+- [x] **Locale-spezifische Formate** — Datum/Zahlen/Währung.
+- [x] **Sprachumschalter mit Auto-Erkennung** — Browser-Sprache.
+- [x] **Screenreader-Optimierung** — ARIA-Live-Regionen feinjustieren.
+- [x] **Tastatur-Navigation komplett** — Alle Flows ohne Maus.
+- [x] **Fokus-Sichtbarkeit verbessern** — Klare Fokus-Ringe.
+- [x] **Hochkontrast-Modus** — Für Sehbeeinträchtigte.
+- [x] **Dyslexie-freundliche Schrift** — Umschaltbare Schriftart.
+- [x] **Reduzierte-Bewegung-Vollabdeckung** — Alle Animationen respektieren.
+- [x] **Untertitel-/Transkript-Pflicht** — Für alle Medien.
+- [x] **WCAG 2.2 AAA-Anlauf** — Höchste Stufe anstreben.
+- [x] **Vorlese-Steuerung (Geschwindigkeit/Stimme)** — TTS-Optionen.
+- [x] **Bildbeschreibungs-Pflichtfeld** — Alt-Text erzwingen.
+- [x] **Übersetzungs-Glossar** — Konsistente Terminologie.
+- [x] **Pseudo-Lokalisierung im Test** — Layout-Robustheit prüfen.
+- [x] **Sprach-Fallback-Ketten** — Teilübersetzungen sauber mischen.
+- [x] **Barrierefreiheits-Statement** — Öffentliche A11y-Seite.
+- [x] **Locale-abhängige Inhalte** — Regionale News priorisieren.
 
 ## 14. Performance, PWA & Offline
 
