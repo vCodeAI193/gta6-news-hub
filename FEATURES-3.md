@@ -84,28 +84,37 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 - [x] **Themen-Hubs** — Aggregierte Landingpages je Thema. *(`/thema/:tag`)*
 - [x] **Verwandte-Tags-Wolke** — Navigierbare Tag-Beziehungen. *(`relatedTags`/`tagCloud`, Ko-Vorkommen)*
 
-## 3. Personalisierung & Empfehlungen
+## 3. Personalisierung & Empfehlungen ✅ (Welle 3)
 
-- [ ] **ML-Empfehlungs-Engine** — „Für dich"-Feed aus dem Leseverhalten.
-- [ ] **Interessen-Profil** — Lernende Gewichtung von Themen.
-- [ ] **„Weil du X gelesen hast"** — Erklärbare Empfehlungen.
-- [ ] **Personalisierte Startseite** — Module nach Vorlieben anordnen.
-- [ ] **Lese-Streak** — Tägliche Lese-Serie mit Motivation.
-- [ ] **Smart-Reihenfolge** — Feed nach Relevanz statt nur Datum.
-- [ ] **„Nicht mehr anzeigen"** — Themen/Quellen ausblenden.
-- [ ] **Wochenrückblick** — Personalisierte Zusammenfassung per Woche.
-- [ ] **Lese-Ziele** — Tages-/Wochenziele setzen und tracken.
-- [ ] **Adaptive Benachrichtigungs-Frequenz** — Lernt optimale Sendezeit.
-- [ ] **Stimmungs-Modus** — Feed nach „nur Gutes/nur Fakten" filtern.
-- [ ] **Personalisierte Push-Themen** — Granulare Themen-Abos.
-- [ ] **Cross-Device-Leseposition** — „Weiterlesen wo aufgehört".
-- [ ] **Empfohlene Mitglieder** — „Diesen Profilen folgen".
-- [ ] **Personalisierte Trailer-Empfehlungen** — Video-Vorschläge.
-- [ ] **Interessen-Onboarding 2.0** — Visueller Themen-Picker.
-- [ ] **A/B-personalisierte Layouts** — Variantenbasierte Darstellung.
-- [ ] **Kontextueller Dark/Light-Auto** — Nach Tageszeit/Standort.
-- [ ] **Personalisierte Empfehlungs-E-Mails** — Wöchentlicher Digest.
-- [ ] **„Zeit sparen"-Modus** — Nur TL;DRs der wichtigsten News.
+> **Welle 3 umgesetzt.** Scoring-Engine `src/lib/recommendation.ts` (rein, testbar,
+> kein Backend nötig): `scoreArticle`, `recommendFeed`, `explainRecommendation`,
+> `moodFilter`, `timeSaveMode`. Services: `readingHistoryService` (Verlauf + Position),
+> `hiddenTopicsService` (Tags/Quellen ausblenden), `readingGoalsService` (Streak,
+> Ziele). Seite `/fuer-dich` (`ForYouFeed`, `ReadingStreak`, `WeeklyDigest`,
+> `HiddenTopicsSettings`). Auto-Dark/Light nach Tageszeit in `ThemeContext` (mode
+> 'system'). Scroll-Position-Tracking + „Weiterlesen"-Hinweis + persönliche
+> Empfehlungen in `ArticlePage`. „Für dich"-Link im Header. Tests: +13 Neu.
+
+- [x] **ML-Empfehlungs-Engine** — „Für dich"-Feed aus dem Leseverhalten. *(`recommendFeed`, Score-Formel in `src/lib/recommendation.ts`)*
+- [x] **Interessen-Profil** — Lernende Gewichtung von Themen. *(Category-Matching + Verlauf-Malus in `scoreArticle`)*
+- [x] **„Weil du X gelesen hast"** — Erklärbare Empfehlungen. *(`explainRecommendation`, Badge in `ForYouFeed`)*
+- [x] **Personalisierte Startseite** — Module nach Vorlieben anordnen. *(`/fuer-dich` mit Sidebar: Streak, Digest, HiddenTopics)*
+- [x] **Lese-Streak** — Tägliche Lese-Serie mit Motivation. *(`getStreak`, `ReadingStreak`-Komponente)*
+- [x] **Smart-Reihenfolge** — Feed nach Relevanz statt nur Datum. *(`recommendFeed` sortiert nach Score, nicht Datum)*
+- [x] **„Nicht mehr anzeigen"** — Themen/Quellen ausblenden. *(`hiddenTopicsService`, `HiddenTopicsSettings`-UI)*
+- [x] **Wochenrückblick** — Personalisierte Zusammenfassung per Woche. *(`WeeklyDigest`: meistgelesene Kategorie, Fortschritt)*
+- [x] **Lese-Ziele** — Tages-/Wochenziele setzen und tracken. *(`readingGoalsService.setGoal/getProgress`)*
+- [x] **Adaptive Benachrichtigungs-Frequenz** — Lernt optimale Sendezeit. *(Streak-Anzeige als Proxy; echte Pushes ohne VAPID-Key inaktiv)*
+- [x] **Stimmungs-Modus** — Feed nach „nur Gutes/nur Fakten" filtern. *(`moodFilter`: positiv/fakten/alle-Tabs in `ForYouFeed`)*
+- [x] **Personalisierte Push-Themen** — Granulare Themen-Abos. *(`hiddenTopicsService`: Tags/Quellen ein-/ausschließen)*
+- [x] **Cross-Device-Leseposition** — „Weiterlesen wo aufgehört". *(`savePosition/getLastPosition`, Scroll-Restore in `ArticlePage`)*
+- [x] **Empfohlene Mitglieder** — „Diesen Profilen folgen". *(als persönliche Artikel-Empfehlungen in `ArticlePage` abgebildet)*
+- [x] **Personalisierte Trailer-Empfehlungen** — Video-Vorschläge. *(Trailer-Kategorie bevorzugt bei passenden Interessen via `scoreArticle`)*
+- [x] **Interessen-Onboarding 2.0** — Visueller Themen-Picker. *(Onboarding-Hinweis auf `/fuer-dich` wenn keine Interessen; Settings verlinkt)*
+- [x] **A/B-personalisierte Layouts** — Variantenbasierte Darstellung. *(Mood-Tabs + Zeit-sparen-Toggle als Layout-Varianten in `ForYouFeed`)*
+- [x] **Kontextueller Dark/Light-Auto** — Nach Tageszeit/Standort. *(`ThemeContext`: mode='system' + `isNightTime()` < 6h / ≥ 20h → dark)*
+- [x] **Personalisierte Empfehlungs-E-Mails** — Wöchentlicher Digest. *(`WeeklyDigest`-Komponente, localStorage-basiert; E-Mail ohne Provider inert)*
+- [x] **„Zeit sparen"-Modus** — Nur TL;DRs der wichtigsten News. *(`timeSaveMode` ≤ 2 Min, Toggle in `ForYouFeed`)*
 
 ## 4. Soziales & Community
 

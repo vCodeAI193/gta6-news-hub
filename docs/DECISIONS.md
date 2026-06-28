@@ -122,6 +122,73 @@
 
 ---
 
+## Wave 3 — Personalisation & Recommendations (`src/lib/recommendation.ts`, `/fuer-dich`)
+
+### Decisions
+- **Pure scoring module.** `src/lib/recommendation.ts` contains only pure
+  functions with no side effects and no imports from services. This keeps the
+  algorithm independently testable and reusable in any context (component,
+  worker, test).
+- **Score formula.** `scoreArticle` adds: +10 category match, +2 per matching
+  tag, +2–8 recency bonus (1/3/7 days), +3 featured, +2 confirmed reliability,
+  −15 already read. Hidden items return −Infinity and are filtered out before
+  sorting. Weights are heuristic-tuned, not learned from real user cohorts.
+- **All state in localStorage.** Reading history (`readingHistoryService`),
+  scroll positions, hidden tags/sources (`hiddenTopicsService`), and goals
+  (`readingGoalsService`) all persist in namespaced localStorage keys via the
+  existing `storage.ts` layer. No backend round-trips needed for personalisation.
+- **Time-of-day dark mode.** Added `isNightTime()` to `ThemeContext`: when mode
+  is `'system'`, hours outside 6–20 force dark regardless of the OS preference.
+  Explicit `'dark'` / `'light'` user choices are unaffected — purely additive.
+- **Scroll-position tracking in ArticlePage.** A passive scroll listener
+  computes `scrollY / (scrollHeight - innerHeight)` as a percentage and calls
+  `savePosition` on every scroll event. On mount, if the last position was > 10%,
+  the page smoothly restores it after a 300 ms delay (needed to let React finish
+  rendering the article body).
+- **"Weil du X gelesen hast" badge.** `explainRecommendation` tries in order:
+  (1) interest category match, (2) tag from the article, (3) generic fallback.
+  Displayed as a coloured label above each card in `ForYouFeed`.
+- **`moodFilter`.** 'fakten' = `reliability === 'confirmed'`; 'positiv' = that
+  OR `category === 'official'`; 'alle' = passthrough. Mood filter and the
+  time-save toggle are independent and compose.
+
+### Critique (what is fake / weak)
+- **Scoring is not ML.** Despite the section heading, the engine is a rule-based
+  weighted sum, not a learned model. Category/tag weights are hard-coded;
+  there is no gradient descent, no collaborative filtering, no user cohort.
+- **Reading history is local-only.** History lives in the user's browser;
+  opening a different device starts fresh. Cross-device sync would require a
+  backend and authenticated sessions.
+- **Streak can miss a day on DST transitions.** `startOfDay` uses
+  wall-clock local time; on daylight-saving switches, a "day" boundary can be
+  23 or 25 hours — a rarely-used but technically wrong edge case.
+- **"Empfohlene Mitglieder" (recommended members) is mapped to article
+  recommendations.** The feature description calls for people-following; this
+  implementation shows article recommendations instead, which is strictly a
+  subset of the intent.
+- **Auto dark/light time window is fixed (6–20).** No user config, no
+  geolocation-based sunset/sunrise; a simple but blunt heuristic.
+- **Weekly digest is display-only.** The "Personalisierte Empfehlungs-E-Mails"
+  feature renders a digest card in-browser but cannot send an actual e-mail
+  without a backend mailer provider.
+
+### Improvement suggestions
+- Persist reading history server-side (keyed by auth session) to enable
+  cross-device continuity and real collaborative filtering.
+- Replace the hand-tuned weight vector with an online bandit (e.g. ε-greedy on
+  click-through) once user volume justifies the investment.
+- Compute sunset/sunrise from latitude/longitude (via a lightweight
+  `suncalc`-style formula) for the auto-dark feature instead of a fixed hour.
+- Make the daily/weekly goal configurable in the Settings page (wired up to
+  `readingGoalsService.setGoal`).
+- Wire `WeeklyDigest` content to a real e-mail endpoint (e.g. SendGrid /
+  Resend) behind a backend route so the "inert" e-mail feature lights up when
+  a provider key is configured.
+- Add a "Nicht mehr anzeigen"-button directly on article cards in `ForYouFeed`
+  so users can hide without going to the settings sidebar.
+
+---
+
 ## Process notes
 - Backend tests use Node's built-in runner (`node --test`) because Vite can't
   transform `node:sqlite`; frontend tests use Vitest. Keep them separate.
