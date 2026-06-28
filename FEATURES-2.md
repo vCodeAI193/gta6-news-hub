@@ -92,6 +92,17 @@ Details: [server/README.md](./server/README.md).
 - **CSV-Export** der Artikel-Reports
 - 50 Backend-Tests (inkl. Editorial/Analytics) + 48 Frontend-Tests — alle grün
 
+### ✅ Welle 9 umgesetzt — Konto & Community
+
+- **Konto-Einstellungen**: Name/E-Mail/Passwort ändern, Konto löschen (DSGVO)
+- **DSGVO-Datenexport** als JSON; **geräteübergreifende Sync** von Lesezeichen/
+  Einstellungen (`/api/me/sync`)
+- **Folgen & Aktivitäts-Feed** (`/feed`): Profilen folgen, Beiträge gefolgter
+  Mitglieder sehen; Follower-Zähler im Profil
+- **Release-Tippspiel** (`/tippspiel`): Tipps auf Termin/Plattform/Metascore mit
+  Community-Tally
+- 60 Backend-Tests (inkl. Account/Social-Tests) + 48 Frontend-Tests — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -101,11 +112,11 @@ Details: [server/README.md](./server/README.md).
 - [ ] **Magic-Link-Login** — Passwortlose Anmeldung per E-Mail-Link.
 - [x] **Öffentliche Profilseiten** — Avatar, Bio, Aktivität, Kommentare eines Nutzers. *(/u/:id — Reputation, Level, Badges, Kommentare)*
 - [ ] **2-Faktor-Authentifizierung** — TOTP/Authenticator-App-Support.
-- [ ] **Server-seitige Sync** — Lesezeichen/Einstellungen geräteübergreifend synchronisieren.
+- [x] **Server-seitige Sync** — Lesezeichen/Einstellungen geräteübergreifend synchronisieren. *(Lesezeichen/Einstellungen, /api/me/sync)*
 - [x] **Rollen & Berechtigungen** — Leser, Autor, Moderator, Admin.
-- [ ] **Konto-Einstellungen** — E-Mail ändern, Passwort zurücksetzen, Konto löschen (DSGVO).
+- [x] **Konto-Einstellungen** — E-Mail ändern, Passwort zurücksetzen, Konto löschen (DSGVO). *(Name/E-Mail/Passwort ändern, Konto löschen)*
 - [x] **Sitzungsverwaltung** — Aktive Geräte/Sessions anzeigen & abmelden. *(API — Sessions auflisten/widerrufen)*
-- [ ] **Datenexport** — Nutzerdaten als JSON exportieren (DSGVO-Auskunft).
+- [x] **Datenexport** — Nutzerdaten als JSON exportieren (DSGVO-Auskunft). *(DSGVO-JSON-Export)*
 
 ## 12. Echtes Backend & API
 
@@ -167,8 +178,8 @@ Details: [server/README.md](./server/README.md).
 - [x] **Nutzer-Einreichungen** — Leser reichen News/Leaks zur Prüfung ein. *(→ Moderations-Queue, +Rep bei Freigabe)*
 - [x] **Upvote/Downvote für Kommentare** — Beste Kommentare nach oben.
 - [ ] **Wöchentliche Community-Challenges** — Themen-Aktionen mit Belohnung.
-- [ ] **Tippspiel zum Release** — Wetten auf Termin/Details, Bestenliste.
-- [ ] **Folgen & Feed** — Autoren/Themen folgen, personalisierter Aktivitäts-Feed.
+- [x] **Tippspiel zum Release** — Wetten auf Termin/Details, Bestenliste. *(/tippspiel — Tipps + Tally)*
+- [x] **Folgen & Feed** — Autoren/Themen folgen, personalisierter Aktivitäts-Feed. *(Profile folgen → /feed)*
 - [ ] **Nutzer-Erwähnungen** — `@mention` in Kommentaren mit Benachrichtigung.
 - [ ] **Community-Wiki** — Kollaborative Wissensseiten zu GTA 6.
 

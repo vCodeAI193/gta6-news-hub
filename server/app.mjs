@@ -7,6 +7,7 @@ import { awardReputation, badgesFor, levelFor, POINTS } from './gamification.mjs
 import { createMetrics } from './metrics.mjs'
 import { createFlags } from './flags.mjs'
 import { API_VERSION, openapiSpec } from './openapi.mjs'
+import { predictionById, predictionQuestions } from './predictions.mjs'
 import {
   authenticate,
   hashPassword,
@@ -132,6 +133,81 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
   app.post('/api/auth/logout', requireAuth(db), (req, res) => {
     db.prepare('UPDATE sessions SET revoked = 1 WHERE id = ?').run(req.auth.sessionId)
     res.json({ ok: true })
+  })
+
+  // Profil aktualisieren (Name/E-Mail).
+  app.patch('/api/auth/me', requireAuth(db), (req, res) => {
+    const { displayName, email } = req.body ?? {}
+    if (email != null) {
+      if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'Ungültige E-Mail' })
+      const taken = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email.toLowerCase(), req.auth.user.id)
+      if (taken) return res.status(409).json({ error: 'E-Mail bereits vergeben' })
+      db.prepare('UPDATE users SET email = ? WHERE id = ?').run(email.toLowerCase(), req.auth.user.id)
+    }
+    if (displayName != null && displayName.trim()) {
+      db.prepare('UPDATE users SET display_name = ? WHERE id = ?').run(displayName.trim(), req.auth.user.id)
+    }
+    res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.auth.user.id)) })
+  })
+
+  // Passwort ändern.
+  app.post('/api/auth/change-password', requireAuth(db), (req, res) => {
+    const { currentPassword, newPassword } = req.body ?? {}
+    if (!verifyPassword(currentPassword ?? '', req.auth.user.password_hash))
+      return res.status(403).json({ error: 'Aktuelles Passwort falsch' })
+    if (!newPassword || newPassword.length < 8)
+      return res.status(400).json({ error: 'Neues Passwort min. 8 Zeichen' })
+    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(hashPassword(newPassword), req.auth.user.id)
+    // Andere Sessions abmelden, aktuelle behalten.
+    db.prepare('UPDATE sessions SET revoked = 1 WHERE user_id = ? AND id != ?').run(req.auth.user.id, req.auth.sessionId)
+    res.json({ ok: true })
+  })
+
+  // DSGVO-Datenexport.
+  app.get('/api/auth/export', requireAuth(db), (req, res) => {
+    const uid = req.auth.user.id
+    res.json({
+      exportedAt: new Date().toISOString(),
+      user: publicUser(req.auth.user),
+      comments: db.prepare('SELECT id, article_id, text, created_at FROM comments WHERE user_id = ?').all(uid),
+      reactions: db.prepare('SELECT article_id, emoji FROM reactions WHERE user_id = ?').all(uid),
+      votes: db.prepare('SELECT article_id, vote FROM votes WHERE user_id = ?').all(uid),
+      follows: db.prepare('SELECT target_id, created_at FROM follows WHERE follower_id = ?').all(uid),
+      predictions: db.prepare('SELECT question_id, choice, created_at FROM predictions WHERE user_id = ?').all(uid),
+      sync: JSON.parse(db.prepare('SELECT data FROM user_sync WHERE user_id = ?').get(uid)?.data ?? '{}'),
+    })
+  })
+
+  // Konto löschen (DSGVO) — entfernt Nutzer und zugehörige Daten.
+  app.delete('/api/auth/me', requireAuth(db), (req, res) => {
+    const uid = req.auth.user.id
+    for (const sql of [
+      'DELETE FROM comments WHERE user_id = ?',
+      'DELETE FROM comment_votes WHERE user_id = ?',
+      'DELETE FROM reactions WHERE user_id = ?',
+      'DELETE FROM votes WHERE user_id = ?',
+      'DELETE FROM follows WHERE follower_id = ? OR target_id = ?',
+      'DELETE FROM predictions WHERE user_id = ?',
+      'DELETE FROM user_sync WHERE user_id = ?',
+      'DELETE FROM sessions WHERE user_id = ?',
+      'DELETE FROM users WHERE id = ?',
+    ]) {
+      db.prepare(sql).run(...(sql.includes('OR target_id') ? [uid, uid] : [uid]))
+    }
+    res.json({ ok: true })
+  })
+
+  // Geräteübergreifende Sync (Lesezeichen/Einstellungen).
+  app.get('/api/me/sync', requireAuth(db), (req, res) => {
+    const row = db.prepare('SELECT data, updated_at FROM user_sync WHERE user_id = ?').get(req.auth.user.id)
+    res.json({ data: JSON.parse(row?.data ?? '{}'), updatedAt: row?.updated_at ?? null })
+  })
+  app.put('/api/me/sync', requireAuth(db), (req, res) => {
+    const data = JSON.stringify(req.body?.data ?? {})
+    const now = new Date().toISOString()
+    db.prepare('INSERT INTO user_sync (user_id, data, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at')
+      .run(req.auth.user.id, data, now)
+    res.json({ ok: true, updatedAt: now })
   })
 
   // -------------------------------------------------------------- articles
@@ -485,6 +561,8 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     if (!u) return res.status(404).json({ error: 'Nutzer nicht gefunden' })
     const commentCount = db.prepare("SELECT COUNT(*) AS n FROM comments WHERE user_id = ? AND status = 'visible'").get(u.id).n
     const submissionsApproved = db.prepare("SELECT COUNT(*) AS n FROM articles WHERE submitted_by = ? AND status = 'published'").get(u.id).n
+    const followers = db.prepare('SELECT COUNT(*) AS n FROM follows WHERE target_id = ?').get(u.id).n
+    const following = db.prepare('SELECT COUNT(*) AS n FROM follows WHERE follower_id = ?').get(u.id).n
     const recent = db.prepare("SELECT id, article_id, text, created_at FROM comments WHERE user_id = ? AND status = 'visible' ORDER BY created_at DESC LIMIT 5").all(u.id)
     res.json({
       profile: {
@@ -495,7 +573,7 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
         joinedAt: u.created_at,
         ...levelFor(u.reputation),
         badges: badgesFor({ reputation: u.reputation, commentCount, submissionsApproved }),
-        stats: { commentCount, submissionsApproved },
+        stats: { commentCount, submissionsApproved, followers, following },
         recentComments: recent.map((c) => ({ id: c.id, articleId: c.article_id, text: c.text, createdAt: c.created_at })),
       },
     })
@@ -507,6 +585,66 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
       rank: i + 1, id: u.id, displayName: u.display_name, role: u.role,
       reputation: u.reputation, level: levelFor(u.reputation).name,
     })) })
+  })
+
+  // ------------------------------------------------------- follow & feed
+  app.post('/api/users/:id/follow', requireAuth(db), (req, res) => {
+    if (req.params.id === req.auth.user.id) return res.status(400).json({ error: 'Selbst folgen geht nicht' })
+    const target = db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id)
+    if (!target) return res.status(404).json({ error: 'Nutzer nicht gefunden' })
+    db.prepare('INSERT OR IGNORE INTO follows (follower_id, target_id, created_at) VALUES (?, ?, ?)')
+      .run(req.auth.user.id, req.params.id, new Date().toISOString())
+    res.json({ ok: true, following: true })
+  })
+
+  app.delete('/api/users/:id/follow', requireAuth(db), (req, res) => {
+    db.prepare('DELETE FROM follows WHERE follower_id = ? AND target_id = ?').run(req.auth.user.id, req.params.id)
+    res.json({ ok: true, following: false })
+  })
+
+  app.get('/api/users/:id/follow-status', optionalAuth(db), (req, res) => {
+    const followers = db.prepare('SELECT COUNT(*) AS n FROM follows WHERE target_id = ?').get(req.params.id).n
+    const following = db.prepare('SELECT COUNT(*) AS n FROM follows WHERE follower_id = ?').get(req.params.id).n
+    const me = req.auth?.user?.id
+    const isFollowing = me ? !!db.prepare('SELECT 1 FROM follows WHERE follower_id = ? AND target_id = ?').get(me, req.params.id) : false
+    res.json({ followers, following, isFollowing })
+  })
+
+  // Aktivitäts-Feed: jüngste Kommentare gefolgter Nutzer.
+  app.get('/api/me/feed', requireAuth(db), (req, res) => {
+    const rows = db.prepare(
+      `SELECT c.id, c.article_id, c.user_id, c.author, c.text, c.created_at
+       FROM comments c
+       JOIN follows f ON f.target_id = c.user_id
+       WHERE f.follower_id = ? AND c.status = 'visible'
+       ORDER BY c.created_at DESC LIMIT 30`,
+    ).all(req.auth.user.id)
+    res.json({ feed: rows.map((c) => ({ id: c.id, articleId: c.article_id, authorId: c.user_id, author: c.author, text: c.text, createdAt: c.created_at })) })
+  })
+
+  // -------------------------------------------------------- predictions (Tippspiel)
+  app.get('/api/predictions', optionalAuth(db), (req, res) => {
+    const me = req.auth?.user?.id
+    const result = predictionQuestions.map((q) => {
+      const counts = {}
+      for (const opt of q.options) counts[opt] = 0
+      for (const row of db.prepare('SELECT choice, COUNT(*) AS n FROM predictions WHERE question_id = ? GROUP BY choice').all(q.id)) {
+        if (row.choice in counts) counts[row.choice] = row.n
+      }
+      const mine = me ? db.prepare('SELECT choice FROM predictions WHERE user_id = ? AND question_id = ?').get(me, q.id)?.choice : undefined
+      return { ...q, counts, mine: mine ?? null }
+    })
+    res.json({ questions: result })
+  })
+
+  app.post('/api/predictions/:qid', requireAuth(db), (req, res) => {
+    const q = predictionById[req.params.qid]
+    if (!q) return res.status(404).json({ error: 'Frage nicht gefunden' })
+    const { choice } = req.body ?? {}
+    if (!q.options.includes(choice)) return res.status(400).json({ error: 'Ungültige Auswahl' })
+    db.prepare('INSERT INTO predictions (user_id, question_id, choice, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, question_id) DO UPDATE SET choice = excluded.choice')
+      .run(req.auth.user.id, req.params.qid, choice, new Date().toISOString())
+    res.json({ ok: true })
   })
 
   // -------------------------------------------------- editorial workflow

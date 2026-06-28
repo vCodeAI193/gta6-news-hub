@@ -166,6 +166,24 @@ const MIGRATIONS = [
     results INTEGER NOT NULL,
     created_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS follows (
+    follower_id TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (follower_id, target_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS predictions (
+    user_id TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    choice TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (user_id, question_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS user_sync (
+    user_id TEXT PRIMARY KEY,
+    data TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )`,
 ]
 
 export function createDb(path = ':memory:') {

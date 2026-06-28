@@ -1,5 +1,6 @@
 import { Seo } from '../components/Seo'
 import { FontSizeControl } from '../components/FontSizeControl'
+import { AccountSettings } from '../components/AccountSettings'
 import { categories } from '../data/categories'
 import { useTheme, type ThemeMode } from '../context/ThemeContext'
 import { usePreferences } from '../context/PreferencesContext'
@@ -138,6 +139,8 @@ export function SettingsPage() {
             Alle lokalen Daten löschen
           </button>
         </section>
+
+        <AccountSettings />
       </div>
     </>
   )

@@ -4,12 +4,16 @@ import { Seo } from '../components/Seo'
 import { SkeletonGrid } from '../components/Skeleton'
 import { isApiEnabled } from '../services/api'
 import { communityApi, type Profile } from '../services/communityApi'
+import { socialApi, type FollowStatus } from '../services/socialApi'
+import { useAuth } from '../context/AuthContext'
 import { formatDate, timeAgo } from '../lib/filterArticles'
 import { NotFoundPage } from './NotFoundPage'
 
 export function ProfilePage() {
   const { id = '' } = useParams()
+  const { user } = useAuth()
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined)
+  const [follow, setFollow] = useState<FollowStatus | null>(null)
 
   useEffect(() => {
     if (!isApiEnabled()) {
@@ -22,10 +26,24 @@ export function ProfilePage() {
       (p) => active && setProfile(p),
       () => active && setProfile(null),
     )
+    socialApi.followStatus(id).then(
+      (s) => active && setFollow(s),
+      () => {},
+    )
     return () => {
       active = false
     }
   }, [id])
+
+  const toggleFollow = async () => {
+    if (!follow) return
+    const next = follow.isFollowing ? await socialApi.unfollow(id) : await socialApi.follow(id)
+    setFollow({
+      ...follow,
+      isFollowing: next.following,
+      followers: follow.followers + (next.following ? 1 : -1),
+    })
+  }
 
   if (profile === undefined) return <SkeletonGrid count={2} />
   if (profile === null) return <NotFoundPage />
@@ -51,7 +69,22 @@ export function ProfilePage() {
           <span className="profile__rep-num">{profile.reputation}</span>
           <span className="profile__rep-label">Reputation</span>
         </div>
+        {follow && user && user.id !== profile.id && (
+          <button
+            type="button"
+            className={`btn${follow.isFollowing ? ' btn--ghost' : ''}`}
+            onClick={toggleFollow}
+          >
+            {follow.isFollowing ? '✓ Folge ich' : '+ Folgen'}
+          </button>
+        )}
       </header>
+
+      {follow && (
+        <p className="profile__follows">
+          <strong>{follow.followers}</strong> Follower · <strong>{follow.following}</strong> gefolgt
+        </p>
+      )}
 
       {profile.next && (
         <div className="profile__progress" aria-label="Fortschritt zum nächsten Level">

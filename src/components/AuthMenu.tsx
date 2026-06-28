@@ -49,6 +49,9 @@ export function AuthMenu() {
           <NavLink to={`/u/${user.id}`} className="authmenu__item" role="menuitem" onClick={() => setOpen(false)}>
             Mein Profil
           </NavLink>
+          <NavLink to="/feed" className="authmenu__item" role="menuitem" onClick={() => setOpen(false)}>
+            Mein Feed
+          </NavLink>
           <NavLink to="/einreichen" className="authmenu__item" role="menuitem" onClick={() => setOpen(false)}>
             News einreichen
           </NavLink>

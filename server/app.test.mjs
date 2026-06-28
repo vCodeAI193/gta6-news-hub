@@ -293,6 +293,95 @@ describe('Gamification', () => {
   })
 })
 
+describe('Account & DSGVO', () => {
+  it('Profil aktualisieren (Name/E-Mail)', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const res = await request(app).patch('/api/auth/me').set('Authorization', auth).send({ displayName: 'Neuer Name', email: 'neu@b.de' })
+    assert.equal(res.body.user.displayName, 'Neuer Name')
+    assert.equal(res.body.user.email, 'neu@b.de')
+  })
+
+  it('verhindert E-Mail-Kollision beim Update', async () => {
+    await register() // a@b.de
+    const second = await registerSecond() // leser@b.de
+    const res = await request(app).patch('/api/auth/me').set('Authorization', `Bearer ${second.body.token}`).send({ email: 'a@b.de' })
+    assert.equal(res.status, 409)
+  })
+
+  it('Passwort ändern erfordert korrektes aktuelles Passwort', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    assert.equal((await request(app).post('/api/auth/change-password').set('Authorization', auth).send({ currentPassword: 'falsch', newPassword: 'neuespasswort' })).status, 403)
+    assert.equal((await request(app).post('/api/auth/change-password').set('Authorization', auth).send({ currentPassword: 'password123', newPassword: 'neuespasswort' })).status, 200)
+  })
+
+  it('exportiert die eigenen Daten (DSGVO)', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', auth).send({ text: 'Hallo' })
+    const res = await request(app).get('/api/auth/export').set('Authorization', auth)
+    assert.equal(res.body.user.email, 'a@b.de')
+    assert.equal(res.body.comments.length, 1)
+  })
+
+  it('Konto löschen entfernt den Nutzer', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    assert.equal((await request(app).delete('/api/auth/me').set('Authorization', auth)).status, 200)
+    assert.equal((await request(app).get('/api/auth/me').set('Authorization', auth)).status, 401)
+  })
+
+  it('Sync speichert und liest Nutzerdaten', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    await request(app).put('/api/me/sync').set('Authorization', auth).send({ data: { bookmarks: ['a', 'b'] } })
+    const res = await request(app).get('/api/me/sync').set('Authorization', auth)
+    assert.deepEqual(res.body.data.bookmarks, ['a', 'b'])
+  })
+})
+
+describe('Follow, Feed & Tippspiel', () => {
+  it('Folgen/Entfolgen aktualisiert die Zähler', async () => {
+    const a = await register()
+    const b = await registerSecond()
+    const auth = `Bearer ${a.body.token}`
+    await request(app).post(`/api/users/${b.body.user.id}/follow`).set('Authorization', auth)
+    const status = await request(app).get(`/api/users/${b.body.user.id}/follow-status`).set('Authorization', auth)
+    assert.equal(status.body.followers, 1)
+    assert.equal(status.body.isFollowing, true)
+    await request(app).delete(`/api/users/${b.body.user.id}/follow`).set('Authorization', auth)
+    const after = await request(app).get(`/api/users/${b.body.user.id}/follow-status`).set('Authorization', auth)
+    assert.equal(after.body.followers, 0)
+  })
+
+  it('Feed zeigt Kommentare gefolgter Nutzer', async () => {
+    const a = await register()
+    const b = await registerSecond()
+    await request(app).post('/api/articles/release-date-confirmed/comments').set('Authorization', `Bearer ${b.body.token}`).send({ text: 'Von B' })
+    await request(app).post(`/api/users/${b.body.user.id}/follow`).set('Authorization', `Bearer ${a.body.token}`)
+    const feed = await request(app).get('/api/me/feed').set('Authorization', `Bearer ${a.body.token}`)
+    assert.ok(feed.body.feed.some((c) => c.text === 'Von B'))
+  })
+
+  it('Tippspiel: abstimmen und Zähler abrufen', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const vote = await request(app).post('/api/predictions/on-time').set('Authorization', auth).send({ choice: 'Ja, pünktlich' })
+    assert.equal(vote.status, 200)
+    const res = await request(app).get('/api/predictions').set('Authorization', auth)
+    const q = res.body.questions.find((x) => x.id === 'on-time')
+    assert.equal(q.counts['Ja, pünktlich'], 1)
+    assert.equal(q.mine, 'Ja, pünktlich')
+  })
+
+  it('Tippspiel lehnt ungültige Auswahl ab', async () => {
+    const { body } = await register()
+    const res = await request(app).post('/api/predictions/on-time').set('Authorization', `Bearer ${body.token}`).send({ choice: 'Quatsch' })
+    assert.equal(res.status, 400)
+  })
+})
+
 describe('Editorial & Analytics', () => {
   async function createArticle(auth, over = {}) {
     const res = await request(app).post('/api/articles').set('Authorization', auth)

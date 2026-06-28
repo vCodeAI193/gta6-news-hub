@@ -35,6 +35,7 @@ export function Footer() {
           <ul>
             <li><Link to="/bookmarks">Lesezeichen</Link></li>
             {flags.community && <li><Link to="/rangliste">Rangliste</Link></li>}
+            {flags.community && <li><Link to="/tippspiel">Tippspiel</Link></li>}
             {flags.community && <li><Link to="/einreichen">News einreichen</Link></li>}
             <li><Link to="/settings">Einstellungen</Link></li>
             <li><Link to="/admin">Redaktion</Link></li>
