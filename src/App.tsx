@@ -40,6 +40,9 @@ const MessagesPage = lazy(() => import('./routes/MessagesPage').then((m) => ({ d
 const UserProfilePage = lazy(() => import('./routes/UserProfilePage').then((m) => ({ default: m.UserProfilePage })))
 const SecurityPage = lazy(() => import('./routes/SecurityPage').then((m) => ({ default: m.SecurityPage })))
 const ModerationQueuePage = lazy(() => import('./routes/ModerationQueuePage').then((m) => ({ default: m.ModerationQueuePage })))
+const DatabasePage = lazy(() => import('./routes/DatabasePage').then((m) => ({ default: m.DatabasePage })))
+const SoundtrackPage = lazy(() => import('./routes/SoundtrackPage').then((m) => ({ default: m.SoundtrackPage })))
+const NotificationsPage = lazy(() => import('./routes/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
 
 export default function App() {
   return (
@@ -112,6 +115,9 @@ export default function App() {
         <Route path="profil" element={<Suspense fallback={<SkeletonGrid count={2} />}><UserProfilePage /></Suspense>} />
         <Route path="sicherheit" element={<Suspense fallback={<SkeletonGrid count={2} />}><SecurityPage /></Suspense>} />
         <Route path="moderation-queue" element={<Suspense fallback={<SkeletonGrid count={2} />}><ModerationQueuePage /></Suspense>} />
+        <Route path="datenbank" element={<Suspense fallback={<SkeletonGrid count={3} />}><DatabasePage /></Suspense>} />
+        <Route path="soundtrack" element={<Suspense fallback={<SkeletonGrid count={3} />}><SoundtrackPage /></Suspense>} />
+        <Route path="benachrichtigungen" element={<Suspense fallback={null}><NotificationsPage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />

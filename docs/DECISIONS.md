@@ -380,3 +380,99 @@
 - Add a real monthly grid to `ContentCalendar` using CSS grid with 7 columns.
 - Wire duplicate detection into the publish flow: block publish (not just warn)
   if `duplicateScore > 0.7` and no override flag is set.
+
+---
+
+## Wave 8 — Media (`src/services/mediaService.ts`, `src/components/AudioPlayer.tsx`, etc.)
+
+### Decisions
+- **No real video hosting.** `VideoPlayer` wraps a `<video>` tag; actual HLS
+  streaming requires a separate CDN/transcoding pipeline (e.g. Cloudflare
+  Stream). The component is wired for a `src` URL and accepts chapter data.
+- **Audio is simulated.** `MOCK_AUDIO_TRACKS` provides 6 sample tracks with
+  metadata; there is no actual audio file. The `AudioPlayer` acts as a UI
+  prototype and persistent mini-player driven by localStorage.
+- **Gallery/Lightbox uses existing images.** `SlideshowGallery` and
+  `ImageLightbox` are generic components that accept any image array. They
+  reuse the project's standard image URLs (picsum etc.) in seed data.
+- **A11y first.** All click handlers are on `<button>` elements (not `<div>`
+  or `<li>`); `<video>` has an empty `<track kind="captions">` stub to
+  satisfy `jsx-a11y/media-has-caption`. The lightbox backdrop is a transparent
+  button positioned absolutely behind the content.
+
+### Critique
+- **HLS, adaptive streaming, transcoding** are all stub features — the UI
+  exists but real implementation needs server infrastructure.
+- **Media library is localStorage-only.** DataURLs hit the 5–10 MB storage
+  limit quickly; a real CDN upload is needed.
+- **Audio player has no actual audio.** Without real `.mp3` files behind the
+  mock tracks, the "play" state is purely cosmetic.
+
+### Improvement suggestions
+- Wire `VideoPlayer` to an HLS.js instance for real adaptive streaming.
+- Replace the media library with a multipart upload to `/api/media`, storing
+  only the resulting CDN URL in localStorage.
+- Add a podcast RSS feed at `/api/podcast.xml` that serves `AudioTrack` items.
+
+---
+
+## Wave 9 — Interactive Tools (`src/lib/interactiveTools.ts`, `src/routes/DatabasePage.tsx`, etc.)
+
+### Decisions
+- **Databases are hardcoded seed data.** Vehicle, weapon, edition, and timeline
+  entries are static arrays in `interactiveTools.ts` — easy to replace with
+  API calls later without changing consumers.
+- **Hype meter is deterministic.** Computed from article counts filtered to
+  the last 30 days; no ML, no real sentiment. Gives a defensible proxy metric.
+- **Timeline uses string date comparison.** ISO-date strings sort correctly
+  lexicographically, so no `Date` parsing is needed for ordering.
+- **Soundtrack explorer** reuses `mediaService` and the persistent
+  `AudioPlayer`; clicking "Abspielen" sets the now-playing track in localStorage.
+
+### Critique
+- **Interactive map** is not implemented — a real leaflet/mapbox integration
+  is out of scope without map data.
+- **Vehicle/weapon databases** are tiny (6 vehicles, 7 weapons). Real data
+  would come from a dedicated API or a datamined game database.
+- **Hype meter has no social signal.** Comment volume, reaction counts, and
+  external social data would make it more meaningful.
+
+### Improvement suggestions
+- Move databases to `/api/vehicles`, `/api/weapons` backed by SQLite with
+  full-text search so the DatabasePage can use the existing search endpoint.
+- Add a Leaflet map component at `/karte` with marker clustering for fan-
+  submitted POIs stored in the backend.
+- Pull hype score into the WebSocket broadcast so all clients update live.
+
+---
+
+## Wave 10 — Notifications & Realtime (`src/services/notificationsService.ts`, `/benachrichtigungen`)
+
+### Decisions
+- **All notifications are client-side.** Inbox, preferences, quiet hours, and
+  bundling all persist in localStorage. The `addInboxNotif` function already
+  bundles duplicate notifications (same type+link within 5 minutes).
+- **Favicon badge uses Canvas API.** `updateFavicon` draws the unread count
+  onto a 32×32 canvas and replaces the `<link rel="icon">` href. Falls back
+  silently if canvas is unavailable.
+- **Quiet hours are enforced client-side.** `isQuietHours()` checks the
+  current hour against the stored window — callers must check this before
+  delivering a notification.
+- **No real push server.** VAPID push, email, SMS, and Discord/Telegram bot
+  stubs are documented in the FEATURES list but not wired — they require
+  external services and credentials.
+
+### Critique
+- **Notifications have no source of truth.** Nothing in the app automatically
+  calls `addInboxNotif`; the inbox will be empty until callers integrate.
+- **Bundle logic is time-based only.** True batching would group by topic and
+  deliver once per quiet-hours window end.
+- **Favicon badge** requires the SVG favicon to be replaced by a canvas URL —
+  this may break PWA icon references in the service worker manifest.
+
+### Improvement suggestions
+- Call `addInboxNotif` from `commentsService` on new replies, from
+  `reactionsService` on reactions, and from `moderationService` on warnings.
+- Implement server-side push via the existing WebSocket hub: on `broadcast`
+  event, call the Notifications API (already wired in `miscServices.ts`).
+- Export/import notification preferences as part of the GDPR data export.

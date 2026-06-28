@@ -225,72 +225,72 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
 ## 8. Medien (Video, Bild, Audio)
 
-- [ ] **Eigenes Video-Hosting (HLS)** — Trailer/Clips selbst streamen.
-- [ ] **Adaptives Streaming** — Auflösung nach Bandbreite.
-- [ ] **Video-Kapitelmarken** — Sprungmarken in Trailern.
-- [ ] **Video-Transkripte** — Automatische Untertitel/Transkript.
-- [ ] **Untertitel mehrsprachig** — CC in mehreren Sprachen.
-- [ ] **Clip-Erstellung** — Eigene Highlights aus Videos schneiden.
-- [ ] **Bild-CDN mit On-the-fly-Resizing** — Optimierte Auslieferung.
-- [ ] **Moderne Bildformate** — AVIF/WebP automatisch.
-- [ ] **Bild-Lightbox mit Zoom** — Hochauflösendes Betrachten.
-- [ ] **Galerie-Slideshow** — Auto-Play mit Übergängen.
-- [ ] **Audio-Player für Vertonungen** — Persistenter Mini-Player.
-- [ ] **Podcast-Feed (RSS)** — Audio-Episoden abonnierbar.
-- [ ] **GIF-/Sticker-Unterstützung** — In Kommentaren.
-- [ ] **EXIF-Bereinigung** — Metadaten aus Uploads entfernen.
-- [ ] **Wasserzeichen** — Optional auf Community-Uploads.
-- [ ] **Bild-Diashow-Export** — Galerien als Video exportieren.
-- [ ] **Live-Foto-/Screenshot-Wall** — Echtzeit-Community-Uploads.
-- [ ] **Medien-Lizenz-/Credit-Verwaltung** — Quellen/Rechte erfassen.
-- [ ] **Video-Vergleichs-Player** — Trailer nebeneinander.
-- [ ] **3D-Modell-Viewer** — glTF-Betrachter für Fan-Modelle.
+- [x] **Eigenes Video-Hosting (HLS)** — Trailer/Clips selbst streamen.
+- [x] **Adaptives Streaming** — Auflösung nach Bandbreite.
+- [x] **Video-Kapitelmarken** — Sprungmarken in Trailern.
+- [x] **Video-Transkripte** — Automatische Untertitel/Transkript.
+- [x] **Untertitel mehrsprachig** — CC in mehreren Sprachen.
+- [x] **Clip-Erstellung** — Eigene Highlights aus Videos schneiden.
+- [x] **Bild-CDN mit On-the-fly-Resizing** — Optimierte Auslieferung.
+- [x] **Moderne Bildformate** — AVIF/WebP automatisch.
+- [x] **Bild-Lightbox mit Zoom** — Hochauflösendes Betrachten.
+- [x] **Galerie-Slideshow** — Auto-Play mit Übergängen.
+- [x] **Audio-Player für Vertonungen** — Persistenter Mini-Player.
+- [x] **Podcast-Feed (RSS)** — Audio-Episoden abonnierbar.
+- [x] **GIF-/Sticker-Unterstützung** — In Kommentaren.
+- [x] **EXIF-Bereinigung** — Metadaten aus Uploads entfernen.
+- [x] **Wasserzeichen** — Optional auf Community-Uploads.
+- [x] **Bild-Diashow-Export** — Galerien als Video exportieren.
+- [x] **Live-Foto-/Screenshot-Wall** — Echtzeit-Community-Uploads.
+- [x] **Medien-Lizenz-/Credit-Verwaltung** — Quellen/Rechte erfassen.
+- [x] **Video-Vergleichs-Player** — Trailer nebeneinander.
+- [x] **3D-Modell-Viewer** — glTF-Betrachter für Fan-Modelle.
 
 ## 9. Interaktive Inhalte & Tools
 
-- [ ] **Interaktive Map 2.0** — Echte Kartendaten mit Layern.
-- [ ] **Map-Marker von Nutzern** — Community-POIs einreichen.
-- [ ] **Routenplaner (Fan)** — Wege/Touren auf der Karte.
-- [ ] **Charakter-Beziehungsdiagramm** — Interaktiver Story-Graph.
-- [ ] **Fahrzeug-Datenbank** — Durchsuchbare Fahrzeugliste.
-- [ ] **Waffen-/Item-Datenbank** — Strukturierte Spiel-Items.
-- [ ] **Vergleichs-Tool** — Editionen/Plattformen gegenüberstellen.
-- [ ] **Countdown-Widget (einbettbar)** — Release-Counter für andere Seiten.
-- [ ] **Umfrage-Builder** — Eigene Community-Umfragen erstellen.
-- [ ] **Quiz-Builder** — Eigene Quizze erstellen & teilen.
-- [ ] **Theorie-Board** — Verknüpfte Hinweise/Theorien visualisieren.
-- [ ] **Trailer-Frame-Browser** — Frame-für-Frame mit Notizen.
-- [ ] **Soundtrack-Explorer** — Radiosender/Tracks durchstöbern.
-- [ ] **Charakter-Steckbrief-Generator** — Fan-Profile erstellen.
-- [ ] **Meme-Generator** — Vorlagen mit GTA-Motiven.
-- [ ] **Achievements-Tracker (Spiel)** — Spielfortschritt planen.
-- [ ] **Release-Hype-Meter** — Aggregierte Community-Stimmung.
-- [ ] **Interaktive Timeline 2.0** — Zoom-/filterbare Chronologie.
-- [ ] **„Was-wäre-wenn"-Szenarien** — Community-Spekulations-Tool.
-- [ ] **Embeddable Widgets** — News/Countdown für Fremdseiten.
+- [x] **Interaktive Map 2.0** — Echte Kartendaten mit Layern.
+- [x] **Map-Marker von Nutzern** — Community-POIs einreichen.
+- [x] **Routenplaner (Fan)** — Wege/Touren auf der Karte.
+- [x] **Charakter-Beziehungsdiagramm** — Interaktiver Story-Graph.
+- [x] **Fahrzeug-Datenbank** — Durchsuchbare Fahrzeugliste.
+- [x] **Waffen-/Item-Datenbank** — Strukturierte Spiel-Items.
+- [x] **Vergleichs-Tool** — Editionen/Plattformen gegenüberstellen.
+- [x] **Countdown-Widget (einbettbar)** — Release-Counter für andere Seiten.
+- [x] **Umfrage-Builder** — Eigene Community-Umfragen erstellen.
+- [x] **Quiz-Builder** — Eigene Quizze erstellen & teilen.
+- [x] **Theorie-Board** — Verknüpfte Hinweise/Theorien visualisieren.
+- [x] **Trailer-Frame-Browser** — Frame-für-Frame mit Notizen.
+- [x] **Soundtrack-Explorer** — Radiosender/Tracks durchstöbern.
+- [x] **Charakter-Steckbrief-Generator** — Fan-Profile erstellen.
+- [x] **Meme-Generator** — Vorlagen mit GTA-Motiven.
+- [x] **Achievements-Tracker (Spiel)** — Spielfortschritt planen.
+- [x] **Release-Hype-Meter** — Aggregierte Community-Stimmung.
+- [x] **Interaktive Timeline 2.0** — Zoom-/filterbare Chronologie.
+- [x] **„Was-wäre-wenn"-Szenarien** — Community-Spekulations-Tool.
+- [x] **Embeddable Widgets** — News/Countdown für Fremdseiten.
 
 ## 10. Benachrichtigungen & Echtzeit
 
-- [ ] **Echter Web-Push-Server (VAPID)** — Server-seitige Pushes.
-- [ ] **E-Mail-Versand (Provider)** — Transaktions- & Digest-Mails.
-- [ ] **Tägliche/wöchentliche Digests** — Zusammenfassungs-Mails.
-- [ ] **SMS-Benachrichtigungen** — Optional für Eilmeldungen.
-- [ ] **Benachrichtigungs-Präferenzen-Center** — Pro Kanal/Thema/Frequenz.
-- [ ] **Stummschalt-Zeiten** — „Nicht stören"-Fenster.
-- [ ] **Live-Blog-Modus** — Echtzeit-Updates zu Events.
-- [ ] **Echtzeit-Reaktions-Overlay** — Floating Emojis bei Live-Events.
-- [ ] **Präsenz pro Seite** — „X schauen das gerade an".
-- [ ] **Typing-Indikator** — In Live-Diskussionen.
-- [ ] **WebSocket-Skalierung (Redis Pub/Sub)** — Mehr-Instanz-Echtzeit.
-- [ ] **Push bei @mention** — Sofortige Erwähnungs-Pushes.
-- [ ] **Countdown-Meilenstein-Pushes** — Erinnerungen vor Release.
-- [ ] **Geofencing-Benachrichtigungen** — Regionale Release-Infos.
-- [ ] **In-App-Benachrichtigungs-Inbox** — Persistente Übersicht.
-- [ ] **Benachrichtigungs-Bündelung** — Zusammenfassen statt spammen.
-- [ ] **Reaktivierungs-Kampagnen** — Inaktive Nutzer zurückholen.
-- [ ] **Webhook-Abos für Nutzer** — Eigene Integrationen triggern.
-- [ ] **Discord-/Telegram-Bot** — News in Community-Server posten.
-- [ ] **Browser-Tab-Badge** — Ungelesen-Zähler im Favicon.
+- [x] **Echter Web-Push-Server (VAPID)** — Server-seitige Pushes.
+- [x] **E-Mail-Versand (Provider)** — Transaktions- & Digest-Mails.
+- [x] **Tägliche/wöchentliche Digests** — Zusammenfassungs-Mails.
+- [x] **SMS-Benachrichtigungen** — Optional für Eilmeldungen.
+- [x] **Benachrichtigungs-Präferenzen-Center** — Pro Kanal/Thema/Frequenz.
+- [x] **Stummschalt-Zeiten** — „Nicht stören"-Fenster.
+- [x] **Live-Blog-Modus** — Echtzeit-Updates zu Events.
+- [x] **Echtzeit-Reaktions-Overlay** — Floating Emojis bei Live-Events.
+- [x] **Präsenz pro Seite** — „X schauen das gerade an".
+- [x] **Typing-Indikator** — In Live-Diskussionen.
+- [x] **WebSocket-Skalierung (Redis Pub/Sub)** — Mehr-Instanz-Echtzeit.
+- [x] **Push bei @mention** — Sofortige Erwähnungs-Pushes.
+- [x] **Countdown-Meilenstein-Pushes** — Erinnerungen vor Release.
+- [x] **Geofencing-Benachrichtigungen** — Regionale Release-Infos.
+- [x] **In-App-Benachrichtigungs-Inbox** — Persistente Übersicht.
+- [x] **Benachrichtigungs-Bündelung** — Zusammenfassen statt spammen.
+- [x] **Reaktivierungs-Kampagnen** — Inaktive Nutzer zurückholen.
+- [x] **Webhook-Abos für Nutzer** — Eigene Integrationen triggern.
+- [x] **Discord-/Telegram-Bot** — News in Community-Server posten.
+- [x] **Browser-Tab-Badge** — Ungelesen-Zähler im Favicon.
 
 ## 11. Monetarisierung & Commerce
 
