@@ -48,6 +48,9 @@ const PrivacyDashboardPage = lazy(() => import('./routes/PrivacyDashboardPage').
 const AccessibilityPage = lazy(() => import('./routes/AccessibilityPage').then((m) => ({ default: m.AccessibilityPage })))
 const AnalyticsDashboardPage = lazy(() => import('./routes/AnalyticsDashboardPage').then((m) => ({ default: m.AnalyticsDashboardPage })))
 const PresseKitPage = lazy(() => import('./routes/PresseKitPage').then((m) => ({ default: m.PresseKitPage })))
+const EventsPage = lazy(() => import('./routes/EventsPage').then((m) => ({ default: m.EventsPage })))
+const UGCPage = lazy(() => import('./routes/UGCPage').then((m) => ({ default: m.UGCPage })))
+const ExperimentsPage = lazy(() => import('./routes/ExperimentsPage').then((m) => ({ default: m.ExperimentsPage })))
 
 export default function App() {
   return (
@@ -131,6 +134,9 @@ export default function App() {
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />
+        <Route path="events" element={<Suspense fallback={<SkeletonGrid count={2} />}><EventsPage /></Suspense>} />
+        <Route path="community-ugc" element={<Suspense fallback={<SkeletonGrid count={3} />}><UGCPage /></Suspense>} />
+        <Route path="experimente" element={<Suspense fallback={<SkeletonGrid count={2} />}><ExperimentsPage /></Suspense>} />
         <Route path="*" element={<Suspense fallback={null}><NotFoundPage /></Suspense>} />
       </Route>
     </Routes>

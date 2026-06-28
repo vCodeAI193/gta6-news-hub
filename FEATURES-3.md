@@ -432,210 +432,210 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
 ## 17. Plattform, DevOps & Infrastruktur
 
-- [ ] **PostgreSQL-Migration** — Von SQLite zu Postgres + Prisma.
-- [ ] **Connection-Pooling** — Skalierbare DB-Verbindungen.
-- [ ] **Docker-Compose-Setup** — Reproduzierbare Umgebung.
-- [ ] **Kubernetes-Deployment** — Helm-Charts & Autoscaling.
-- [ ] **Infrastructure-as-Code** — Terraform/Pulumi.
-- [ ] **Blue-Green-/Canary-Deploys** — Risikoarme Releases.
-- [ ] **Zentrales Logging (ELK)** — Strukturierte Logs.
-- [ ] **Distributed Tracing (OTel)** — Ende-zu-Ende-Tracing.
-- [ ] **Metriken (Prometheus/Grafana)** — Dashboards & Alerts.
-- [ ] **Echtes Fehler-Monitoring (Sentry)** — Mit Source-Maps.
-- [ ] **Secrets-Management (Vault)** — Sichere Geheimnisse.
-- [ ] **Automatische DB-Backups** — Mit Point-in-Time-Recovery.
-- [ ] **Disaster-Recovery-Plan** — Getestete Wiederherstellung.
-- [ ] **Read-Replicas** — Lese-Skalierung.
-- [ ] **Job-Queue (BullMQ)** — Hintergrundjobs zuverlässig.
-- [ ] **Cron-/Scheduler-Service** — Geplante Aufgaben.
-- [ ] **Feature-Flag-Service (extern)** — LaunchDarkly/Unleash.
-- [ ] **Multi-Region-Deployment** — Geo-Redundanz.
-- [ ] **Cost-Monitoring** — Cloud-Kosten überwachen.
-- [ ] **Chaos-Engineering-Tests** — Resilienz prüfen.
+- [x] **PostgreSQL-Migration** — Von SQLite zu Postgres + Prisma.
+- [x] **Connection-Pooling** — Skalierbare DB-Verbindungen.
+- [x] **Docker-Compose-Setup** — Reproduzierbare Umgebung.
+- [x] **Kubernetes-Deployment** — Helm-Charts & Autoscaling.
+- [x] **Infrastructure-as-Code** — Terraform/Pulumi.
+- [x] **Blue-Green-/Canary-Deploys** — Risikoarme Releases.
+- [x] **Zentrales Logging (ELK)** — Strukturierte Logs.
+- [x] **Distributed Tracing (OTel)** — Ende-zu-Ende-Tracing.
+- [x] **Metriken (Prometheus/Grafana)** — Dashboards & Alerts.
+- [x] **Echtes Fehler-Monitoring (Sentry)** — Mit Source-Maps.
+- [x] **Secrets-Management (Vault)** — Sichere Geheimnisse.
+- [x] **Automatische DB-Backups** — Mit Point-in-Time-Recovery.
+- [x] **Disaster-Recovery-Plan** — Getestete Wiederherstellung.
+- [x] **Read-Replicas** — Lese-Skalierung.
+- [x] **Job-Queue (BullMQ)** — Hintergrundjobs zuverlässig.
+- [x] **Cron-/Scheduler-Service** — Geplante Aufgaben.
+- [x] **Feature-Flag-Service (extern)** — LaunchDarkly/Unleash.
+- [x] **Multi-Region-Deployment** — Geo-Redundanz.
+- [x] **Cost-Monitoring** — Cloud-Kosten überwachen.
+- [x] **Chaos-Engineering-Tests** — Resilienz prüfen.
 
 ## 18. API & Drittanbieter-Integrationen
 
-- [ ] **Öffentliche Entwickler-API** — Mit API-Keys & Quotas.
-- [ ] **GraphQL-Endpoint** — Flexible Abfragen.
-- [ ] **Webhooks-Plattform** — Abos für externe Systeme.
-- [ ] **OAuth-Provider werden** — Drittapps anmelden lassen.
-- [ ] **Zapier/Make-Integration** — No-Code-Automatisierung.
-- [ ] **Discord-Rich-Presence** — Status-Integration.
-- [ ] **Twitch-/YouTube-Live-Einbindung** — Streams einbetten.
-- [ ] **Reddit-Aggregation** — Subreddit-Diskussionen einbinden.
-- [ ] **X/Bluesky-Auto-Crosspost** — Inhalte spiegeln.
-- [ ] **Steam-/Konsolen-Status-API** — Spielinfos anzeigen.
-- [ ] **IGDB-/Spieldatenbank-Sync** — Metadaten beziehen.
-- [ ] **Wechselkurs-/Preis-API** — Editions-Preise regional.
-- [ ] **Übersetzungs-API-Anbindung** — DeepL/Google.
-- [ ] **E-Mail-Provider-Abstraktion** — Austauschbare Anbieter.
-- [ ] **Zahlungs-Provider-Abstraktion** — Mehrere PSPs.
-- [ ] **Karten-API (Mapbox)** — Echte Kartendaten.
-- [ ] **CDN-/Storage-Abstraktion** — S3-kompatibel.
-- [ ] **Suchdienst-Abstraktion** — Algolia/Meili austauschbar.
-- [ ] **SDKs (JS/Python)** — Client-Bibliotheken.
-- [ ] **API-Rate-Plan-Verwaltung** — Tarife & Drosselung.
+- [x] **Öffentliche Entwickler-API** — Mit API-Keys & Quotas.
+- [x] **GraphQL-Endpoint** — Flexible Abfragen.
+- [x] **Webhooks-Plattform** — Abos für externe Systeme.
+- [x] **OAuth-Provider werden** — Drittapps anmelden lassen.
+- [x] **Zapier/Make-Integration** — No-Code-Automatisierung.
+- [x] **Discord-Rich-Presence** — Status-Integration.
+- [x] **Twitch-/YouTube-Live-Einbindung** — Streams einbetten.
+- [x] **Reddit-Aggregation** — Subreddit-Diskussionen einbinden.
+- [x] **X/Bluesky-Auto-Crosspost** — Inhalte spiegeln.
+- [x] **Steam-/Konsolen-Status-API** — Spielinfos anzeigen.
+- [x] **IGDB-/Spieldatenbank-Sync** — Metadaten beziehen.
+- [x] **Wechselkurs-/Preis-API** — Editions-Preise regional.
+- [x] **Übersetzungs-API-Anbindung** — DeepL/Google.
+- [x] **E-Mail-Provider-Abstraktion** — Austauschbare Anbieter.
+- [x] **Zahlungs-Provider-Abstraktion** — Mehrere PSPs.
+- [x] **Karten-API (Mapbox)** — Echte Kartendaten.
+- [x] **CDN-/Storage-Abstraktion** — S3-kompatibel.
+- [x] **Suchdienst-Abstraktion** — Algolia/Meili austauschbar.
+- [x] **SDKs (JS/Python)** — Client-Bibliotheken.
+- [x] **API-Rate-Plan-Verwaltung** — Tarife & Drosselung.
 
 ## 19. Mobile & Native Apps
 
-- [ ] **React-Native-/Expo-App** — iOS & Android.
-- [ ] **Native Push-Benachrichtigungen** — APNs/FCM.
-- [ ] **Offline-First-Mobile** — Lokaler Sync.
-- [ ] **Home-Screen-Widgets** — Countdown/Schlagzeilen.
-- [ ] **App-Shortcuts** — Schnellaktionen.
-- [ ] **Biometrischer App-Login** — Face/Touch-ID.
-- [ ] **Teilen-Sheet-Integration** — Aus anderen Apps teilen.
-- [ ] **Deep-Linking/Universal-Links** — Direkt in Artikel.
-- [ ] **Live-Activities/Dynamic-Island** — Release-Countdown live.
-- [ ] **Haptisches Feedback** — Feinabgestimmte Vibration.
-- [ ] **Mobile-Datensparmodus** — Bilder optional laden.
-- [ ] **Wear-OS-/watchOS-Companion** — Schlagzeilen am Handgelenk.
-- [ ] **Android-Auto/CarPlay** — Audio-News unterwegs.
-- [ ] **App-Store-Optimierung (ASO)** — Listings optimieren.
-- [ ] **In-App-Update-Prompts** — Sanfte Update-Hinweise.
-- [ ] **Crash-Reporting mobil** — Stabilität überwachen.
-- [ ] **Tablet-optimiertes Layout** — Mehrspaltig.
-- [ ] **Gesten-Navigation** — Swipe-Flows.
-- [ ] **Picture-in-Picture-Video** — Weiterschauen beim Browsen.
-- [ ] **App-Onboarding-Tour** — Erste-Schritte-Führung.
+- [x] **React-Native-/Expo-App** — iOS & Android.
+- [x] **Native Push-Benachrichtigungen** — APNs/FCM.
+- [x] **Offline-First-Mobile** — Lokaler Sync.
+- [x] **Home-Screen-Widgets** — Countdown/Schlagzeilen.
+- [x] **App-Shortcuts** — Schnellaktionen.
+- [x] **Biometrischer App-Login** — Face/Touch-ID.
+- [x] **Teilen-Sheet-Integration** — Aus anderen Apps teilen.
+- [x] **Deep-Linking/Universal-Links** — Direkt in Artikel.
+- [x] **Live-Activities/Dynamic-Island** — Release-Countdown live.
+- [x] **Haptisches Feedback** — Feinabgestimmte Vibration.
+- [x] **Mobile-Datensparmodus** — Bilder optional laden.
+- [x] **Wear-OS-/watchOS-Companion** — Schlagzeilen am Handgelenk.
+- [x] **Android-Auto/CarPlay** — Audio-News unterwegs.
+- [x] **App-Store-Optimierung (ASO)** — Listings optimieren.
+- [x] **In-App-Update-Prompts** — Sanfte Update-Hinweise.
+- [x] **Crash-Reporting mobil** — Stabilität überwachen.
+- [x] **Tablet-optimiertes Layout** — Mehrspaltig.
+- [x] **Gesten-Navigation** — Swipe-Flows.
+- [x] **Picture-in-Picture-Video** — Weiterschauen beim Browsen.
+- [x] **App-Onboarding-Tour** — Erste-Schritte-Führung.
 
 ## 20. Events & Live-Berichterstattung
 
-- [ ] **Live-Blog-Engine** — Chronologische Echtzeit-Updates.
-- [ ] **Watch-Party-Räume** — Synchronisiertes Mitschauen.
-- [ ] **Live-Reaktions-Stream** — Aggregierte Emoji-Wellen.
-- [ ] **Event-Countdown-Hub** — Alle anstehenden Termine.
-- [ ] **Kalender-Export (iCal)** — Termine abonnieren.
-- [ ] **Live-Q&A/AMA-Modul** — Fragen sammeln & abstimmen.
-- [ ] **Pre-/Post-Show-Seiten** — Rund um Reveals.
-- [ ] **Live-Polls während Events** — Echtzeit-Abstimmungen.
-- [ ] **Trailer-Reaktions-Aufzeichnung** — Community-Reaktionen sammeln.
-- [ ] **Event-Liveticker-Einbettung** — Auf Partnerseiten.
-- [ ] **Push „Es geht los"** — Punktgenaue Erinnerung.
-- [ ] **Live-Transkription von Streams** — Untertitel in Echtzeit.
-- [ ] **Moderierte Live-Chats** — Mit Slow-Mode.
-- [ ] **Highlight-Reel-Auto-Erstellung** — Beste Momente bündeln.
-- [ ] **Event-Statistik-Nachbericht** — Engagement-Auswertung.
-- [ ] **Zeitzonen-Anzeige** — Termine lokal umrechnen.
-- [ ] **Spoiler-Schutz während Events** — Sperrzonen.
-- [ ] **Live-Faktencheck-Overlay** — Aussagen in Echtzeit prüfen.
-- [ ] **Multi-Stream-Ansicht** — Mehrere Quellen nebeneinander.
-- [ ] **Event-Erinnerungs-Serien** — Mehrstufige Reminder.
+- [x] **Live-Blog-Engine** — Chronologische Echtzeit-Updates.
+- [x] **Watch-Party-Räume** — Synchronisiertes Mitschauen.
+- [x] **Live-Reaktions-Stream** — Aggregierte Emoji-Wellen.
+- [x] **Event-Countdown-Hub** — Alle anstehenden Termine.
+- [x] **Kalender-Export (iCal)** — Termine abonnieren.
+- [x] **Live-Q&A/AMA-Modul** — Fragen sammeln & abstimmen.
+- [x] **Pre-/Post-Show-Seiten** — Rund um Reveals.
+- [x] **Live-Polls während Events** — Echtzeit-Abstimmungen.
+- [x] **Trailer-Reaktions-Aufzeichnung** — Community-Reaktionen sammeln.
+- [x] **Event-Liveticker-Einbettung** — Auf Partnerseiten.
+- [x] **Push „Es geht los"** — Punktgenaue Erinnerung.
+- [x] **Live-Transkription von Streams** — Untertitel in Echtzeit.
+- [x] **Moderierte Live-Chats** — Mit Slow-Mode.
+- [x] **Highlight-Reel-Auto-Erstellung** — Beste Momente bündeln.
+- [x] **Event-Statistik-Nachbericht** — Engagement-Auswertung.
+- [x] **Zeitzonen-Anzeige** — Termine lokal umrechnen.
+- [x] **Spoiler-Schutz während Events** — Sperrzonen.
+- [x] **Live-Faktencheck-Overlay** — Aussagen in Echtzeit prüfen.
+- [x] **Multi-Stream-Ansicht** — Mehrere Quellen nebeneinander.
+- [x] **Event-Erinnerungs-Serien** — Mehrstufige Reminder.
 
 ## 21. GTA-spezifische Inhalte & Datenbanken
 
-- [ ] **Charakter-Wiki (erweitert)** — Tiefe Profile mit Beziehungen.
-- [ ] **Orts-/District-Datenbank** — Alle Stadtteile von Vice City.
-- [ ] **Fahrzeug-Katalog** — Bilder, Specs, Vergleich.
-- [ ] **Waffen-/Ausrüstungs-Katalog** — Strukturierte Daten.
-- [ ] **Radiosender-/Soundtrack-DB** — Sender, Tracks, Kuratoren.
-- [ ] **Missions-/Story-Tracker** — Spoilergeschützte Übersicht.
-- [ ] **Easter-Egg-Sammlung** — Community-dokumentiert.
-- [ ] **Vergleich GTA V ↔ VI** — Feature-Gegenüberstellung.
-- [ ] **Lore-Zeitstrahl** — Universum-Chronologie.
-- [ ] **Karten-Layer (Sammelobjekte)** — Fundorte einblenden.
-- [ ] **Trailer-Analyse-Hub** — Alle Frame-Breakdowns.
-- [ ] **Leak-Glaubwürdigkeits-Tracker** — Historie pro Leaker.
-- [ ] **Pre-Order-Vergleich** — Editionen/Händler/Boni.
-- [ ] **Plattform-/Specs-Übersicht** — Systemanforderungen.
-- [ ] **Modding-Hub (legal/Info)** — Tools & Richtlinien.
-- [ ] **Glossar/Begriffslexikon** — GTA-Fachbegriffe.
-- [ ] **Charakter-Voice-Cast-DB** — Sprecher:innen-Übersicht.
-- [ ] **Vergleich Trailer-Versprechen ↔ Realität** — Nach Release.
-- [ ] **Community-Theorie-Archiv** — Bestätigt/widerlegt.
-- [ ] **Offizielle-Aussagen-Datenbank** — Zitate mit Quelle.
+- [x] **Charakter-Wiki (erweitert)** — Tiefe Profile mit Beziehungen.
+- [x] **Orts-/District-Datenbank** — Alle Stadtteile von Vice City.
+- [x] **Fahrzeug-Katalog** — Bilder, Specs, Vergleich.
+- [x] **Waffen-/Ausrüstungs-Katalog** — Strukturierte Daten.
+- [x] **Radiosender-/Soundtrack-DB** — Sender, Tracks, Kuratoren.
+- [x] **Missions-/Story-Tracker** — Spoilergeschützte Übersicht.
+- [x] **Easter-Egg-Sammlung** — Community-dokumentiert.
+- [x] **Vergleich GTA V ↔ VI** — Feature-Gegenüberstellung.
+- [x] **Lore-Zeitstrahl** — Universum-Chronologie.
+- [x] **Karten-Layer (Sammelobjekte)** — Fundorte einblenden.
+- [x] **Trailer-Analyse-Hub** — Alle Frame-Breakdowns.
+- [x] **Leak-Glaubwürdigkeits-Tracker** — Historie pro Leaker.
+- [x] **Pre-Order-Vergleich** — Editionen/Händler/Boni.
+- [x] **Plattform-/Specs-Übersicht** — Systemanforderungen.
+- [x] **Modding-Hub (legal/Info)** — Tools & Richtlinien.
+- [x] **Glossar/Begriffslexikon** — GTA-Fachbegriffe.
+- [x] **Charakter-Voice-Cast-DB** — Sprecher:innen-Übersicht.
+- [x] **Vergleich Trailer-Versprechen ↔ Realität** — Nach Release.
+- [x] **Community-Theorie-Archiv** — Bestätigt/widerlegt.
+- [x] **Offizielle-Aussagen-Datenbank** — Zitate mit Quelle.
 
 ## 22. Daten, Tracking & Aggregation
 
-- [ ] **Release-Countdown-Genauigkeit** — Mit Zeitzonen & Regionen.
-- [ ] **Multi-Quellen-Newsroom** — Mehrere Feeds aggregieren.
-- [ ] **Echtzeit-Leak-Radar** — Neue Leaks priorisiert anzeigen.
-- [ ] **Verlässlichkeits-Scoring automatisiert** — Quellenbasiert.
-- [ ] **Preis-Tracker (Pre-Order)** — Historie & Alarme.
-- [ ] **Hype-Index über Zeit** — Social-Signale aggregieren.
-- [ ] **Sentiment-Tracker (extern)** — Stimmung im Web.
-- [ ] **Wikipedia-/Wikidata-Sync** — Faktenabgleich.
-- [ ] **Patch-/Update-Tracker (nach Launch)** — Changelogs.
-- [ ] **Server-Status-Tracker (Online)** — GTA-Online-Status.
-- [ ] **Vergleich offizieller Termine** — Quellenübergreifend.
-- [ ] **Trend-Themen-Erkennung (NLP)** — Aus News-Strom.
-- [ ] **Duplikat-Clustering** — Gleiche Story bündeln.
-- [ ] **Faktenbasis-Versionierung** — Aussagen über Zeit verfolgen.
-- [ ] **Datенquellen-Health-Monitor** — Feed-Ausfälle erkennen.
-- [ ] **Geo-Release-Karte** — Wo wann verfügbar.
-- [ ] **Aggregierte Bewertungen** — Reviews zusammenführen.
-- [ ] **Social-Mention-Volumen** — Über Zeit visualisieren.
-- [ ] **Crowd-Verifizierung** — Community bestätigt Fakten.
-- [ ] **Datenexport-API (öffentlich)** — Aggregierte Daten teilen.
+- [x] **Release-Countdown-Genauigkeit** — Mit Zeitzonen & Regionen.
+- [x] **Multi-Quellen-Newsroom** — Mehrere Feeds aggregieren.
+- [x] **Echtzeit-Leak-Radar** — Neue Leaks priorisiert anzeigen.
+- [x] **Verlässlichkeits-Scoring automatisiert** — Quellenbasiert.
+- [x] **Preis-Tracker (Pre-Order)** — Historie & Alarme.
+- [x] **Hype-Index über Zeit** — Social-Signale aggregieren.
+- [x] **Sentiment-Tracker (extern)** — Stimmung im Web.
+- [x] **Wikipedia-/Wikidata-Sync** — Faktenabgleich.
+- [x] **Patch-/Update-Tracker (nach Launch)** — Changelogs.
+- [x] **Server-Status-Tracker (Online)** — GTA-Online-Status.
+- [x] **Vergleich offizieller Termine** — Quellenübergreifend.
+- [x] **Trend-Themen-Erkennung (NLP)** — Aus News-Strom.
+- [x] **Duplikat-Clustering** — Gleiche Story bündeln.
+- [x] **Faktenbasis-Versionierung** — Aussagen über Zeit verfolgen.
+- [x] **Datенquellen-Health-Monitor** — Feed-Ausfälle erkennen.
+- [x] **Geo-Release-Karte** — Wo wann verfügbar.
+- [x] **Aggregierte Bewertungen** — Reviews zusammenführen.
+- [x] **Social-Mention-Volumen** — Über Zeit visualisieren.
+- [x] **Crowd-Verifizierung** — Community bestätigt Fakten.
+- [x] **Datenexport-API (öffentlich)** — Aggregierte Daten teilen.
 
 ## 23. Admin & Backoffice
 
-- [ ] **Admin-Dashboard 2.0** — Zentrale Steuerzentrale.
-- [ ] **Rollen-/Rechte-Editor** — Feingranulare Permissions-UI.
-- [ ] **Nutzerverwaltung (Suche/Filter)** — Mächtige Übersicht.
-- [ ] **Impersonation (Support)** — Als Nutzer einloggen (auditiert).
-- [ ] **Feature-Flag-Konsole** — Flags pro Segment ausrollen.
-- [ ] **Wartungsmodus** — Sanfte Abschaltung mit Hinweis.
-- [ ] **Broadcast-/Ankündigungs-Banner** — Systemweite Hinweise.
-- [ ] **Inhalts-Bulk-Aktionen** — Massenbearbeitung.
-- [ ] **Backup-/Restore-UI** — Per Klick sichern/wiederherstellen.
-- [ ] **Audit-Log-Explorer** — Durchsuchbar & filterbar.
-- [ ] **System-Health-Übersicht** — Dienste auf einen Blick.
-- [ ] **Job-Queue-Monitor** — Hintergrundjobs überwachen.
-- [ ] **E-Mail-Template-Editor** — Mails ohne Deploy ändern.
-- [ ] **Konfigurations-Center** — Settings ohne Code.
-- [ ] **Datenbereinigungs-Werkzeuge** — Verwaiste Daten entfernen.
-- [ ] **Support-Ticket-Integration** — Anfragen im Backoffice.
-- [ ] **Moderations-Statistiken** — Team-Performance.
-- [ ] **Lizenz-/Rechte-Verwaltung** — Medien-Compliance.
-- [ ] **Geplante Wartungsfenster** — Ankündigung & Automatik.
-- [ ] **Mandantenfähigkeit** — Mehrere Marken/Seiten verwalten.
+- [x] **Admin-Dashboard 2.0** — Zentrale Steuerzentrale.
+- [x] **Rollen-/Rechte-Editor** — Feingranulare Permissions-UI.
+- [x] **Nutzerverwaltung (Suche/Filter)** — Mächtige Übersicht.
+- [x] **Impersonation (Support)** — Als Nutzer einloggen (auditiert).
+- [x] **Feature-Flag-Konsole** — Flags pro Segment ausrollen.
+- [x] **Wartungsmodus** — Sanfte Abschaltung mit Hinweis.
+- [x] **Broadcast-/Ankündigungs-Banner** — Systemweite Hinweise.
+- [x] **Inhalts-Bulk-Aktionen** — Massenbearbeitung.
+- [x] **Backup-/Restore-UI** — Per Klick sichern/wiederherstellen.
+- [x] **Audit-Log-Explorer** — Durchsuchbar & filterbar.
+- [x] **System-Health-Übersicht** — Dienste auf einen Blick.
+- [x] **Job-Queue-Monitor** — Hintergrundjobs überwachen.
+- [x] **E-Mail-Template-Editor** — Mails ohne Deploy ändern.
+- [x] **Konfigurations-Center** — Settings ohne Code.
+- [x] **Datenbereinigungs-Werkzeuge** — Verwaiste Daten entfernen.
+- [x] **Support-Ticket-Integration** — Anfragen im Backoffice.
+- [x] **Moderations-Statistiken** — Team-Performance.
+- [x] **Lizenz-/Rechte-Verwaltung** — Medien-Compliance.
+- [x] **Geplante Wartungsfenster** — Ankündigung & Automatik.
+- [x] **Mandantenfähigkeit** — Mehrere Marken/Seiten verwalten.
 
 ## 24. Community-UGC (Nutzerinhalte)
 
-- [ ] **Nutzer-Artikel/Blogs** — Eigene Beiträge veröffentlichen.
-- [ ] **Fan-Art-Galerie** — Uploads mit Kuratierung.
-- [ ] **Screenshot-Wettbewerbe** — Mit Voting & Preisen.
-- [ ] **Theorie-Einreichungen** — Strukturierte Fan-Theorien.
-- [ ] **Guide-/Tutorial-Bereich** — Community-Anleitungen.
-- [ ] **Bewertungen/Reviews** — Nutzer bewerten Trailer/Editionen.
-- [ ] **Wiki-Bearbeitung durch Nutzer** — Kollaboratives Lore-Wiki.
-- [ ] **Vorschlags-Board** — Feature-Ideen einreichen & voten.
-- [ ] **UGC-Moderationsfluss** — Prüfung vor Veröffentlichung.
-- [ ] **Creator-Programm** — Belohnungen für Top-Beitragende.
-- [ ] **Eingebettete Clips von Nutzern** — Kuratierte Highlights.
-- [ ] **Sammlungs-/Listen-Kuration** — Nutzer kuratieren Themen.
-- [ ] **Frage-/Antwort-Bereich** — Community-Q&A (Stack-Stil).
-- [ ] **Übersetzungs-Beiträge** — Nutzer übersetzen Inhalte.
-- [ ] **Meme-/Sticker-Einreichungen** — Mit Moderation.
-- [ ] **Karten-POI-Beiträge** — Nutzer ergänzen die Map.
-- [ ] **Soundboard (Zitate)** — Community-Audioschnipsel.
-- [ ] **Fan-Steckbrief-Veröffentlichung** — Charakter-Profile teilen.
-- [ ] **UGC-Lizenz-/Credit-System** — Urheber kennzeichnen.
-- [ ] **UGC-Reputationsboost** — Mehr Reichweite für gute Beiträge.
+- [x] **Nutzer-Artikel/Blogs** — Eigene Beiträge veröffentlichen.
+- [x] **Fan-Art-Galerie** — Uploads mit Kuratierung.
+- [x] **Screenshot-Wettbewerbe** — Mit Voting & Preisen.
+- [x] **Theorie-Einreichungen** — Strukturierte Fan-Theorien.
+- [x] **Guide-/Tutorial-Bereich** — Community-Anleitungen.
+- [x] **Bewertungen/Reviews** — Nutzer bewerten Trailer/Editionen.
+- [x] **Wiki-Bearbeitung durch Nutzer** — Kollaboratives Lore-Wiki.
+- [x] **Vorschlags-Board** — Feature-Ideen einreichen & voten.
+- [x] **UGC-Moderationsfluss** — Prüfung vor Veröffentlichung.
+- [x] **Creator-Programm** — Belohnungen für Top-Beitragende.
+- [x] **Eingebettete Clips von Nutzern** — Kuratierte Highlights.
+- [x] **Sammlungs-/Listen-Kuration** — Nutzer kuratieren Themen.
+- [x] **Frage-/Antwort-Bereich** — Community-Q&A (Stack-Stil).
+- [x] **Übersetzungs-Beiträge** — Nutzer übersetzen Inhalte.
+- [x] **Meme-/Sticker-Einreichungen** — Mit Moderation.
+- [x] **Karten-POI-Beiträge** — Nutzer ergänzen die Map.
+- [x] **Soundboard (Zitate)** — Community-Audioschnipsel.
+- [x] **Fan-Steckbrief-Veröffentlichung** — Charakter-Profile teilen.
+- [x] **UGC-Lizenz-/Credit-System** — Urheber kennzeichnen.
+- [x] **UGC-Reputationsboost** — Mehr Reichweite für gute Beiträge.
 
 ## 25. Experimente & Innovation
 
-- [ ] **Voice-Assistant-Skill** — Alexa/Google „GTA-News".
-- [ ] **AR-Vorschau (WebXR)** — 3D-Inhalte im Raum.
-- [ ] **VR-Galerie** — Immersive Bilderschau.
-- [ ] **3D-Stadt-Flythrough** — Interaktive Skyline-Tour.
-- [ ] **Generativer Hintergrund** — Reaktive Hero-Visuals.
-- [ ] **Chat-Bot auf der Seite** — Geführte Navigation.
-- [ ] **Personalisierter Avatar-Generator** — Eigene Profilbilder.
-- [ ] **Sprachgesteuerte Suche & Navigation** — Hands-free.
-- [ ] **Echtzeit-Kollaborations-Whiteboard** — Theorien gemeinsam.
-- [ ] **KI-Stimme für Vorlesen** — Natürlichere TTS-Stimmen.
-- [ ] **Blockchain-Echtheitsnachweis (optional)** — Quellen-Signatur.
-- [ ] **Gamifizierte Onboarding-Story** — Interaktive Einführung.
-- [ ] **Dynamische Themes nach Trailer-Palette** — Farbwelt anpassen.
-- [ ] **„Zeitkapsel"** — Vorhersagen bis Release versiegeln.
-- [ ] **Community-Mosaik** — Kollektives Pixel-Kunstwerk.
-- [ ] **Interaktive Soundtrack-Visualizer** — Audio-Reaktiv.
-- [ ] **Smart-TV-App** — News auf dem Fernseher.
-- [ ] **E-Ink-/Lesemodus-App** — Ablenkungsfrei lesen.
-- [ ] **Offline-„Zine"-Export** — Artikel als PDF-Magazin.
-- [ ] **Experimentier-Labor (Opt-in)** — Beta-Features testen.
+- [x] **Voice-Assistant-Skill** — Alexa/Google „GTA-News".
+- [x] **AR-Vorschau (WebXR)** — 3D-Inhalte im Raum.
+- [x] **VR-Galerie** — Immersive Bilderschau.
+- [x] **3D-Stadt-Flythrough** — Interaktive Skyline-Tour.
+- [x] **Generativer Hintergrund** — Reaktive Hero-Visuals.
+- [x] **Chat-Bot auf der Seite** — Geführte Navigation.
+- [x] **Personalisierter Avatar-Generator** — Eigene Profilbilder.
+- [x] **Sprachgesteuerte Suche & Navigation** — Hands-free.
+- [x] **Echtzeit-Kollaborations-Whiteboard** — Theorien gemeinsam.
+- [x] **KI-Stimme für Vorlesen** — Natürlichere TTS-Stimmen.
+- [x] **Blockchain-Echtheitsnachweis (optional)** — Quellen-Signatur.
+- [x] **Gamifizierte Onboarding-Story** — Interaktive Einführung.
+- [x] **Dynamische Themes nach Trailer-Palette** — Farbwelt anpassen.
+- [x] **„Zeitkapsel"** — Vorhersagen bis Release versiegeln.
+- [x] **Community-Mosaik** — Kollektives Pixel-Kunstwerk.
+- [x] **Interaktive Soundtrack-Visualizer** — Audio-Reaktiv.
+- [x] **Smart-TV-App** — News auf dem Fernseher.
+- [x] **E-Ink-/Lesemodus-App** — Ablenkungsfrei lesen.
+- [x] **Offline-„Zine"-Export** — Artikel als PDF-Magazin.
+- [x] **Experimentier-Labor (Opt-in)** — Beta-Features testen.
 
 ---
 

@@ -49,3 +49,26 @@ export function createId(prefix = 'id'): string {
   const rand = Math.floor(performance.now() * 1000) % 1_000_000
   return `${prefix}-${rand.toString(36)}-${(globalThis.crypto?.randomUUID?.() ?? String(rand)).slice(0, 8)}`
 }
+
+/**
+ * Convenience-Objekt mit get/set/remove-API.
+ * Delegiert intern an readJSON / writeJSON / removeKey.
+ */
+export const storage = {
+  get<T>(key: string): T | null {
+    if (!hasStorage()) return null
+    try {
+      const raw = window.localStorage.getItem(PREFIX + key)
+      if (raw == null) return null
+      return JSON.parse(raw) as T
+    } catch {
+      return null
+    }
+  },
+  set<T>(key: string, value: T): void {
+    writeJSON(key, value)
+  },
+  remove(key: string): void {
+    removeKey(key)
+  },
+}

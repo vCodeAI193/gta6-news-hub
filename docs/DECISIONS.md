@@ -679,3 +679,59 @@
   and display a real distribution in the dashboard.
 - Implement a minimal funnel dashboard: for each funnel, show a step-by-step
   drop-off percentage using the completion arrays in localStorage.
+
+## Wave 17: Platform, DevOps & Infrastructure (2026-06-28)
+
+Added full infrastructure-as-code scaffolding:
+- `docker-compose.yml` + `Dockerfile` + `nginx.conf` for containerized deployment
+- `k8s/deployment.yaml`, `service.yaml`, `ingress.yaml` with rolling-update strategy and health probes
+- `k8s/helm/Chart.yaml` + `values.yaml` with autoscaling configuration
+- `terraform/main.tf` for AWS S3 + CloudFront CDN via Terraform
+- `monitoring/prometheus.yml` + `grafana-dashboard.json` for metrics visibility
+- `server/scheduler.mjs` — setInterval-based job scheduler (swap for BullMQ + Redis in production)
+- `server/featureFlags.mjs` — JSON-file + env-variable feature flags (LaunchDarkly-compatible shape)
+- `server/otel.mjs` — no-op OpenTelemetry stub; set OTEL_EXPORTER_OTLP_ENDPOINT for real tracing
+- `server/metrics.mjs` — Prometheus text-format endpoint with request/error counters and gauge
+
+## Wave 18: API & Third-party Integrations (2026-06-28)
+
+- `src/services/apiKeyService.ts` — API key CRUD with free/basic/pro quota tiers
+- `src/services/webhooksService.ts` — webhook subscription + delivery log (localStorage-backed, stub-fires)
+- `src/services/integrationsService.ts` — 14 integrations (Discord, Twitch, YouTube, Reddit, Twitter, Bluesky, Steam, IGDB, DeepL, Mapbox, Stripe, PayPal, Algolia, Zapier) with configure/toggle logic
+- `src/services/featureFlagsClient.ts` — client-side feature flags with rollout % and user targeting
+
+## Wave 19: Mobile & Native Apps (2026-06-28)
+
+- `src/hooks/useSwipeGesture.ts` — touch event hook for left/right/up/down swipe callbacks
+- `src/components/AppOnboardingTour.tsx` — 5-step modal tour with dot pagination, localStorage completion flag
+- `src/components/PictureInPicture.tsx` — PiP video player using `requestPictureInPicture` browser API with native event listener for `leavepictureinpicture`
+
+## Wave 20: Events & Live Coverage (2026-06-28)
+
+- `src/services/liveBlogService.ts` — LiveEvent + LiveBlogPost CRUD, iCal generation + `.ics` download
+- `src/services/liveChatService.ts` — chat rooms with slow-mode enforcement (per-user timestamp gate), soft-delete via `moderated` flag
+- `src/routes/EventsPage.tsx` at `/events` — event grid with countdown labels, Live-Blog tab (post + emoji reactions), Live-Chat tab with slow-mode indicator
+
+## Wave 21: GTA-Specific Content & Databases (2026-06-28)
+
+- `src/lib/gtaDatabase.ts` — static dataset: GTA_CHARACTERS (Lucia, Jason), GTA_LOCATIONS (Vice City, Leonida, etc.), EASTER_EGGS, GLOSSARY (8 entries), LEAKERS (2 profiles with accuracy %), OFFICIAL_STATEMENTS (3 confirmed Rockstar/Take-Two quotes)
+- `src/routes/DatabasePage.tsx` — complete rewrite adding 6 new tabs: Charaktere, Orte, Easter Eggs, Glossar (category-filterable), Leaker, Offizielle Statements alongside existing Fahrzeuge/Waffen/Editionen/Timeline tabs
+
+## Wave 22: Data Tracking & Aggregation (2026-06-28)
+
+- `src/services/leakRadarService.ts` — indexes leak-tagged articles into a radar with credibility score, status lifecycle (unverified → confirmed/debunked), and community up/downvoting
+- `src/services/aggregationService.ts` — `clusterDuplicates` (Jaccard similarity deduplication), `detectTrends` (tag frequency analysis with growth rate), `monitorSourceHealth` (per-source recency + reliability health), `getGeoReleases` (global release times with timezones)
+
+## Wave 23: Admin & Backoffice (2026-06-28)
+
+- `src/services/adminService.ts` — maintenance mode toggle, broadcast banners with expiry, system config key-value store, permission roles editor, admin user management (search, ban, role assignment)
+
+## Wave 24: Community UGC (2026-06-28)
+
+- `src/services/ugcService.ts` — UGC CRUD for 9 content types (article/theory/guide/review/fanart/suggestion/translation/meme/mapPoi), moderation workflow (pending → approved/rejected), per-user up/downvoting, creator stats with bronze/silver/gold/platinum tier system
+- `src/routes/UGCPage.tsx` at `/community-ugc` — browse (type filter + voting), submit form, top-creator leaderboard
+
+## Wave 25: Experiments & Innovation (2026-06-28)
+
+- `src/services/experimentService.ts` — experiment opt-in toggling with rollout status, time capsule sealing/voting with enforced seal date, avatar config persistence with 5 attribute categories
+- `src/routes/ExperimentsPage.tsx` at `/experimente` — beta-feature lab, time capsule (seal + sealed list with hidden predictions), avatar builder
