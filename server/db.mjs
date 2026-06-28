@@ -153,6 +153,19 @@ const MIGRATIONS = [
     value INTEGER NOT NULL,
     PRIMARY KEY (comment_id, user_id)
   )`,
+  `CREATE TABLE IF NOT EXISTS article_revisions (
+    id TEXT PRIMARY KEY,
+    article_id TEXT NOT NULL,
+    snapshot TEXT NOT NULL,
+    edited_by TEXT,
+    edited_at TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS search_log (
+    id TEXT PRIMARY KEY,
+    term TEXT NOT NULL,
+    results INTEGER NOT NULL,
+    created_at TEXT NOT NULL
+  )`,
 ]
 
 export function createDb(path = ':memory:') {
@@ -163,6 +176,7 @@ export function createDb(path = ':memory:') {
   ensureColumn(db, 'users', 'banned', 'INTEGER NOT NULL DEFAULT 0')
   ensureColumn(db, 'users', 'reputation', 'INTEGER NOT NULL DEFAULT 0')
   ensureColumn(db, 'articles', 'submitted_by', 'TEXT')
+  ensureColumn(db, 'articles', 'views', 'INTEGER NOT NULL DEFAULT 0')
   seedArticles(db)
   return db
 }
@@ -258,5 +272,6 @@ export function rowToArticle(row) {
     reliability: row.reliability ?? undefined,
     status: row.status,
     publishAt: row.publish_at ?? undefined,
+    views: row.views ?? 0,
   }
 }

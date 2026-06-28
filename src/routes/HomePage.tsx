@@ -10,6 +10,8 @@ import { Newsletter } from '../components/Newsletter'
 import { Poll } from '../components/Poll'
 import { useArticles } from '../hooks/useArticles'
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll'
+import { useDebounce } from '../hooks/useDebounce'
+import { editorialApi } from '../services/editorialApi'
 import { usePreferences } from '../context/PreferencesContext'
 import { useRealtime } from '../context/RealtimeContext'
 import { useI18n } from '../i18n/I18nContext'
@@ -27,6 +29,15 @@ export function HomePage() {
 
   // Live: neue/aktualisierte Artikel signalisieren (ohne Auto-Reload zu erzwingen).
   useEffect(() => subscribe('article', () => setHasNew(true)), [subscribe])
+
+  // Such-Analytics: abgeschlossene Suchbegriffe (debounced) protokollieren.
+  const debouncedQuery = useDebounce(params.get('q') ?? '', 900)
+  useEffect(() => {
+    if (debouncedQuery.trim().length >= 2) {
+      const count = filterArticles(articles, { query: debouncedQuery }).length
+      editorialApi.logSearch(debouncedQuery, count)
+    }
+  }, [debouncedQuery, articles])
 
   const query = params.get('q') ?? ''
   const tag = params.get('tag') ?? undefined

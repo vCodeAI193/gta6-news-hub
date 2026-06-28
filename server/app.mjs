@@ -145,7 +145,37 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     const row = db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)
     if (!row || (!isPublished(row) && !canEdit(req)))
       return res.status(404).json({ error: 'Nicht gefunden' })
+    // Aufruf zählen (nur veröffentlichte Artikel, kein Redaktions-Preview).
+    if (isPublished(row) && !canEdit(req)) {
+      db.prepare('UPDATE articles SET views = views + 1 WHERE id = ?').run(req.params.id)
+      row.views = (row.views ?? 0) + 1
+    }
     res.json({ article: rowToArticle(row) })
+  })
+
+  // Versionshistorie eines Artikels.
+  app.get('/api/articles/:id/revisions', requireAuth(db, 'author'), (req, res) => {
+    const rows = db
+      .prepare('SELECT id, edited_by, edited_at FROM article_revisions WHERE article_id = ? ORDER BY edited_at DESC')
+      .all(req.params.id)
+    res.json({ revisions: rows })
+  })
+
+  app.post('/api/articles/:id/revisions/:revId/restore', requireAuth(db, 'author'), (req, res) => {
+    const rev = db.prepare('SELECT * FROM article_revisions WHERE id = ? AND article_id = ?').get(req.params.revId, req.params.id)
+    if (!rev) return res.status(404).json({ error: 'Revision nicht gefunden' })
+    const current = db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)
+    if (current) snapshotRevision(db, current, req.auth.user) // aktuellen Stand sichern
+    const snap = JSON.parse(rev.snapshot)
+    const now = new Date().toISOString()
+    db.prepare(
+      `UPDATE articles SET title=?, excerpt=?, body=?, category=?, source=?, source_url=?, image=?, tags=?, author=?, reliability=?, updated_at=? WHERE id=?`,
+    ).run(
+      snap.title, snap.excerpt, snap.body, snap.category, snap.source, snap.source_url,
+      snap.image, snap.tags, snap.author, snap.reliability, now, req.params.id,
+    )
+    logAudit(db, req.auth.user, 'article.revision.restore', 'article', req.params.id, req.params.revId)
+    res.json({ article: rowToArticle(db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)) })
   })
 
   app.post('/api/articles', requireAuth(db, 'author'), (req, res) => {
@@ -172,6 +202,8 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     if (!row) return res.status(404).json({ error: 'Nicht gefunden' })
     const b = req.body ?? {}
     const now = new Date().toISOString()
+    // Aktuelle Version vor dem Überschreiben als Revision sichern.
+    snapshotRevision(db, row, req.auth.user)
     db.prepare(
       `UPDATE articles SET title=?, excerpt=?, body=?, category=?, date=?, source=?, source_url=?, image=?, tags=?, author=?, reliability=?, status=?, publish_at=?, updated_at=? WHERE id=?`,
     ).run(
@@ -477,6 +509,54 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     })) })
   })
 
+  // -------------------------------------------------- editorial workflow
+  // Artikel im Status 'review' (Redaktions-Freigabe).
+  app.get('/api/moderation/review', requireAuth(db, 'moderator'), (_req, res) => {
+    const rows = db.prepare("SELECT * FROM articles WHERE status = 'review' ORDER BY updated_at DESC").all()
+    res.json({ review: rows.map(rowToArticle) })
+  })
+
+  app.post('/api/articles/:id/publish', requireAuth(db, 'moderator'), (req, res) => {
+    const row = db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)
+    if (!row) return res.status(404).json({ error: 'Nicht gefunden' })
+    db.prepare("UPDATE articles SET status = 'published', updated_at = ? WHERE id = ?").run(new Date().toISOString(), req.params.id)
+    logAudit(db, req.auth.user, 'article.publish', 'article', req.params.id, row.title)
+    publish('article', { action: 'created', id: req.params.id })
+    res.json({ ok: true })
+  })
+
+  // ----------------------------------------------------------- analytics
+  const searchLimiter = rateLimit({ windowMs: 60_000, max: 60 })
+  app.post('/api/analytics/search', searchLimiter, (req, res) => {
+    const term = (req.body?.term ?? '').trim().slice(0, 100)
+    if (!term) return res.status(400).json({ error: 'term nötig' })
+    db.prepare('INSERT INTO search_log (id, term, results, created_at) VALUES (?, ?, ?, ?)').run(
+      randomUUID(), term.toLowerCase(), Number(req.body?.results) || 0, new Date().toISOString(),
+    )
+    res.status(201).json({ ok: true })
+  })
+
+  app.get('/api/analytics/dashboard', requireAuth(db, 'author'), (_req, res) => {
+    const totalViews = db.prepare('SELECT COALESCE(SUM(views),0) AS n FROM articles').get().n
+    const totalComments = db.prepare("SELECT COUNT(*) AS n FROM comments WHERE status = 'visible'").get().n
+    const totalUsers = db.prepare('SELECT COUNT(*) AS n FROM users').get().n
+    const topArticles = db.prepare("SELECT id, title, views FROM articles WHERE status = 'published' ORDER BY views DESC LIMIT 5").all()
+    const topSearches = db.prepare('SELECT term, COUNT(*) AS count FROM search_log GROUP BY term ORDER BY count DESC LIMIT 8').all()
+    const zeroResults = db.prepare('SELECT DISTINCT term FROM search_log WHERE results = 0 ORDER BY created_at DESC LIMIT 8').all().map((r) => r.term)
+    res.json({ totals: { totalViews, totalComments, totalUsers }, topArticles, topSearches, zeroResults })
+  })
+
+  app.get('/api/analytics/export.csv', requireAuth(db, 'author'), (_req, res) => {
+    const rows = db.prepare("SELECT id, title, category, date, status, views FROM articles ORDER BY views DESC").all()
+    const header = 'id,title,category,date,status,views'
+    const csv = [header, ...rows.map((r) =>
+      [r.id, '"' + String(r.title).replace(/"/g, '""') + '"', r.category, r.date, r.status, r.views].join(','),
+    )].join('\n')
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="artikel-report.csv"')
+    res.send(csv)
+  })
+
   // ------------------------------------------------------------- not found
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Route nicht gefunden' }))
 
@@ -499,6 +579,12 @@ function forwardToDiscord(content) {
   } catch {
     /* Integration darf die API nie blockieren. */
   }
+}
+
+function snapshotRevision(db, row, user) {
+  db.prepare(
+    'INSERT INTO article_revisions (id, article_id, snapshot, edited_by, edited_at) VALUES (?, ?, ?, ?, ?)',
+  ).run(randomUUID(), row.id, JSON.stringify(row), user?.display_name ?? null, new Date().toISOString())
 }
 
 function commentScore(db, commentId) {

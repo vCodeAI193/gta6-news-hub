@@ -4,7 +4,7 @@ export type CategoryId = 'official' | 'trailer' | 'leak' | 'release'
 export type Reliability = 'confirmed' | 'rumor' | 'unconfirmed'
 
 /** Veröffentlichungsstatus (für den Admin-/CMS-Workflow). */
-export type ArticleStatus = 'published' | 'draft'
+export type ArticleStatus = 'published' | 'draft' | 'review' | 'submitted' | 'rejected'
 
 export interface Category {
   id: CategoryId
@@ -59,4 +59,6 @@ export interface Article {
   publishAt?: string
   /** Markiert nutzergenerierte (Admin-)Artikel aus dem localStorage-Store */
   userCreated?: boolean
+  /** Aufrufzähler (vom Backend). */
+  views?: number
 }

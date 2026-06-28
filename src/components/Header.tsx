@@ -88,6 +88,11 @@ export function Header() {
           <NavLink to="/admin" className="mainnav__link" onClick={closeMenu}>
             {t('nav.admin')}
           </NavLink>
+          {hasRole('author') && (
+            <NavLink to="/dashboard" className="mainnav__link" onClick={closeMenu}>
+              📊 Dashboard
+            </NavLink>
+          )}
           {hasRole('moderator') && (
             <NavLink to="/moderation" className="mainnav__link" onClick={closeMenu}>
               🛡️ Moderation

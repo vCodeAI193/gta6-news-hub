@@ -22,6 +22,7 @@ const LorePage = lazy(() => import('./routes/LorePage').then((m) => ({ default: 
 const LoreDetailPage = lazy(() => import('./routes/LorePage').then((m) => ({ default: m.LoreDetailPage })))
 const StatusPage = lazy(() => import('./routes/StatusPage').then((m) => ({ default: m.StatusPage })))
 const ApiDocsPage = lazy(() => import('./routes/ApiDocsPage').then((m) => ({ default: m.ApiDocsPage })))
+const DashboardPage = lazy(() => import('./routes/DashboardPage').then((m) => ({ default: m.DashboardPage })))
 const AboutPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.AboutPage })))
 const PrivacyPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.PrivacyPage })))
 const ImprintPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.ImprintPage })))
@@ -84,6 +85,7 @@ export default function App() {
         <Route path="lore/:id" element={<Suspense fallback={<SkeletonGrid count={2} />}><LoreDetailPage /></Suspense>} />
         <Route path="status" element={<Suspense fallback={null}><StatusPage /></Suspense>} />
         <Route path="api-docs" element={<Suspense fallback={null}><ApiDocsPage /></Suspense>} />
+        <Route path="dashboard" element={<Suspense fallback={<SkeletonGrid count={2} />}><DashboardPage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />

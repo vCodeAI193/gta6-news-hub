@@ -12,15 +12,17 @@ import {
   type Report,
 } from '../services/moderationApi'
 import { communityApi } from '../services/communityApi'
+import { editorialApi } from '../services/editorialApi'
 import type { Article } from '../types'
 import { timeAgo } from '../lib/filterArticles'
 
-type Tab = 'submissions' | 'comments' | 'reports' | 'users' | 'audit'
+type Tab = 'review' | 'submissions' | 'comments' | 'reports' | 'users' | 'audit'
 
 export function ModerationPage() {
   const { user, loading } = useAuth()
   const { notify } = useToast()
-  const [tab, setTab] = useState<Tab>('submissions')
+  const [tab, setTab] = useState<Tab>('review')
+  const [review, setReview] = useState<Article[]>([])
   const [submissions, setSubmissions] = useState<Article[]>([])
   const [comments, setComments] = useState<PendingComment[]>([])
   const [reports, setReports] = useState<Report[]>([])
@@ -29,13 +31,15 @@ export function ModerationPage() {
 
   const reload = useCallback(async () => {
     try {
-      const [s, c, r, u, a] = await Promise.all([
+      const [rev, s, c, r, u, a] = await Promise.all([
+        editorialApi.reviewList(),
         communityApi.submissions(),
         moderationApi.pendingComments(),
         moderationApi.reports(),
         moderationApi.users(),
         moderationApi.audit(),
       ])
+      setReview(rev)
       setSubmissions(s)
       setComments(c)
       setReports(r)
@@ -66,6 +70,7 @@ export function ModerationPage() {
   }
 
   const tabs: Array<[Tab, string, number]> = [
+    ['review', 'Review', review.length],
     ['submissions', 'Einreichungen', submissions.length],
     ['comments', 'Kommentare', comments.length],
     ['reports', 'Meldungen', reports.length],
@@ -95,6 +100,24 @@ export function ModerationPage() {
           </button>
         ))}
       </div>
+
+      {tab === 'review' && (
+        <ModList
+          items={review}
+          empty="Keine Artikel zur Freigabe."
+          render={(a) => (
+            <li key={a.id} className="modrow">
+              <div>
+                <span className={`card__tag tag--${a.category}`}>{a.category}</span> <strong>{a.title}</strong>
+                <p className="modrow__text">{a.excerpt || a.body?.slice(0, 120)} — {a.author}</p>
+              </div>
+              <div className="modrow__actions">
+                <button className="btn btn--small" onClick={() => act(() => editorialApi.publish(a.id), 'Veröffentlicht')}>Freigeben</button>
+              </div>
+            </li>
+          )}
+        />
+      )}
 
       {tab === 'submissions' && (
         <ModList

@@ -112,6 +112,9 @@ export function ArticlePage() {
             </span>
           )}
           <span>{readingTimeLabel(article.body)}</span>
+          {typeof article.views === 'number' && article.views > 0 && (
+            <span>📊 {article.views} Aufrufe</span>
+          )}
           {presence > 1 && (
             <span className="presence" title="Gerade aktive Leser:innen">
               👁 {presence} lesen das gerade

@@ -293,6 +293,80 @@ describe('Gamification', () => {
   })
 })
 
+describe('Editorial & Analytics', () => {
+  async function createArticle(auth, over = {}) {
+    const res = await request(app).post('/api/articles').set('Authorization', auth)
+      .send({ title: 'Original', source: 'Q', category: 'official', body: 'b1', ...over })
+    return res.body.article.id
+  }
+
+  it('legt bei Updates Revisionen an und kann zurückrollen', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const id = await createArticle(auth)
+    await request(app).put(`/api/articles/${id}`).set('Authorization', auth).send({ title: 'Geändert 1' })
+    await request(app).put(`/api/articles/${id}`).set('Authorization', auth).send({ title: 'Geändert 2' })
+
+    const revs = await request(app).get(`/api/articles/${id}/revisions`).set('Authorization', auth)
+    assert.ok(revs.body.revisions.length >= 2)
+
+    // Älteste Revision enthält den Originaltitel.
+    const oldest = revs.body.revisions[revs.body.revisions.length - 1]
+    const restore = await request(app).post(`/api/articles/${id}/revisions/${oldest.id}/restore`).set('Authorization', auth)
+    assert.equal(restore.body.article.title, 'Original')
+  })
+
+  it('zählt Aufrufe und füllt das Dashboard', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    // Anonyme Detailaufrufe zählen.
+    await request(app).get('/api/articles/release-date-confirmed')
+    await request(app).get('/api/articles/release-date-confirmed')
+    const dash = await request(app).get('/api/analytics/dashboard').set('Authorization', auth)
+    assert.ok(dash.body.totals.totalViews >= 2)
+    assert.ok(dash.body.topArticles.length > 0)
+  })
+
+  it('Redaktions-Preview (Admin) zählt keine Aufrufe', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const before = (await request(app).get('/api/analytics/dashboard').set('Authorization', auth)).body.totals.totalViews
+    await request(app).get('/api/articles/release-date-confirmed').set('Authorization', auth) // Admin
+    const after = (await request(app).get('/api/analytics/dashboard').set('Authorization', auth)).body.totals.totalViews
+    assert.equal(after, before)
+  })
+
+  it('Workflow: review → publish macht den Artikel öffentlich', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const id = await createArticle(auth, { status: 'review' })
+    const reviewList = await request(app).get('/api/moderation/review').set('Authorization', auth)
+    assert.ok(reviewList.body.review.some((a) => a.id === id))
+
+    await request(app).post(`/api/articles/${id}/publish`).set('Authorization', auth)
+    const pub = await request(app).get('/api/articles')
+    assert.ok(pub.body.articles.some((a) => a.id === id))
+  })
+
+  it('Such-Analytics protokolliert Begriffe inkl. Null-Treffer', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    await request(app).post('/api/analytics/search').send({ term: 'lucia', results: 3 })
+    await request(app).post('/api/analytics/search').send({ term: 'zzznope', results: 0 })
+    const dash = await request(app).get('/api/analytics/dashboard').set('Authorization', auth)
+    assert.ok(dash.body.topSearches.some((s) => s.term === 'lucia'))
+    assert.ok(dash.body.zeroResults.includes('zzznope'))
+  })
+
+  it('CSV-Export liefert eine Report-Datei', async () => {
+    const { body } = await register()
+    const res = await request(app).get('/api/analytics/export.csv').set('Authorization', `Bearer ${body.token}`)
+    assert.equal(res.status, 200)
+    assert.match(res.headers['content-type'], /csv/)
+    assert.match(res.text, /id,title,category,date,status,views/)
+  })
+})
+
 describe('Platform & API', () => {
   it('Health liefert Version & Uptime', async () => {
     const res = await request(app).get('/api/health')

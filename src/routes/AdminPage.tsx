@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext'
 import { formatDate } from '../lib/filterArticles'
 import { emitWebhook, importMockFeed } from '../services/integrations'
 import { api, isApiEnabled } from '../services/api'
+import { editorialApi, type Revision } from '../services/editorialApi'
 import {
   deleteArticle,
   getAllRaw,
@@ -30,6 +31,7 @@ export function AdminPage() {
   const [list, setList] = useState<Article[]>(() => getAllRaw())
   const [form, setForm] = useState<ArticleInput>(EMPTY)
   const [breaking, setBreaking] = useState('')
+  const [revisions, setRevisions] = useState<Revision[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
 
   const sendBreaking = async (e: React.FormEvent) => {
@@ -79,7 +81,21 @@ export function AdminPage() {
       status: a.status ?? 'published',
       publishAt: a.publishAt,
     })
+    setRevisions([])
+    if (isApiEnabled()) editorialApi.revisions(a.id).then(setRevisions, () => setRevisions([]))
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const restoreRevision = async (revId: string) => {
+    if (!form.id) return
+    try {
+      await editorialApi.restoreRevision(form.id, revId)
+      notify('Version wiederhergestellt', 'success')
+      editorialApi.revisions(form.id).then(setRevisions, () => {})
+      refresh()
+    } catch {
+      notify('Wiederherstellen fehlgeschlagen', 'error')
+    }
   }
 
   const remove = (id: string) => {
@@ -87,6 +103,11 @@ export function AdminPage() {
     notify('Artikel gelöscht', 'info')
     refresh()
   }
+
+  // Redaktionskalender: geplante/zu prüfende Beiträge nach Datum gruppiert.
+  const calendar = [...list]
+    .filter((a) => a.status === 'draft' || a.status === 'review' || (a.publishAt && new Date(a.publishAt) > new Date()))
+    .sort((a, b) => (a.publishAt ?? a.date).localeCompare(b.publishAt ?? b.date))
 
   const onImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -163,6 +184,7 @@ export function AdminPage() {
             <select value={form.status} onChange={(e) => set('status', e.target.value as Article['status'])}>
               <option value="published">Veröffentlicht</option>
               <option value="draft">Entwurf</option>
+              <option value="review">Zur Freigabe (Review)</option>
             </select>
           </label>
           <label>
@@ -203,7 +225,45 @@ export function AdminPage() {
             ⤓ RSS importieren
           </button>
         </div>
+
+        {form.id && isApiEnabled() && (
+          <div className="revisions">
+            <strong>Versionshistorie ({revisions.length})</strong>
+            {revisions.length === 0 ? (
+              <p className="settings__hint">Noch keine früheren Versionen.</p>
+            ) : (
+              <ul className="revisions__list">
+                {revisions.map((r) => (
+                  <li key={r.id}>
+                    <span>{formatDate(r.edited_at.slice(0, 10))} · {r.edited_by ?? 'System'}</span>
+                    <button type="button" className="linkbtn" onClick={() => restoreRevision(r.id)}>
+                      Wiederherstellen
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
       </form>
+
+      {calendar.length > 0 && (
+        <section className="editorial-calendar">
+          <h2 className="section-title">🗓️ Redaktionskalender</h2>
+          <ul className="editorial-calendar__list">
+            {calendar.map((a) => (
+              <li key={a.id} className="editorial-calendar__item">
+                <time>{formatDate((a.publishAt ?? a.date).slice(0, 10))}</time>
+                <span className={`card__tag tag--${a.category}`}>{a.category}</span>
+                <span className="editorial-calendar__title">{a.title}</span>
+                <span className="badge badge--muted">
+                  {a.status === 'review' ? 'Review' : a.status === 'draft' ? 'Entwurf' : 'Geplant'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <h2 className="section-title">Alle Artikel ({list.length})</h2>
       <table className="admin-table">

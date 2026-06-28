@@ -398,6 +398,19 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .auth-form input { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.6rem 0.7rem; font-size: 0.95rem; }
 .auth-card__switch { font-size: 0.88rem; color: var(--text-muted); text-align: center; }
 
+/* ---------- Editorial (revisions, calendar, dashboard) ---------- */
+.revisions { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.revisions__list { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.4rem; }
+.revisions__list li { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.85rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.7rem; }
+.editorial-calendar { margin: 1.5rem 0; }
+.editorial-calendar__list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.4rem; }
+.editorial-calendar__item { display: flex; align-items: center; gap: 0.8rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.8rem; flex-wrap: wrap; }
+.editorial-calendar__item time { color: var(--text-muted); font-size: 0.8rem; min-width: 110px; }
+.editorial-calendar__title { flex: 1; font-weight: 600; }
+.dash-cols { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media (min-width: 720px) { .dash-cols { grid-template-columns: 1fr 1fr; } }
+.status-card strong { font-size: 1.6rem; }
+
 /* ---------- Status page ---------- */
 .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
 .status-card { display: flex; gap: 0.8rem; align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; }

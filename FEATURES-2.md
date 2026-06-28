@@ -81,6 +81,17 @@ Details: [server/README.md](./server/README.md).
 - **WCAG-Audit** (axe über mehrere Kernkomponenten) + **k6-Lasttest-Script**
 - 44 Backend-Tests (inkl. Plattform-Tests) + 48 Frontend-Tests — alle grün
 
+### ✅ Welle 8 umgesetzt — Redaktion & Analytics
+
+- **Versionshistorie + Rollback**: jede Artikeländerung wird als Revision
+  gesichert; Wiederherstellen im Admin-Editor
+- **Redaktioneller Workflow**: Status „Review" → Freigabe im Moderations-Tab
+- **Redaktionskalender**: geplante/zu prüfende Beiträge nach Datum im Admin
+- **Redaktions-Dashboard** (`/dashboard`): Aufruf-Tracking, Top-Artikel, Totals
+- **Such-Analytics**: Top-Suchbegriffe & Suchen ohne Treffer
+- **CSV-Export** der Artikel-Reports
+- 50 Backend-Tests (inkl. Editorial/Analytics) + 48 Frontend-Tests — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -111,14 +122,14 @@ Details: [server/README.md](./server/README.md).
 
 ## 13. Redaktion & Moderation
 
-- [ ] **Redaktioneller Workflow** — Entwurf → Review → Freigabe → Veröffentlichung.
+- [x] **Redaktioneller Workflow** — Entwurf → Review → Freigabe → Veröffentlichung. *(Entwurf → Review → Freigabe, /moderation)*
 - [x] **Moderations-Queue** — Gemeldete Kommentare/Artikel zentral prüfen. *(Pending-Kommentare + Meldungen, /moderation)*
 - [x] **Spam-Filter** — Automatische Erkennung & Quarantäne von Spam. *(Heuristik: Links/CAPS/Wiederholungen → Queue)*
 - [x] **Wort-/Blocklisten** — Konfigurierbare Filter für Kommentare. *(serverseitig, via COMMENT_BLOCKLIST erweiterbar)*
-- [ ] **Versionshistorie** — Änderungsverlauf je Artikel mit Diff & Rollback.
+- [x] **Versionshistorie** — Änderungsverlauf je Artikel mit Diff & Rollback. *(Revisionen + Rollback)*
 - [ ] **Mehrere Autoren** — Co-Authoring & Zuweisung von Beiträgen.
 - [x] **Audit-Log** — Nachvollziehbare Protokollierung aller Redaktions-Aktionen.
-- [ ] **Geplanter Redaktionskalender** — Kalender-Ansicht für geplante Beiträge.
+- [x] **Geplanter Redaktionskalender** — Kalender-Ansicht für geplante Beiträge. *(Admin: geplante/Review-Beiträge nach Datum)*
 - [x] **Bann-/Mute-System** — Nutzer temporär oder dauerhaft sperren.
 - [x] **Faktencheck-Workflow** — Leak-Verifizierung mit Status-Updates. *(Moderator setzt Verlässlichkeit + Audit)*
 
@@ -189,15 +200,15 @@ Details: [server/README.md](./server/README.md).
 
 ## 19. Analytics & Insights
 
-- [ ] **Redaktions-Dashboard** — Aufrufe, Verweildauer, Top-Artikel.
+- [x] **Redaktions-Dashboard** — Aufrufe, Verweildauer, Top-Artikel. *(/dashboard — Aufrufe, Top-Artikel)*
 - [ ] **A/B-Testing-Framework** — Überschriften/Layouts experimentell testen.
 - [ ] **Funnel-Analyse** — Conversion vom Besuch zum Abo nachverfolgen.
 - [ ] **Heatmaps** — Klick-/Scroll-Verhalten visualisieren.
 - [ ] **Echtzeit-Besucherzähler** — Live-Traffic im Dashboard.
-- [ ] **Such-Analytics** — Häufige Suchbegriffe & Null-Treffer auswerten.
+- [x] **Such-Analytics** — Häufige Suchbegriffe & Null-Treffer auswerten. *(Top-Begriffe + Null-Treffer)*
 - [ ] **Kohorten-Analyse** — Nutzerbindung über die Zeit.
 - [ ] **Trend-Erkennung** — Aufkommende Themen automatisch erkennen.
-- [ ] **Export & Reports** — Geplante CSV/PDF-Berichte.
+- [x] **Export & Reports** — Geplante CSV/PDF-Berichte. *(CSV-Export)*
 - [ ] **Performance-Budget-Monitoring** — Web-Vitals-Alarme bei Regression.
 
 ## 20. Plattform & Betrieb

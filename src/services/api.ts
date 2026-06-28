@@ -67,3 +67,22 @@ export async function api<T>(path: string, { method = 'GET', body, auth = true }
   }
   return data as T
 }
+
+/** Lädt eine Datei (z. B. CSV) authentifiziert herunter und stößt den Download an. */
+export async function apiDownload(path: string, filename: string): Promise<void> {
+  if (!BASE_URL) throw new ApiError(0, 'API nicht konfiguriert')
+  const token = getToken()
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  })
+  if (!res.ok) throw new ApiError(res.status, `HTTP ${res.status}`)
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
