@@ -1,0 +1,260 @@
+name: Lighthouse CI & Performance
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  lighthouse-ci:
+    name: Lighthouse CI Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@latest
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          lhci autorun \
+            --upload.target=temporary-public-storage \
+            --collect.numberOfRuns=3 \
+            --collect.settings.chromeFlags="--no-sandbox --headless" || true
+        continue-on-error: true
+
+      - name: Parse Lighthouse Results
+        id: parse-results
+        run: |
+          # Extract key metrics from latest report
+          if [ -f ".lighthouseci/latest.json" ]; then
+            node .github/scripts/parse-lighthouse.js
+          fi
+
+      - name: Upload Lighthouse Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30
+
+  bundle-size:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    needs: lighthouse-ci
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Analyze Bundle Size
+        id: bundle-size
+        run: |
+          node .github/scripts/track-bundle-size.js > bundle-report.txt
+          cat bundle-report.txt
+
+      - name: Check Bundle Budget
+        run: |
+          node .github/scripts/check-bundle-budget.js
+
+      - name: Upload Bundle Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report
+          path: |
+            bundle-report.txt
+            docs/performance/bundle-history.json
+          retention-days: 30
+
+  load-testing:
+    name: Load Testing (k6)
+    runs-on: ubuntu-latest
+    needs: lighthouse-ci
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Start preview server
+        run: npm run preview &
+        env:
+          NODE_ENV: production
+
+      - name: Wait for server
+        run: |
+          npm install -g wait-on
+          wait-on http://localhost:4173 -t 30000
+
+      - name: Run k6 Load Test
+        id: loadtest
+        run: |
+          npm run loadtest 2>&1 | tee loadtest-results.txt
+        continue-on-error: true
+
+      - name: Upload Load Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loadtest-results
+          path: loadtest-results.txt
+          retention-days: 30
+
+  regression-detection:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    needs: [lighthouse-ci, bundle-size]
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Download Lighthouse Reports
+        uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+
+      - name: Detect Regressions
+        id: regressions
+        run: |
+          node .github/scripts/detect-regressions.js > regression-report.json
+          cat regression-report.json
+
+      - name: Comment on PR with Results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const regressions = JSON.parse(fs.readFileSync('regression-report.json', 'utf8'));
+
+            let comment = '## 📊 Performance Report\n\n';
+
+            if (regressions.regressions && regressions.regressions.length > 0) {
+              comment += '⚠️ **Potential Regressions Detected**\n\n';
+              comment += '| Metric | Previous | Current | Change |\n';
+              comment += '|--------|----------|---------|--------|\n';
+
+              regressions.regressions.forEach(reg => {
+                const icon = reg.status === 'error' ? '❌' : '⚠️';
+                comment += `| ${icon} ${reg.metric} | ${reg.previous} | ${reg.current} | ${reg.change} |\n`;
+              });
+            } else {
+              comment += '✅ **No Performance Regressions Detected**\n\n';
+            }
+
+            comment += `\n**Summary:**\n`;
+            comment += `- Lighthouse Score: ${regressions.lighthouse_score || 'N/A'}\n`;
+            comment += `- Bundle Size: ${regressions.bundle_size || 'N/A'}\n`;
+            comment += `- LCP: ${regressions.lcp || 'N/A'}\n`;
+            comment += `- CLS: ${regressions.cls || 'N/A'}\n`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Fail if Critical Regressions
+        run: |
+          node .github/scripts/fail-on-critical-regression.js
+
+  performance-summary:
+    name: Performance Summary Report
+    runs-on: ubuntu-latest
+    needs: [lighthouse-ci, bundle-size, load-testing]
+    if: always()
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate Summary Report
+        run: |
+          echo "# Performance Test Summary" > summary.md
+          echo "" >> summary.md
+          echo "## Artifacts Generated" >> summary.md
+          echo "- Lighthouse Reports: [Download](./lighthouse-reports/)" >> summary.md
+          echo "- Bundle Analysis: [Download](./bundle-report/)" >> summary.md
+          echo "- Load Test Results: [Download](./loadtest-results/)" >> summary.md
+
+      - name: Upload Summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-summary
+          path: summary.md
+          retention-days: 30
+
+      - name: Post Workflow Status
+        if: failure()
+        run: |
+          echo "⚠️ Performance workflow completed with warnings. Check artifacts."
+          exit 0
