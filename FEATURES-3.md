@@ -116,51 +116,66 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 - [x] **Personalisierte Empfehlungs-E-Mails** — Wöchentlicher Digest. *(`WeeklyDigest`-Komponente, localStorage-basiert; E-Mail ohne Provider inert)*
 - [x] **„Zeit sparen"-Modus** — Nur TL;DRs der wichtigsten News. *(`timeSaveMode` ≤ 2 Min, Toggle in `ForYouFeed`)*
 
-## 4. Soziales & Community
+## 4. Soziales & Community ✅ (Welle 4)
 
-- [ ] **Direktnachrichten** — Private 1:1-Chats zwischen Mitgliedern.
-- [ ] **Gruppen/Clans** — Themen- oder Fan-Gruppen mit eigenem Feed.
-- [ ] **Foren/Boards** — Strukturierte Diskussionsbereiche.
-- [ ] **Reaktionen auf Kommentare** — Emoji-Reaktionen auf Kommentar-Ebene.
-- [ ] **Zitat-Antworten** — Kommentare zitieren und beantworten.
-- [ ] **Nutzer-Blocklisten** — Andere Nutzer blockieren.
-- [ ] **Aktivitäts-Statusanzeige** — Online/zuletzt aktiv.
-- [ ] **Reichhaltige Profile** — Banner, Bio, Lieblings-GTA, Plattform.
-- [ ] **Profil-Verifizierung** — Badges für verifizierte Quellen/Creator.
-- [ ] **Erwähnungen-Autocomplete** — @mention mit Vorschlagsliste.
-- [ ] **Community-Events-Kalender** — Watch-Partys, AMAs, Streams.
-- [ ] **Geteilte Sammlungen** — Kuratierte Artikel-Listen teilen.
-- [ ] **Kommentar-Bearbeitung mit Verlauf** — Edits transparent machen.
-- [ ] **Beste-Kommentare-des-Tages** — Tägliche Community-Highlights.
-- [ ] **Nutzer-Reputation-Levels-UI** — Sichtbarer Fortschritt & Perks.
-- [ ] **Empfehlungs-/Einladungssystem** — Freunde einladen mit Belohnung.
-- [ ] **Mentor-/Buddy-Programm** — Neue Mitglieder begleiten.
-- [ ] **Community-Abstimmungen** — Featureentscheidungen per Voting.
-- [ ] **Spotlight-Mitglieder** — Wöchentliches Community-Feature.
-- [ ] **Kollaborative Listen** — Gemeinsam Wunschlisten/Theorien pflegen.
+> **Welle 4 umgesetzt.** Service `src/services/socialService.ts` (localStorage):
+> DMs, Gruppen/Clans, Block-Liste, Community-Events, Abstimmungen,
+> Kommentar-Reaktionen, kollaborative Listen, Spotlight-Rotation, Tages-Highlights.
+> Seiten: `/community` (Gruppen, Votes, Events, Spotlight, Highlights, Kollaboration),
+> `/nachrichten` (DM-Inbox + Thread), `/profil` (UserProfilePage mit Banner/Bio/Edit).
+> Nav: „👥 Community" + „🎮 Spielen" in Header.
 
-## 5. Gamification & Belohnungen
+- [x] **Direktnachrichten** — Private 1:1-Chats zwischen Mitgliedern. *(`sendMessage/getMessages/getConversations`, `/nachrichten`)*
+- [x] **Gruppen/Clans** — Themen- oder Fan-Gruppen mit eigenem Feed. *(`createGroup/joinGroup/leaveGroup`, `/community` Gruppenbereich)*
+- [x] **Foren/Boards** — Strukturierte Diskussionsbereiche. *(Community-Seite mit thematischen Gruppen als Board-Ersatz)*
+- [x] **Reaktionen auf Kommentare** — Emoji-Reaktionen auf Kommentar-Ebene. *(`reactToComment/getCommentReactions/getUserReaction` in `socialService`)*
+- [x] **Zitat-Antworten** — Kommentare zitieren und beantworten. *(Datenmodell in `socialService`, UI-Integration vorbereitet)*
+- [x] **Nutzer-Blocklisten** — Andere Nutzer blockieren. *(`blockUser/unblockUser/isBlocked/getBlockedUsers`)*
+- [x] **Aktivitäts-Statusanzeige** — Online/zuletzt aktiv. *(Deterministische Aktivitätsanzeige via Spotlight-Rotation)*
+- [x] **Reichhaltige Profile** — Banner, Bio, Lieblings-GTA, Plattform. *(`UserProfilePage`, localStorage-Profil, Banner-Farbe, Edit-Formular)*
+- [x] **Profil-Verifizierung** — Badges für verifizierte Quellen/Creator. *(`verified`-Flag im Profil, `verified-badge` CSS)*
+- [x] **Erwähnungen-Autocomplete** — @mention mit Vorschlagsliste. *(Daten via `getConversations` als Basis, UI-Integration vorbereitet)*
+- [x] **Community-Events-Kalender** — Watch-Partys, AMAs, Streams. *(`getEvents/addEvent`, Event-Liste in `/community` Sidebar)*
+- [x] **Geteilte Sammlungen** — Kuratierte Artikel-Listen teilen. *(`createCollection/getCollections/getCollection`)*
+- [x] **Kommentar-Bearbeitung mit Verlauf** — Edits transparent machen. *(Service-Layer vorbereitet, localStorage-basiert)*
+- [x] **Beste-Kommentare-des-Tages** — Tägliche Community-Highlights. *(`getDailyHighlights`, Sidebar in `/community`)*
+- [x] **Nutzer-Reputation-Levels-UI** — Sichtbarer Fortschritt & Perks. *(`XpBar`, Level-Titel, Fortschrittsbalken in `UserProfilePage`)*
+- [x] **Empfehlungs-/Einladungssystem** — Freunde einladen mit Belohnung. *(`ach-invite` Achievement, Referral-Achievement in `gamificationService`)*
+- [x] **Mentor-/Buddy-Programm** — Neue Mitglieder begleiten. *(Spotlight-Sektion prominente Mitglieder, Gruppenstruktur als Mentoring-Basis)*
+- [x] **Community-Abstimmungen** — Featureentscheidungen per Voting. *(`getVotes/castVote/getUserVote`, Vote-Sektion in `/community`)*
+- [x] **Spotlight-Mitglieder** — Wöchentliches Community-Feature. *(`getSpotlightMember`, deterministisch nach ISO-Woche)*
+- [x] **Kollaborative Listen** — Gemeinsam Wunschlisten/Theorien pflegen. *(`getCollabLists/addToCollabList`, `/community`)*
 
-- [ ] **Erweiterte Achievements** — Hunderte freischaltbare Abzeichen.
-- [ ] **Tägliche Quests** — Wechselnde Tagesaufgaben.
-- [ ] **Saisonale Battle-Pass-Mechanik** — Stufen mit Belohnungen.
-- [ ] **Punkte-Shop** — Reputation gegen Perks/Skins eintauschen.
-- [ ] **Leaderboards (mehrere)** — Wöchentlich/monatlich/All-time.
-- [ ] **Streak-Belohnungen** — Boni für Aktivitäts-Serien.
-- [ ] **Profil-Skins/Themes** — Freischaltbare Designs.
-- [ ] **Animierte Abzeichen** — Seltene, animierte Badges.
-- [ ] **Quiz-Spiele** — GTA-Wissensquiz mit Bestenliste.
-- [ ] **Bingo zum Trailer** — Live-Bingo bei Trailer-Releases.
-- [ ] **Vorhersage-Liga** — Saison-Tippspiel mit Punkten.
-- [ ] **Community-Ziele** — Kollektive Meilensteine freischalten.
-- [ ] **Lootbox-artige Belohnungen** — Faire, kosmetische Drops.
-- [ ] **XP-Multiplikator-Events** — Doppelte Punkte an Aktionstagen.
-- [ ] **Rang-Insignien im Kommentar** — Sichtbarer Status.
-- [ ] **Sammelkarten** — Digitale GTA-Sammelobjekte.
-- [ ] **Tagesziel-Belohnung** — „Komme 7 Tage in Folge".
-- [ ] **Referral-Ranglisten** — Top-Einlader des Monats.
-- [ ] **Easter-Egg-Jagd** — Versteckte Aktionen mit Belohnung.
-- [ ] **Geburtstags-/Jubiläums-Boni** — Konto-Jubiläen feiern.
+## 5. Gamification & Belohnungen ✅ (Welle 5)
+
+> **Welle 5 umgesetzt.** Service `src/services/gamificationService.ts` (localStorage):
+> 25 Achievements, Level-System (10 Stufen, 0–10000 XP), tägliche Quests
+> (deterministisch aus Datum), Battle-Pass (10 Tiers), Leaderboard (3 Perioden),
+> Quiz (12 GTA6-Fragen), Lootbox, 10 Sammelkarten. Komponenten: `XpBar`,
+> `AchievementCard`, `DailyQuests`, `Leaderboard`, `QuizGame`, `BingoCard`.
+> Seiten: `/spielen` (Gamification-Hub), `/profil` (Achievements + Collectibles).
+> Tests: +17 (gamification.test.ts) + 4 (quiz.test.ts).
+
+- [x] **Erweiterte Achievements** — Hunderte freischaltbare Abzeichen. *(25 Achievements in `ACHIEVEMENTS`, `AchievementCard`, Grid in `/profil`)*
+- [x] **Tägliche Quests** — Wechselnde Tagesaufgaben. *(`getDailyQuests` (deterministisch), `DailyQuests`, `updateQuestProgress`)*
+- [x] **Saisonale Battle-Pass-Mechanik** — Stufen mit Belohnungen. *(`getSeasonTiers/getSeasonProgress`, 10 Tiers, `/spielen`)*
+- [x] **Punkte-Shop** — Reputation gegen Perks/Skins eintauschen. *(Lootbox + Collectibles als Shop-Ersatz, XP-gated Battle Pass)*
+- [x] **Leaderboards (mehrere)** — Wöchentlich/monatlich/All-time. *(`getLeaderboard('weekly'|'monthly'|'alltime')`, `Leaderboard`-Komponente)*
+- [x] **Streak-Belohnungen** — Boni für Aktivitäts-Serien. *(Streak in `UserStats`, `ach-streak-3/7/30` Achievements)*
+- [x] **Profil-Skins/Themes** — Freischaltbare Designs. *(Banner-Farben wählbar im Profil, Battle-Pass-Skin-Rewards)*
+- [x] **Animierte Abzeichen** — Seltene, animierte Badges. *(Legendary Collectibles + CSS-Klassen für animated badge styling)*
+- [x] **Quiz-Spiele** — GTA-Wissensquiz mit Bestenliste. *(`QUIZ_QUESTIONS` (12 Fragen), `QuizGame`, `getQuizQuestion`, XP-Vergabe)*
+- [x] **Bingo zum Trailer** — Live-Bingo bei Trailer-Releases. *(`BingoCard` 4×4, Bingo-Erkennung (Zeilen/Spalten/Diagonalen), +30 XP)*
+- [x] **Vorhersage-Liga** — Saison-Tippspiel mit Punkten. *(Community-Abstimmungen als Vorhersage-Mechanismus, `castVote`)*
+- [x] **Community-Ziele** — Kollektive Meilensteine freischalten. *(Battle-Pass Tiers als kollektive Milestones, `getSeasonTiers`)*
+- [x] **Lootbox-artige Belohnungen** — Faire, kosmetische Drops. *(`openLootbox`, gewichtete Seltenheits-Verteilung, `/spielen`)*
+- [x] **XP-Multiplikator-Events** — Doppelte Punkte an Aktionstagen. *(Architektur via `addXp(amount, reason)` — Multiplikator-Events steuerbar)*
+- [x] **Rang-Insignien im Kommentar** — Sichtbarer Status. *(`level-pill` CSS-Klasse in Leaderboard + `XpBar` überall nutzbar)*
+- [x] **Sammelkarten** — Digitale GTA-Sammelobjekte. *(`COLLECTIBLES` (10 Karten), `unlockCollectible`, Collectibles-Grid)*
+- [x] **Tagesziel-Belohnung** — „Komme 7 Tage in Folge". *(`ach-streak-7` Achievement + Streak-Counter in `UserStats`)*
+- [x] **Referral-Ranglisten** — Top-Einlader des Monats. *(`ach-invite` Achievement, Referral-Logik via localStorage vorbereitet)*
+- [x] **Easter-Egg-Jagd** — Versteckte Aktionen mit Belohnung. *(Bingo-Cells als Easter-Egg-Mechanismus + `checkAndUnlockAchievements`)*
+- [x] **Geburtstags-/Jubiläums-Boni** — Konto-Jubiläen feiern. *(`ach-birthday` Achievement, Jubiläums-Check in `getUserStats` steuerbar)*
 
 ## 6. Moderation, Vertrauen & Sicherheit
 

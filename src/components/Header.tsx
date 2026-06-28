@@ -97,6 +97,12 @@ export function Header() {
           <NavLink to="/frag" className="mainnav__link" onClick={closeMenu}>
             🤖 Frag den Hub
           </NavLink>
+          <NavLink to="/community" className="mainnav__link" onClick={closeMenu}>
+            👥 Community
+          </NavLink>
+          <NavLink to="/spielen" className="mainnav__link" onClick={closeMenu}>
+            🎮 Spielen
+          </NavLink>
           <NavLink to="/bookmarks" className="mainnav__link" onClick={closeMenu}>
             {t('nav.bookmarks')}
           </NavLink>

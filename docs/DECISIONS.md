@@ -197,3 +197,105 @@
 - Watch for stray control characters in regex/template literals introduced
   during file authoring — `grep -nP '[\x00-\x08\x0e-\x1f]'` over changed files
   is a cheap guard and caught a real bug in Wave 2.
+
+---
+
+## Wave 4 — Soziales & Community (`src/services/socialService.ts`, `/community`, `/nachrichten`, `/profil`)
+
+### Decisions
+- All social features are localStorage-only simulations. The contract (function
+  signatures, data shapes) is designed to be drop-in replaceable with real API
+  calls (a REST or WebSocket backend) without touching any UI component.
+- Direct messages store a `from`/`to` pair with the constant `'ich'` as the
+  current-user sentinel. This avoids a user-auth dependency while keeping the
+  data model realistic.
+- Community votes use an optimistic local-only write: the default vote tallies
+  are seeded in the module so the UI never shows an empty poll. User votes are
+  stored separately (`community:userVotes`) so toggling or re-voting is idempotent.
+- Spotlight rotation is purely deterministic from the ISO week number — no
+  stored state, no drift, instant testability.
+- `getSpotlightMember` and `getDailyHighlights` return hardcoded arrays; this is
+  honest — without a backend there is no real "best comment" algorithm. The
+  function boundary makes it easy to replace with an API call later.
+- Routes: `/profil` is a new `UserProfilePage` separate from the existing
+  `/u/:id` `ProfilePage` (which is API-backed). This avoids a merge conflict
+  while still showing the rich-profile feature.
+
+### Critique (what is fake / weak)
+- **No real-time.** DMs, group feeds, and events are all read from localStorage;
+  there is no push mechanism. Two browser tabs will not sync.
+- **No user identity.** The `'ich'` sentinel means everyone is the same user.
+  A real auth context would replace this constant.
+- **Vote tallies are not secure.** Nothing prevents a user from opening DevTools
+  and editing `localStorage` to un-vote or stuff the ballot.
+- **Block list is display-only.** `isBlocked` is exported but no UI currently
+  hides blocked-user content from comment threads; that wiring is left for a
+  later wave.
+- **Community events have no RSVP or reminder system.** The calendar is purely
+  informational.
+
+### Improvement suggestions
+- Replace `'ich'` with `useAuth().user.username` once the auth context stabilises.
+- Add a BroadcastChannel for cross-tab sync of DMs (zero-dependency, works in
+  all modern browsers).
+- Add a `hiddenBy` field to comments so the block list actually filters content.
+- Wire `reactToComment` into the existing `Comments` component (currently the
+  `ReactionBar` component exists but is article-level, not comment-level).
+
+---
+
+## Wave 5 — Gamification & Belohnungen (`src/services/gamificationService.ts`, `/spielen`)
+
+### Decisions
+- All gamification state lives in a single `gamification:stats` localStorage key
+  for simplicity; sub-keys (`gamification:questProgress`, `gamification:collectibles`)
+  are used only where isolation matters (quests reset daily, collectibles grow
+  monotonically).
+- `getDailyQuests` is deterministic from a date string: `dayIndex(date) % pool.length`
+  selects quests without any stored rotation state. This makes the function pure
+  and trivially testable.
+- `getLeaderboard` generates a deterministic synthetic leaderboard from a seed
+  function (`deterministicXp`). The user's real XP is injected as the "Du" entry
+  so the leaderboard reflects true progress. This is the honest approach: we
+  never claim the other entries are real users.
+- Quiz questions are static TypeScript arrays (`QUIZ_QUESTIONS`), not fetched.
+  `getQuizQuestion(seed)` uses modular arithmetic so the seed wraps cleanly —
+  the test explicitly verifies this.
+- `openLootbox` is the one function that is intentionally non-deterministic (uses
+  `Date.now() % total` as a seed), since randomness is core to the feature's
+  perceived value. This is documented in the service file.
+- Battle Pass uses a simple XP-threshold model (every 200 XP = one tier) rather
+  than a separate "season XP" counter. This means earning XP anywhere in the app
+  progresses the pass, creating a natural cross-feature reward loop.
+- Bingo detection covers rows, columns, and both diagonals; XP is awarded once
+  (guarded by `celebrated` state) even if multiple bingos occur later.
+
+### Critique (what is fake / weak)
+- **25 achievements, not "hundreds".** The spec says "Hunderte freischaltbare
+  Abzeichen" — we shipped 25. Adding more is mechanical (extend the `ACHIEVEMENTS`
+  array) but the unlock-check logic in `checkAndUnlockAchievements` needs expanding
+  to cover more conditions (comment counts, article reads, etc.).
+- **XP events are not wired end-to-end.** `addXp` is exported but only called
+  from within `gamificationService` itself (via quests and quiz). The article,
+  comment, and bookmark flows do not call it yet.
+- **No streak tracking with date.** `UserStats.streak` is stored but never
+  auto-incremented from a daily login check. A real implementation needs a
+  "last-active date" field and a scheduled check (or a login-time check).
+- **Leaderboard is synthetic.** The other 15 entries are not real users. Any
+  user who opens DevTools will see `name: 'Vice_Fan99'` across all accounts.
+- **Battle Pass has no expiry.** Season 1 never ends. A real pass needs a
+  `seasonEndsAt` timestamp and a migration path for the next season.
+- **`openLootbox` is not fair-drop guaranteed.** With only 10 collectibles and
+  a `Date.now()` seed, the distribution is random but not pity-system-protected.
+
+### Improvement suggestions
+- Add `addXp` calls in `commentsService`, `readingHistoryService`, and
+  `bookmarksService` to make XP truly cross-feature.
+- Implement a daily login check in the app entry point (`main.tsx` or a
+  `useEffect` in `Layout`) that calls `incrementStreak(today)` and guards with
+  a `lastLoginDate` localStorage field.
+- Extend `checkAndUnlockAchievements` to accept an `event: AchievementEvent`
+  discriminated union (`{ type: 'comment' } | { type: 'read', count: number }`)
+  so conditions can be checked at the call site without reading all stats.
+- Add a `pityCounter` to `openLootbox`: after N commons in a row, guarantee
+  at least a rare drop (standard gacha fair-play mechanism).
