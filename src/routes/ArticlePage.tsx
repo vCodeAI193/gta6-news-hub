@@ -15,7 +15,9 @@ import { Comments } from '../components/Comments'
 import { Gallery, Lightbox } from '../components/Lightbox'
 import { VideoEmbed } from '../components/VideoEmbed'
 import { RelatedArticles } from '../components/RelatedArticles'
+import { ArticleSummary } from '../components/ArticleSummary'
 import { TextToSpeech } from '../components/TextToSpeech'
+import { generateCover } from '../lib/coverImage'
 import { SkeletonGrid } from '../components/Skeleton'
 import { categoryMap } from '../data/categories'
 import { useArticles } from '../hooks/useArticles'
@@ -128,7 +130,18 @@ export function ArticlePage() {
         </div>
       </header>
 
-      <img className="article__cover" src={article.image} alt="" width={800} height={450} />
+      <img
+        className="article__cover"
+        src={article.image}
+        alt=""
+        width={800}
+        height={450}
+        onError={(e) => {
+          e.currentTarget.src = generateCover(article.title, { label: category?.label })
+        }}
+      />
+
+      <ArticleSummary text={article.body} />
 
       <div className="article__toolbar">
         <BookmarkButton articleId={article.id} />

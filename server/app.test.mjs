@@ -639,3 +639,55 @@ describe('Rate limiting', () => {
     assert.equal(limited, true)
   })
 })
+
+describe('KI & Automatisierung', () => {
+  it('liefert AI-Status (heuristisch ohne Key)', async () => {
+    const res = await request(app).get('/api/ai/status')
+    assert.equal(res.status, 200)
+    assert.ok(['heuristic', 'anthropic'].includes(res.body.provider))
+  })
+
+  it('fasst Text zusammen', async () => {
+    const text =
+      'Rockstar hat GTA 6 angekündigt. Das Spiel erscheint 2026. Der Trailer zeigt Vice City. Fans sind begeistert.'
+    const res = await request(app).post('/api/ai/summarize').send({ text, sentences: 2 })
+    assert.equal(res.status, 200)
+    assert.ok(res.body.summary.length > 0)
+    assert.equal(res.body.provider, 'heuristic')
+  })
+
+  it('lehnt zu kurzen Text ab', async () => {
+    assert.equal((await request(app).post('/api/ai/summarize').send({ text: 'kurz' })).status, 400)
+  })
+
+  it('liefert Tags, Sentiment und Moderation', async () => {
+    const tags = await request(app).post('/api/ai/tags').send({ text: 'Vice City Trailer Rockstar Rockstar' })
+    assert.ok(tags.body.tags.length >= 1)
+    const senti = await request(app).post('/api/ai/sentiment').send({ text: 'Das ist mega genial' })
+    assert.equal(senti.body.label, 'positiv')
+    const mod = await request(app).post('/api/ai/moderate').send({ text: 'Du Idiot' })
+    assert.equal(mod.body.flagged, true)
+  })
+
+  it('beantwortet Fragen via RAG mit Quellen', async () => {
+    const res = await request(app).post('/api/ai/ask').send({ question: 'Wann erscheint GTA 6?' })
+    assert.equal(res.status, 200)
+    assert.ok(Array.isArray(res.body.sources))
+    assert.ok(res.body.sources.length >= 1)
+  })
+
+  it('liefert Briefing, Lesbarkeit und Quellenbewertung', async () => {
+    const brief = await request(app).get('/api/ai/briefing')
+    assert.ok(brief.body.items.length >= 1)
+    const read = await request(app).post('/api/ai/readability').send({ text: 'Ein kurzer Satz. Noch einer hier.' })
+    assert.ok(read.body.score >= 0 && read.body.score <= 100)
+    const cred = await request(app).post('/api/ai/source-credibility').send({ source: 'rockstargames.com' })
+    assert.equal(cred.body.label, 'verlässlich')
+  })
+
+  it('macht semantische Suche', async () => {
+    const res = await request(app).get('/api/ai/semantic-search').query({ q: 'Release Termin' })
+    assert.equal(res.status, 200)
+    assert.ok(Array.isArray(res.body.results))
+  })
+})

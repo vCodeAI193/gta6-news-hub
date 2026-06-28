@@ -82,6 +82,9 @@ export function Header() {
               {c.label}
             </NavLink>
           ))}
+          <NavLink to="/frag" className="mainnav__link" onClick={closeMenu}>
+            🤖 Frag den Hub
+          </NavLink>
           <NavLink to="/bookmarks" className="mainnav__link" onClick={closeMenu}>
             {t('nav.bookmarks')}
           </NavLink>

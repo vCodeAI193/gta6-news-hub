@@ -33,6 +33,11 @@ für künftige Ausbaustufen in [FEATURES-3.md](./FEATURES-3.md)):
   Cookie-Consent, Datenschutz/Impressum
 - **Mobile-first & barrierearm**: Skip-Link, ARIA-Rollen, Tastatur-Support,
   `prefers-reduced-motion`, jsx-a11y- und axe-geprüft
+- **KI & Automatisierung** (FEATURES-3 Welle 1): TL;DR-Zusammenfassung im Artikel,
+  „Frag den Hub"-Chat (`/frag`, RAG über alle Artikel), Auto-Tagging, Sentiment,
+  Auto-Moderation, semantische Suche, Faktencheck, Tagesbriefing u. v. m. unter
+  `/api/ai/*`. Läuft **heuristisch ohne Key**; mit `ANTHROPIC_API_KEY` übernimmt
+  **Claude** (siehe `server/ai.mjs`)
 
 > Backend-/Community-Features nutzen eine **localStorage-Service-Schicht**
 > (`src/services/`), die sich 1:1 gegen eine echte API/CMS austauschen lässt.

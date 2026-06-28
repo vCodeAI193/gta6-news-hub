@@ -9,33 +9,44 @@ Gegliedert in **25 Themenbereiche × 20 Features**. Erledigtes wird abgehakt
 (`- [x]`). Viele Punkte brauchen externe Dienste/Keys — diese werden beim
 Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
+**Fortschritt:** 20/500 umgesetzt — ✅ Welle 1 (Kategorie 1: KI & Automatisierung).
+
 > Konvention: pro Bereich grob nach Aufwand/Abhängigkeit. Beim Erledigen
 > `[ ]` → `[x]` setzen und kurz annotieren.
 
 ---
 
-## 1. KI & Automatisierung
+## 1. KI & Automatisierung ✅ (Welle 1)
 
-- [ ] **KI-Artikelzusammenfassung** — Automatisches TL;DR oben in jedem Artikel.
-- [ ] **KI-Auto-Tagging** — Schlagworte automatisch aus dem Text ableiten.
-- [ ] **Semantische Suche (Embeddings)** — Vektorsuche statt reiner Stichworte.
-- [ ] **„Frag den Hub" (RAG-Chat)** — Chat-Assistent mit Wissen aus allen Artikeln.
-- [ ] **KI-Übersetzung** — Artikel on-the-fly in weitere Sprachen übersetzen.
-- [ ] **KI-Auto-Moderation** — Toxische/Spam-Kommentare automatisch markieren.
-- [ ] **KI-Sentiment-Analyse** — Stimmung in Kommentaren auswerten.
-- [ ] **KI-Duplikaterkennung** — Doppelte/ähnliche Meldungen automatisch bündeln.
-- [ ] **KI-Titel-/Teaser-Vorschläge** — Im Editor Vorschläge generieren.
-- [ ] **KI-Alt-Text-Generator** — Bildbeschreibungen für Barrierefreiheit erzeugen.
-- [ ] **KI-Faktencheck-Assistent** — Leaks gegen bekannte Quellen plausibilisieren.
-- [ ] **KI-Trendvorhersage** — Aufkommende Themen frühzeitig erkennen.
-- [ ] **KI-Tagesbriefing** — Personalisierte Zusammenfassung des Tages.
-- [ ] **KI-Schwierigkeits-/Lesezeitanalyse** — Textkomplexität bewerten.
-- [ ] **KI-Kommentar-Zusammenfassung** — „Was sagt die Community?" pro Artikel.
-- [ ] **KI-Podcast-Generator** — Audio-Episode aus Artikeln (Skript + TTS).
-- [ ] **KI-Cover-Bildgenerierung** — Platzhalter-Cover automatisch erzeugen.
-- [ ] **KI-SEO-Assistent** — Meta-/Keyword-Vorschläge pro Artikel.
-- [ ] **KI-Quellenbewertung** — Glaubwürdigkeit einer Quelle einschätzen.
-- [ ] **KI-Live-Thread-Moderator** — Echtzeit-Diskussionen automatisch moderieren.
+> **Welle 1 umgesetzt.** Neue KI-Schicht `server/ai.mjs` mit zwei Betriebsarten:
+> deterministische **Heuristiken ohne Key** (überall offline + testbar) und
+> **Anthropic/Claude mit `ANTHROPIC_API_KEY`** (`withAi`-Wrapper, fällt bei
+> fehlendem Key/Fehler nahtlos auf die Heuristik zurück). Endpunkte unter
+> `/api/ai/*`, Frontend-Client `src/services/aiApi.ts` + lokale Heuristiken
+> `src/lib/aiLocal.ts`. Sichtbar: TL;DR-Box im Artikel, „Frag den Hub"-Chat
+> (`/frag`), Cover-Generator-Fallback. Tests: 18 (`server/ai.test.mjs`) + 7
+> Integration + 4 (`coverImage`).
+
+- [x] **KI-Artikelzusammenfassung** — Automatisches TL;DR oben in jedem Artikel. *(extraktiv/Claude, `ArticleSummary`)*
+- [x] **KI-Auto-Tagging** — Schlagworte automatisch aus dem Text ableiten. *(`/api/ai/tags`)*
+- [x] **Semantische Suche (Embeddings)** — Vektorsuche statt reiner Stichworte. *(Token-Cosinus, `/api/ai/semantic-search`)*
+- [x] **„Frag den Hub" (RAG-Chat)** — Chat-Assistent mit Wissen aus allen Artikeln. *(Seite `/frag`, `/api/ai/ask`)*
+- [x] **KI-Übersetzung** — Artikel on-the-fly in weitere Sprachen übersetzen. *(`/api/ai/translate`, echt nur mit Key)*
+- [x] **KI-Auto-Moderation** — Toxische/Spam-Kommentare automatisch markieren. *(`/api/ai/moderate`)*
+- [x] **KI-Sentiment-Analyse** — Stimmung in Kommentaren auswerten. *(Lexikon, `/api/ai/sentiment`)*
+- [x] **KI-Duplikaterkennung** — Doppelte/ähnliche Meldungen automatisch bündeln. *(`/api/ai/duplicates`)*
+- [x] **KI-Titel-/Teaser-Vorschläge** — Im Editor Vorschläge generieren. *(`/api/ai/title-suggestions`)*
+- [x] **KI-Alt-Text-Generator** — Bildbeschreibungen für Barrierefreiheit erzeugen. *(`/api/ai/alt-text`)*
+- [x] **KI-Faktencheck-Assistent** — Leaks gegen bekannte Quellen plausibilisieren. *(`/api/ai/fact-check`)*
+- [x] **KI-Trendvorhersage** — Aufkommende Themen frühzeitig erkennen. *(Momentum aus Suchprotokoll, `/api/ai/trends`)*
+- [x] **KI-Tagesbriefing** — Personalisierte Zusammenfassung des Tages. *(`/api/ai/briefing`)*
+- [x] **KI-Schwierigkeits-/Lesezeitanalyse** — Textkomplexität bewerten. *(Flesch-DE, `/api/ai/readability`)*
+- [x] **KI-Kommentar-Zusammenfassung** — „Was sagt die Community?" pro Artikel. *(`/api/ai/articles/:id/comment-summary`)*
+- [x] **KI-Podcast-Generator** — Audio-Episode aus Artikeln (Skript + TTS). *(Skript via `/api/ai/podcast-script`; TTS = Web-Speech)*
+- [x] **KI-Cover-Bildgenerierung** — Platzhalter-Cover automatisch erzeugen. *(`src/lib/coverImage.ts`, SVG-Fallback)*
+- [x] **KI-SEO-Assistent** — Meta-/Keyword-Vorschläge pro Artikel. *(`/api/ai/seo`)*
+- [x] **KI-Quellenbewertung** — Glaubwürdigkeit einer Quelle einschätzen. *(`/api/ai/source-credibility`)*
+- [x] **KI-Live-Thread-Moderator** — Echtzeit-Diskussionen automatisch moderieren. *(teilt `moderateText` mit Auto-Moderation)*
 
 ## 2. Suche & Discovery
 

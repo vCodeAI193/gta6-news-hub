@@ -12,6 +12,28 @@ import { generateSecret, otpauthUrl, verifyTotp } from './totp.mjs'
 import { assignVariant, experiments } from './experiments.mjs'
 import { startOfWeek, weeklyChallenge } from './challenges.mjs'
 import {
+  aiStatus,
+  altText,
+  analyzeSentiment,
+  autoTag,
+  briefing,
+  detectDuplicates,
+  emergingTrends,
+  factCheck,
+  moderateText,
+  podcastScript,
+  ragAnswer,
+  readability,
+  semanticRank,
+  seoSuggest,
+  sourceCredibility,
+  summarize,
+  summarizeComments,
+  titleSuggestions,
+  translateHeuristic,
+  withAi,
+} from './ai.mjs'
+import {
   authenticate,
   hashPassword,
   issueToken,
@@ -817,6 +839,140 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     for (const r of recent) for (const t of JSON.parse(r.tags || '[]')) tagCounts[t] = (tagCounts[t] ?? 0) + 1
     const tagTrends = Object.entries(tagCounts).map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count).slice(0, 8)
     res.json({ searchTrends, tagTrends })
+  })
+
+  // ------------------------------------------------------ KI & Automatisierung
+  // Heuristik ohne Key, Anthropic mit ANTHROPIC_API_KEY (siehe server/ai.mjs).
+  const publishedArticles = () =>
+    db.prepare('SELECT * FROM articles ORDER BY date DESC').all().filter(isPublished).map(rowToArticle)
+
+  app.get('/api/ai/status', (_req, res) => res.json(aiStatus()))
+
+  // #1 Artikelzusammenfassung (TL;DR)
+  app.post('/api/ai/summarize', async (req, res) => {
+    const text = String(req.body?.text || '')
+    if (text.trim().length < 20) return res.status(400).json({ error: 'Text zu kurz' })
+    const n = Math.min(4, Math.max(1, Number(req.body?.sentences) || 2))
+    const result = await withAi(
+      {
+        system: 'Du fasst deutsche GTA-6-News in maximal ' + n + ' Sätzen sachlich zusammen. Antworte nur mit der Zusammenfassung.',
+        user: text,
+        maxTokens: 256,
+        map: (raw) => ({ summary: raw }),
+      },
+      { summary: summarize(text, { sentences: n }) },
+    )
+    res.json(result)
+  })
+
+  // #2 Auto-Tagging  &  #9 Titel-/Teaser-Vorschläge  &  #18 SEO
+  app.post('/api/ai/tags', (req, res) => res.json({ tags: autoTag(String(req.body?.text || '')) }))
+  app.post('/api/ai/title-suggestions', (req, res) =>
+    res.json({ titles: titleSuggestions(String(req.body?.text || '')) }),
+  )
+  app.post('/api/ai/seo', (req, res) =>
+    res.json(seoSuggest(String(req.body?.title || ''), String(req.body?.text || ''))),
+  )
+
+  // #7 Sentiment  &  #6/#20 Auto-/Live-Moderation
+  app.post('/api/ai/sentiment', (req, res) => res.json(analyzeSentiment(String(req.body?.text || ''))))
+  app.post('/api/ai/moderate', (req, res) => res.json(moderateText(String(req.body?.text || ''))))
+
+  // #10 Alt-Text  &  #14 Lesbarkeit  &  #19 Quellenbewertung
+  app.post('/api/ai/alt-text', (req, res) =>
+    res.json({ alt: altText(String(req.body?.title || ''), String(req.body?.category || '')) }),
+  )
+  app.post('/api/ai/readability', (req, res) => res.json(readability(String(req.body?.text || ''))))
+  app.post('/api/ai/source-credibility', (req, res) =>
+    res.json(sourceCredibility(String(req.body?.source || ''))),
+  )
+
+  // #5 Übersetzung (heuristisch = Pass-through; mit Key echte Übersetzung)
+  app.post('/api/ai/translate', async (req, res) => {
+    const text = String(req.body?.text || '')
+    const lang = String(req.body?.lang || 'en')
+    const result = await withAi(
+      {
+        system: `Übersetze den folgenden Text nach "${lang}". Antworte nur mit der Übersetzung.`,
+        user: text,
+        maxTokens: 1024,
+        map: (raw) => ({ lang, text: raw, machine: true }),
+      },
+      translateHeuristic(text, lang),
+    )
+    res.json(result)
+  })
+
+  // #3 Semantische Suche
+  app.get('/api/ai/semantic-search', (req, res) => {
+    const q = String(req.query.q || '')
+    if (!q.trim()) return res.json({ results: [] })
+    const ranked = semanticRank(
+      q,
+      publishedArticles().map((a) => ({ text: `${a.title} ${a.body || a.excerpt || ''}`, ref: a })),
+    )
+    res.json({
+      results: ranked.map((r) => ({ id: r.item.ref.id, title: r.item.ref.title, score: Number(r.score.toFixed(3)) })),
+    })
+  })
+
+  // #8 Duplikaterkennung (über veröffentlichte Artikel)
+  app.get('/api/ai/duplicates', (_req, res) => {
+    const groups = detectDuplicates(
+      publishedArticles().map((a) => ({ id: a.id, title: a.title, text: `${a.title} ${a.excerpt || ''}` })),
+    )
+    res.json({ groups: groups.map((g) => g.map((x) => ({ id: x.id, title: x.title }))) })
+  })
+
+  // #11 Faktencheck (Behauptung gegen Artikelkorpus)
+  app.post('/api/ai/fact-check', (req, res) => {
+    const claim = String(req.body?.claim || '')
+    if (!claim.trim()) return res.status(400).json({ error: 'claim fehlt' })
+    const corpus = publishedArticles().map((a) => ({ text: `${a.title}. ${a.body || a.excerpt || ''}`, id: a.id, title: a.title }))
+    res.json(factCheck(claim, corpus))
+  })
+
+  // #12 Trendvorhersage (aus Suchprotokoll)
+  app.get('/api/ai/trends', (_req, res) => {
+    const rows = db.prepare('SELECT term, COUNT(*) as count FROM search_log GROUP BY term ORDER BY count DESC LIMIT 30').all()
+    res.json({ trends: emergingTrends(rows.map((r) => ({ term: r.term, count: r.count }))) })
+  })
+
+  // #13 Tagesbriefing  &  #16 Podcast-Skript
+  app.get('/api/ai/briefing', (_req, res) => res.json(briefing(publishedArticles())))
+  app.get('/api/ai/podcast-script', (_req, res) => res.json(podcastScript(publishedArticles())))
+
+  // #15 Kommentar-Zusammenfassung
+  app.get('/api/ai/articles/:id/comment-summary', (req, res) => {
+    const rows = db
+      .prepare("SELECT text FROM comments WHERE article_id = ? AND status = 'visible'")
+      .all(req.params.id)
+    res.json(summarizeComments(rows))
+  })
+
+  // #4 „Frag den Hub" (RAG-Chat)
+  app.post('/api/ai/ask', async (req, res) => {
+    const question = String(req.body?.question || '')
+    if (question.trim().length < 3) return res.status(400).json({ error: 'Frage zu kurz' })
+    const arts = publishedArticles()
+    const local = ragAnswer(question, arts)
+    const context = local.sources
+      .map((s) => arts.find((a) => a.id === s.id))
+      .filter(Boolean)
+      .map((a) => `# ${a.title}\n${a.body || a.excerpt || ''}`)
+      .join('\n\n')
+    const result = await withAi(
+      {
+        system:
+          'Du bist der Assistent des GTA 6 News Hub. Beantworte die Frage NUR auf Basis des Kontexts. ' +
+          'Wenn der Kontext nicht reicht, sage das. Antworte auf Deutsch, knapp und sachlich.',
+        user: `Kontext:\n${context}\n\nFrage: ${question}`,
+        maxTokens: 512,
+        map: (raw) => ({ answer: raw, sources: local.sources }),
+      },
+      local,
+    )
+    res.json(result)
   })
 
   // ------------------------------------------------------------- not found
