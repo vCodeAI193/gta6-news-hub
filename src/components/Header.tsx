@@ -5,6 +5,7 @@ import { useArticles } from '../hooks/useArticles'
 import { useDebounce } from '../hooks/useDebounce'
 import { useI18n } from '../i18n/I18nContext'
 import { searchSuggestions } from '../lib/filterArticles'
+import { entitySuggestions } from '../lib/entities'
 import { pushSearchHistory } from '../services/miscServices'
 import { SearchBar } from './SearchBar'
 import { ThemeToggle } from './ThemeToggle'
@@ -41,7 +42,12 @@ export function Header() {
     setQ(params.get('q') ?? '')
   }, [params])
 
-  const suggestions = useMemo(() => searchSuggestions(articles, q), [articles, q])
+  // Autocomplete: Titel/Tags (#Suche) + Entitäten (Personen/Orte/Themen, #12).
+  const suggestions = useMemo(() => {
+    const base = searchSuggestions(articles, q)
+    const entities = entitySuggestions(articles, q)
+    return [...new Set([...base, ...entities])].slice(0, 8)
+  }, [articles, q])
 
   const submit = (value: string) => {
     if (value.trim()) pushSearchHistory(value)
@@ -82,6 +88,9 @@ export function Header() {
               {c.label}
             </NavLink>
           ))}
+          <NavLink to="/entdecken" className="mainnav__link" onClick={closeMenu}>
+            ✨ Entdecken
+          </NavLink>
           <NavLink to="/frag" className="mainnav__link" onClick={closeMenu}>
             🤖 Frag den Hub
           </NavLink>

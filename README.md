@@ -38,6 +38,13 @@ für künftige Ausbaustufen in [FEATURES-3.md](./FEATURES-3.md)):
   Auto-Moderation, semantische Suche, Faktencheck, Tagesbriefing u. v. m. unter
   `/api/ai/*`. Läuft **heuristisch ohne Key**; mit `ANTHROPIC_API_KEY` übernimmt
   **Claude** (siehe `server/ai.mjs`)
+- **Suche & Discovery** (FEATURES-3 Welle 2): Such-Seite `/suche` mit Operatoren
+  (`"phrase"`, `-ausschluss`, `a OR b`), Synonymen, Tippfehler-Toleranz, Facetten,
+  Verlässlichkeits-/Lesezeit-Filtern, Kontext-Snippets sowie Tabs für Artikel,
+  Kommentare und Lore. Dazu Entdecken-Seite `/entdecken` (Discovery-Feed,
+  „Überrasch mich", Tag-Wolke), Themen-Hubs `/thema/:tag`, Sprachsuche und
+  Entitäts-Autocomplete. Backend unter `/api/search` (austauschbar gegen einen
+  echten Index). Architektur-Entscheidungen & offene Punkte: `docs/DECISIONS.md`
 
 > Backend-/Community-Features nutzen eine **localStorage-Service-Schicht**
 > (`src/services/`), die sich 1:1 gegen eine echte API/CMS austauschen lässt.

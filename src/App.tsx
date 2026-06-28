@@ -26,6 +26,9 @@ const DashboardPage = lazy(() => import('./routes/DashboardPage').then((m) => ({
 const FeedPage = lazy(() => import('./routes/FeedPage').then((m) => ({ default: m.FeedPage })))
 const TippspielPage = lazy(() => import('./routes/TippspielPage').then((m) => ({ default: m.TippspielPage })))
 const AskHubPage = lazy(() => import('./routes/AskHubPage').then((m) => ({ default: m.AskHubPage })))
+const SearchPage = lazy(() => import('./routes/SearchPage').then((m) => ({ default: m.SearchPage })))
+const DiscoverPage = lazy(() => import('./routes/DiscoverPage').then((m) => ({ default: m.DiscoverPage })))
+const TopicHubPage = lazy(() => import('./routes/TopicHubPage').then((m) => ({ default: m.TopicHubPage })))
 const AboutPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.AboutPage })))
 const PrivacyPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.PrivacyPage })))
 const ImprintPage = lazy(() => import('./routes/StaticPages').then((m) => ({ default: m.ImprintPage })))
@@ -92,6 +95,9 @@ export default function App() {
         <Route path="feed" element={<Suspense fallback={<SkeletonGrid count={2} />}><FeedPage /></Suspense>} />
         <Route path="tippspiel" element={<Suspense fallback={null}><TippspielPage /></Suspense>} />
         <Route path="frag" element={<Suspense fallback={null}><AskHubPage /></Suspense>} />
+        <Route path="suche" element={<Suspense fallback={<SkeletonGrid count={3} />}><SearchPage /></Suspense>} />
+        <Route path="entdecken" element={<Suspense fallback={<SkeletonGrid count={3} />}><DiscoverPage /></Suspense>} />
+        <Route path="thema/:tag" element={<Suspense fallback={<SkeletonGrid count={3} />}><TopicHubPage /></Suspense>} />
         <Route path="about" element={<Suspense fallback={null}><AboutPage /></Suspense>} />
         <Route path="datenschutz" element={<Suspense fallback={null}><PrivacyPage /></Suspense>} />
         <Route path="impressum" element={<Suspense fallback={null}><ImprintPage /></Suspense>} />

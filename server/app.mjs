@@ -33,6 +33,7 @@ import {
   translateHeuristic,
   withAi,
 } from './ai.mjs'
+import { searchArticles, searchComments } from './search.mjs'
 import {
   authenticate,
   hashPassword,
@@ -973,6 +974,66 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
       local,
     )
     res.json(result)
+  })
+
+  // ------------------------------------------------------ Suche & Discovery
+  // #1 Volltextsuche, #2 Facetten, #3 Synonyme/Tippfehler, #16 Snippets,
+  // #13 Verlässlichkeits-Filter, #14 Lesezeit-Filter.
+  app.get('/api/search', (req, res) => {
+    const q = String(req.query.q || '')
+    const opts = {
+      category: req.query.category ? String(req.query.category) : undefined,
+      reliability: req.query.reliability ? String(req.query.reliability) : undefined,
+      maxMinutes: req.query.maxMinutes ? Number(req.query.maxMinutes) : undefined,
+    }
+    const out = searchArticles(publishedArticles(), q, opts)
+    // Suchbegriff fürs Trend-/Analytics-Protokoll mitschreiben.
+    if (q.trim()) {
+      try {
+        db.prepare('INSERT INTO search_log (id, term, results, created_at) VALUES (?, ?, ?, ?)').run(
+          randomUUID(),
+          q.trim().toLowerCase().slice(0, 100),
+          out.total,
+          new Date().toISOString(),
+        )
+      } catch {
+        /* search_log optional */
+      }
+    }
+    res.json({ results: out.results, total: out.total, facets: out.facets })
+  })
+
+  // #8 Suche über Kommentare
+  app.get('/api/search/comments', (req, res) => {
+    const q = String(req.query.q || '')
+    if (!q.trim()) return res.json({ results: [] })
+    const rows = db
+      .prepare("SELECT id, article_id, author, text, created_at FROM comments WHERE status = 'visible'")
+      .all()
+    const matched = searchComments(rows, q).slice(0, 30)
+    res.json({
+      results: matched.map((c) => ({
+        id: c.id,
+        articleId: c.article_id,
+        author: c.author,
+        snippet: c.snippet,
+        createdAt: c.created_at,
+      })),
+    })
+  })
+
+  // #7 „Ähnliche Artikel" (semantisch)
+  app.get('/api/articles/:id/similar', (req, res) => {
+    const arts = publishedArticles()
+    const target = arts.find((a) => a.id === req.params.id)
+    if (!target) return res.status(404).json({ error: 'Nicht gefunden' })
+    const ranked = semanticRank(
+      `${target.title} ${target.body || target.excerpt || ''}`,
+      arts.filter((a) => a.id !== target.id).map((a) => ({ text: `${a.title} ${a.body || a.excerpt || ''}`, ref: a })),
+    )
+    res.json({
+      similar: ranked.map((r) => ({ id: r.item.ref.id, title: r.item.ref.title, score: Number(r.score.toFixed(3)) })),
+    })
   })
 
   // ------------------------------------------------------------- not found

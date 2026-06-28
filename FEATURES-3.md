@@ -9,7 +9,9 @@ Gegliedert in **25 Themenbereiche × 20 Features**. Erledigtes wird abgehakt
 (`- [x]`). Viele Punkte brauchen externe Dienste/Keys — diese werden beim
 Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
-**Fortschritt:** 20/500 umgesetzt — ✅ Welle 1 (Kategorie 1: KI & Automatisierung).
+**Fortschritt:** 40/500 umgesetzt — ✅ Welle 1 (KI & Automatisierung),
+✅ Welle 2 (Suche & Discovery). Entscheidungen, Kritik & Verbesserungsideen:
+[docs/DECISIONS.md](./docs/DECISIONS.md).
 
 > Konvention: pro Bereich grob nach Aufwand/Abhängigkeit. Beim Erledigen
 > `[ ]` → `[x]` setzen und kurz annotieren.
@@ -48,28 +50,39 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 - [x] **KI-Quellenbewertung** — Glaubwürdigkeit einer Quelle einschätzen. *(`/api/ai/source-credibility`)*
 - [x] **KI-Live-Thread-Moderator** — Echtzeit-Diskussionen automatisch moderieren. *(teilt `moderateText` mit Auto-Moderation)*
 
-## 2. Suche & Discovery
+## 2. Suche & Discovery ✅ (Welle 2)
 
-- [ ] **Server-seitige Volltextsuche** — Meilisearch/Algolia-Index.
-- [ ] **Facettierte Suche** — Filter-Facetten (Kategorie, Tag, Datum, Quelle).
-- [ ] **Synonym-/Tippfehler-Engine** — Bessere Treffer bei Varianten.
-- [ ] **Gespeicherte Suchen** — Suchabos mit Benachrichtigung bei neuen Treffern.
-- [ ] **Sprachsuche** — Suche per Mikrofon (Web Speech).
-- [ ] **Reverse-Image-Suche** — Ähnliche Bilder/Screenshots finden.
-- [ ] **„Ähnliche Artikel"** — Empfehlung verwandter Beiträge pro Artikel.
-- [ ] **Suche über Kommentare** — Diskussionen durchsuchbar machen.
-- [ ] **Suche über das Lore-Wiki** — Eigener Index für Wiki-Einträge.
-- [ ] **Erweiterte Operatoren** — AND/OR/Phrasen/Ausschluss.
-- [ ] **Personalisierte Ergebnisse** — Ranking nach Interessen.
-- [ ] **Entitäts-Autocomplete** — Vorschläge zu Personen/Orten/Themen.
-- [ ] **Filter nach Verlässlichkeit** — Nur bestätigte / nur Gerüchte.
-- [ ] **Filter nach Lesezeit** — Kurz/mittel/lang.
-- [ ] **„Überrasch mich"** — Zufälliger Artikel/Entdeckung.
-- [ ] **Kontext-Snippets** — Treffer mit umgebendem Text + Highlight.
-- [ ] **Such-Analytics für Nutzer** — „Deine häufigsten Suchen".
-- [ ] **Discovery-Feed** — Endloser, kuratierter Entdeckungs-Stream.
-- [ ] **Themen-Hubs** — Aggregierte Landingpages je Thema.
-- [ ] **Verwandte-Tags-Wolke** — Navigierbare Tag-Beziehungen.
+> **Welle 2 umgesetzt.** Such-Engine `src/lib/searchQuery.ts` (Operatoren,
+> Synonyme, Tippfehler, Snippets) + Backend `server/search.mjs` mit Facetten
+> (`/api/search`, `/api/search/comments`, `/api/articles/:id/similar`).
+> Frontend: Such-Seite `/suche` (Facetten, Filter, Tabs Artikel/Kommentare/Lore,
+> gespeicherte Suchen, „häufigste Suchen", personalisiertes Ranking),
+> Entdecken-Seite `/entdecken` (Discovery-Feed, „Überrasch mich", Tag-Wolke),
+> Themen-Hub `/thema/:tag`, Sprachsuche (Web Speech) + Entitäts-Autocomplete in
+> der Suchleiste. Discovery-Helfer `src/lib/discovery.ts`, Entitäten
+> `src/lib/entities.ts`. Kein externer Index — Route bleibt austauschbar.
+> Tests: +21 Frontend / +12 Backend. Entscheidungen & Kritik: `docs/DECISIONS.md`.
+
+- [x] **Server-seitige Volltextsuche** — Meilisearch/Algolia-Index. *(SQLite-basiert, `/api/search`; Index später austauschbar)*
+- [x] **Facettierte Suche** — Filter-Facetten (Kategorie, Tag, Datum, Quelle). *(`facetsFor`, Facet-Counts in der UI)*
+- [x] **Synonym-/Tippfehler-Engine** — Bessere Treffer bei Varianten. *(GTA-Synonyme + Levenshtein)*
+- [x] **Gespeicherte Suchen** — Suchabos mit Benachrichtigung bei neuen Treffern. *(lokal, „+N neu"-Badge; echte Subscriptions offen — s. DECISIONS)*
+- [x] **Sprachsuche** — Suche per Mikrofon (Web Speech). *(SearchBar-Mikro, Browser-abhängig)*
+- [x] **Reverse-Image-Suche** — Ähnliche Bilder/Screenshots finden. *(heuristisch: Kategorie + Tag-Überschneidung, `similarImages`)*
+- [x] **„Ähnliche Artikel"** — Empfehlung verwandter Beiträge pro Artikel. *(`/api/articles/:id/similar`, semantisch)*
+- [x] **Suche über Kommentare** — Diskussionen durchsuchbar machen. *(`/api/search/comments`, Tab in der Suche)*
+- [x] **Suche über das Lore-Wiki** — Eigener Index für Wiki-Einträge. *(Frontend-Index über `loreEntries`)*
+- [x] **Erweiterte Operatoren** — AND/OR/Phrasen/Ausschluss. *(`parseQuery`: `"phrase"`, `-wort`, `a OR b`)*
+- [x] **Personalisierte Ergebnisse** — Ranking nach Interessen. *(Re-Ranking via `prefs.interests`)*
+- [x] **Entitäts-Autocomplete** — Vorschläge zu Personen/Orten/Themen. *(`entities.ts`: Lore + Tags/Quellen/Autoren)*
+- [x] **Filter nach Verlässlichkeit** — Nur bestätigte / nur Gerüchte. *(Facet-Select + Server-Filter)*
+- [x] **Filter nach Lesezeit** — Kurz/mittel/lang. *(maxMinutes-Filter)*
+- [x] **„Überrasch mich"** — Zufälliger Artikel/Entdeckung. *(`pickRandom`, deterministisch zum Seed)*
+- [x] **Kontext-Snippets** — Treffer mit umgebendem Text + Highlight. *(`makeSnippet` + `highlight`)*
+- [x] **Such-Analytics für Nutzer** — „Deine häufigsten Suchen". *(lokale Zähler, `topSearches`)*
+- [x] **Discovery-Feed** — Endloser, kuratierter Entdeckungs-Stream. *(`discoveryStream`, „Mehr"-Paginierung)*
+- [x] **Themen-Hubs** — Aggregierte Landingpages je Thema. *(`/thema/:tag`)*
+- [x] **Verwandte-Tags-Wolke** — Navigierbare Tag-Beziehungen. *(`relatedTags`/`tagCloud`, Ko-Vorkommen)*
 
 ## 3. Personalisierung & Empfehlungen
 

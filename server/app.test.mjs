@@ -691,3 +691,40 @@ describe('KI & Automatisierung', () => {
     assert.ok(Array.isArray(res.body.results))
   })
 })
+
+describe('Suche & Discovery', () => {
+  it('Volltextsuche liefert Treffer, Facetten und Snippets', async () => {
+    const res = await request(app).get('/api/search').query({ q: 'trailer' })
+    assert.equal(res.status, 200)
+    assert.ok(Array.isArray(res.body.results))
+    assert.ok(res.body.facets.categories.length >= 1)
+    if (res.body.results.length) assert.ok('snippet' in res.body.results[0])
+  })
+
+  it('Synonyme und Operatoren funktionieren', async () => {
+    const syn = await request(app).get('/api/search').query({ q: 'karte' })
+    assert.equal(syn.status, 200)
+    const excl = await request(app).get('/api/search').query({ q: 'gta -xyzqurk' })
+    assert.equal(excl.status, 200)
+  })
+
+  it('filtert nach Verlässlichkeit', async () => {
+    const res = await request(app).get('/api/search').query({ reliability: 'confirmed' })
+    assert.equal(res.status, 200)
+    assert.ok(res.body.results.every((r) => r.reliability === 'confirmed'))
+  })
+
+  it('durchsucht Kommentare', async () => {
+    const res = await request(app).get('/api/search/comments').query({ q: 'gta' })
+    assert.equal(res.status, 200)
+    assert.ok(Array.isArray(res.body.results))
+  })
+
+  it('liefert ähnliche Artikel', async () => {
+    const list = await request(app).get('/api/articles')
+    const id = list.body.articles[0]?.id
+    const res = await request(app).get(`/api/articles/${id}/similar`)
+    assert.equal(res.status, 200)
+    assert.ok(Array.isArray(res.body.similar))
+  })
+})
