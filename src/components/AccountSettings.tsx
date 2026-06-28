@@ -8,14 +8,31 @@ import { readJSON, writeJSON } from '../services/storage'
 
 /** Konto-Verwaltung (nur mit Backend & Login sichtbar). */
 export function AccountSettings() {
-  const { user, logout, loading } = useAuth()
+  const { user, logout, loading, refresh } = useAuth()
   const { notify } = useToast()
   const [displayName, setDisplayName] = useState(user?.displayName ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
   const [currentPw, setCurrentPw] = useState('')
   const [newPw, setNewPw] = useState('')
+  const [setup, setSetup] = useState<{ secret: string; otpauth: string } | null>(null)
+  const [code, setCode] = useState('')
 
   if (loading || !isApiEnabled() || !user) return null
+
+  const startSetup = () => run(async () => setSetup(await accountApi.twofaSetup()), '2FA-Setup gestartet')
+  const enable2fa = () =>
+    run(async () => {
+      await accountApi.twofaEnable(code)
+      setSetup(null)
+      setCode('')
+      await refresh()
+    }, '2FA aktiviert ✅')
+  const disable2fa = () =>
+    run(async () => {
+      await accountApi.twofaDisable(code)
+      setCode('')
+      await refresh()
+    }, '2FA deaktiviert')
 
   const run = async (fn: () => Promise<unknown>, ok: string) => {
     try {
@@ -90,6 +107,34 @@ export function AccountSettings() {
       <button type="button" className="btn btn--small" onClick={changePassword} disabled={!currentPw || newPw.length < 8}>
         Passwort ändern
       </button>
+
+      <h3 className="settings__subhead">Zwei-Faktor-Authentifizierung (2FA)</h3>
+      {user.twoFactorEnabled ? (
+        <div className="twofa">
+          <p className="settings__hint">✅ 2FA ist aktiv.</p>
+          <div className="settings__btnrow">
+            <input type="text" inputMode="numeric" placeholder="Code zum Deaktivieren" value={code} onChange={(e) => setCode(e.target.value)} />
+            <button type="button" className="btn btn--small btn--ghost btn--danger" onClick={disable2fa}>Deaktivieren</button>
+          </div>
+        </div>
+      ) : setup ? (
+        <div className="twofa">
+          <p className="settings__hint">
+            Füge dieses Geheimnis in deiner Authenticator-App hinzu und gib den 6-stelligen Code ein:
+          </p>
+          <code className="twofa__secret">{setup.secret}</code>
+          <details>
+            <summary>otpauth-URI</summary>
+            <code className="twofa__uri">{setup.otpauth}</code>
+          </details>
+          <div className="settings__btnrow">
+            <input type="text" inputMode="numeric" placeholder="123456" value={code} onChange={(e) => setCode(e.target.value)} />
+            <button type="button" className="btn btn--small" onClick={enable2fa} disabled={code.length !== 6}>Aktivieren</button>
+          </div>
+        </div>
+      ) : (
+        <button type="button" className="btn btn--small btn--ghost" onClick={startSetup}>2FA einrichten</button>
+      )}
 
       <h3 className="settings__subhead">Geräteübergreifende Sync</h3>
       <p className="settings__hint">Lesezeichen & Einstellungen mit deinem Konto abgleichen.</p>

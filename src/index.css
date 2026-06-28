@@ -399,6 +399,10 @@ a.tag-chip:hover { color: var(--text); border-color: var(--pink); }
 .auth-card__switch { font-size: 0.88rem; color: var(--text-muted); text-align: center; }
 
 /* ---------- Account & social ---------- */
+.twofa { display: grid; gap: 0.5rem; }
+.twofa__secret { display: inline-block; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.8rem; font-family: ui-monospace, monospace; letter-spacing: 0.15em; word-break: break-all; }
+.twofa__uri { display: block; font-size: 0.72rem; color: var(--text-muted); word-break: break-all; margin-top: 0.3rem; }
+.twofa input { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.5rem 0.7rem; }
 .settings__subhead { font-size: 0.95rem; margin: 1.2rem 0 0.4rem; color: var(--text); }
 .settings__btnrow { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .profile__follows { color: var(--text-muted); margin: 0 0 1rem; }

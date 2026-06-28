@@ -8,6 +8,7 @@ import { createMetrics } from './metrics.mjs'
 import { createFlags } from './flags.mjs'
 import { API_VERSION, openapiSpec } from './openapi.mjs'
 import { predictionById, predictionQuestions } from './predictions.mjs'
+import { generateSecret, otpauthUrl, verifyTotp } from './totp.mjs'
 import {
   authenticate,
   hashPassword,
@@ -103,12 +104,40 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
   })
 
   app.post('/api/auth/login', authLimiter, (req, res) => {
-    const { email, password } = req.body ?? {}
+    const { email, password, code } = req.body ?? {}
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get((email ?? '').toLowerCase())
     if (!user || !verifyPassword(password ?? '', user.password_hash))
       return res.status(401).json({ error: 'E-Mail oder Passwort falsch' })
+    // Zweiter Faktor, falls aktiviert.
+    if (user.totp_enabled) {
+      if (!code) return res.status(401).json({ error: '2FA-Code erforderlich', require2fa: true })
+      if (!verifyTotp(user.totp_secret, code)) return res.status(401).json({ error: '2FA-Code falsch', require2fa: true })
+    }
     const { token } = issueToken(db, user, req.headers['user-agent'])
     res.json({ token, user: publicUser(user) })
+  })
+
+  // --- 2-Faktor-Authentifizierung (TOTP) ---
+  app.post('/api/auth/2fa/setup', requireAuth(db), (req, res) => {
+    const secret = generateSecret()
+    db.prepare('UPDATE users SET totp_secret = ?, totp_enabled = 0 WHERE id = ?').run(secret, req.auth.user.id)
+    res.json({ secret, otpauth: otpauthUrl(secret, req.auth.user.email) })
+  })
+
+  app.post('/api/auth/2fa/enable', requireAuth(db), (req, res) => {
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.auth.user.id)
+    if (!user.totp_secret) return res.status(400).json({ error: 'Erst Setup aufrufen' })
+    if (!verifyTotp(user.totp_secret, req.body?.code)) return res.status(400).json({ error: 'Code falsch' })
+    db.prepare('UPDATE users SET totp_enabled = 1 WHERE id = ?').run(user.id)
+    res.json({ ok: true, twoFactorEnabled: true })
+  })
+
+  app.post('/api/auth/2fa/disable', requireAuth(db), (req, res) => {
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.auth.user.id)
+    if (user.totp_enabled && !verifyTotp(user.totp_secret, req.body?.code))
+      return res.status(400).json({ error: 'Code falsch' })
+    db.prepare('UPDATE users SET totp_enabled = 0, totp_secret = NULL WHERE id = ?').run(user.id)
+    res.json({ ok: true, twoFactorEnabled: false })
   })
 
   app.get('/api/auth/me', requireAuth(db), (req, res) => {
@@ -197,6 +226,18 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     res.json({ ok: true })
   })
 
+  // --- Benachrichtigungen (inkl. @mentions) ---
+  app.get('/api/me/notifications', requireAuth(db), (req, res) => {
+    const rows = db.prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 30').all(req.auth.user.id)
+    const unread = rows.filter((n) => !n.read).length
+    res.json({ notifications: rows.map((n) => ({ id: n.id, type: n.type, text: n.text, link: n.link, read: !!n.read, createdAt: n.created_at })), unread })
+  })
+
+  app.post('/api/me/notifications/read', requireAuth(db), (req, res) => {
+    db.prepare('UPDATE notifications SET read = 1 WHERE user_id = ?').run(req.auth.user.id)
+    res.json({ ok: true })
+  })
+
   // Geräteübergreifende Sync (Lesezeichen/Einstellungen).
   app.get('/api/me/sync', requireAuth(db), (req, res) => {
     const row = db.prepare('SELECT data, updated_at FROM user_sync WHERE user_id = ?').get(req.auth.user.id)
@@ -260,14 +301,14 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     const id = b.id || randomUUID()
     const now = new Date().toISOString()
     db.prepare(
-      `INSERT INTO articles (id, title, excerpt, body, category, date, source, source_url, image, tags, author, reliability, status, publish_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO articles (id, title, excerpt, body, category, date, source, source_url, image, tags, author, reliability, status, publish_at, co_authors, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       id, b.title, b.excerpt ?? '', b.body ?? '', b.category ?? 'official',
       b.date ?? now.slice(0, 10), b.source, b.sourceUrl ?? null,
       b.image ?? 'https://picsum.photos/seed/neu/800/450', JSON.stringify(b.tags ?? []),
       b.author ?? req.auth.user.display_name, b.reliability ?? null,
-      b.status ?? 'published', b.publishAt ?? null, now, now,
+      b.status ?? 'published', b.publishAt ?? null, JSON.stringify(b.coAuthors ?? []), now, now,
     )
     publish('article', { action: 'created', id })
     res.status(201).json({ article: rowToArticle(db.prepare('SELECT * FROM articles WHERE id = ?').get(id)) })
@@ -281,14 +322,14 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
     // Aktuelle Version vor dem Überschreiben als Revision sichern.
     snapshotRevision(db, row, req.auth.user)
     db.prepare(
-      `UPDATE articles SET title=?, excerpt=?, body=?, category=?, date=?, source=?, source_url=?, image=?, tags=?, author=?, reliability=?, status=?, publish_at=?, updated_at=? WHERE id=?`,
+      `UPDATE articles SET title=?, excerpt=?, body=?, category=?, date=?, source=?, source_url=?, image=?, tags=?, author=?, reliability=?, status=?, publish_at=?, co_authors=?, updated_at=? WHERE id=?`,
     ).run(
       b.title ?? row.title, b.excerpt ?? row.excerpt, b.body ?? row.body,
       b.category ?? row.category, b.date ?? row.date, b.source ?? row.source,
       b.sourceUrl ?? row.source_url, b.image ?? row.image,
       JSON.stringify(b.tags ?? JSON.parse(row.tags)), b.author ?? row.author,
       b.reliability ?? row.reliability, b.status ?? row.status,
-      b.publishAt ?? row.publish_at, now, req.params.id,
+      b.publishAt ?? row.publish_at, JSON.stringify(b.coAuthors ?? JSON.parse(row.co_authors || '[]')), now, req.params.id,
     )
     res.json({ article: rowToArticle(db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id)) })
   })
@@ -352,6 +393,8 @@ export function createApp({ dbPath = ':memory:', hub = null } = {}) {
 
     // Reputation fürs Mitmachen.
     awardReputation(db, req.auth.user.id, POINTS.comment)
+    // @mentions → Benachrichtigungen.
+    createMentionNotifications(db, text.trim(), req.params.id, req.auth.user)
 
     const comment = { id, articleId: req.params.id, author: req.auth.user.display_name, text: text.trim(), parentId: parentId ?? null, createdAt: now }
     // Nur sofort sichtbare Kommentare live verteilen.
@@ -716,6 +759,23 @@ function forwardToDiscord(content) {
     })
   } catch {
     /* Integration darf die API nie blockieren. */
+  }
+}
+
+/** Erzeugt Benachrichtigungen für @erwähnte Nutzer in einem Kommentar. */
+function createMentionNotifications(db, text, articleId, author) {
+  const tokens = [...new Set((text.match(/@(\w+)/g) ?? []).map((t) => t.slice(1).toLowerCase()))]
+  if (tokens.length === 0) return
+  const now = new Date().toISOString()
+  for (const token of tokens) {
+    const target = db
+      .prepare("SELECT id FROM users WHERE lower(replace(display_name, ' ', '')) = ? AND id != ?")
+      .get(token, author.id)
+    if (!target) continue
+    db.prepare('INSERT INTO notifications (id, user_id, type, text, link, read, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)').run(
+      randomUUID(), target.id, 'mention',
+      `${author.display_name} hat dich erwähnt`, `/news/${articleId}`, now,
+    )
   }
 }
 

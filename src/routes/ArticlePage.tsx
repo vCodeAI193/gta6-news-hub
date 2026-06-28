@@ -104,7 +104,12 @@ export function ArticlePage() {
         </div>
         <h1 className="article__title">{article.title}</h1>
         <div className="article__meta">
-          {article.author && <span>Von <strong>{article.author}</strong></span>}
+          {article.author && (
+            <span>
+              Von <strong>{article.author}</strong>
+              {article.coAuthors && article.coAuthors.length > 0 && <> &amp; {article.coAuthors.join(', ')}</>}
+            </span>
+          )}
           <time dateTime={article.date}>{formatDate(article.date)}</time>
           {article.updatedDate && (
             <span>

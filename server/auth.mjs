@@ -42,6 +42,7 @@ export function publicUser(row) {
     displayName: row.display_name,
     role: row.role,
     reputation: row.reputation ?? 0,
+    twoFactorEnabled: !!row.totp_enabled,
     createdAt: row.created_at,
   }
 }

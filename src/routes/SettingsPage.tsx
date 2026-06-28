@@ -76,6 +76,7 @@ export function SettingsPage() {
             <select value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
               <option value="de">Deutsch</option>
               <option value="en">English</option>
+              <option value="ar">العربية (RTL)</option>
             </select>
           </label>
           <label className="settings__row settings__row--switch">

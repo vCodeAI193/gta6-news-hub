@@ -49,6 +49,8 @@ export interface Article {
   tags?: string[]
   /** Autor/Redakteur */
   author?: string
+  /** Weitere Autor:innen (Co-Authoring) */
+  coAuthors?: string[]
   /** Verlässlichkeit der Meldung */
   reliability?: Reliability
   /** Hervorhebung (Hero/Karussell) */

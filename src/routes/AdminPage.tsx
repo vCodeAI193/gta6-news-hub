@@ -176,6 +176,13 @@ export function AdminPage() {
             <input value={form.author ?? ''} onChange={(e) => set('author', e.target.value)} />
           </label>
           <label>
+            Co-Autor:innen (Komma-getrennt)
+            <input
+              value={(form.coAuthors ?? []).join(', ')}
+              onChange={(e) => set('coAuthors', e.target.value.split(',').map((t) => t.trim()).filter(Boolean))}
+            />
+          </label>
+          <label>
             Quelle-URL
             <input value={form.sourceUrl ?? ''} onChange={(e) => set('sourceUrl', e.target.value)} />
           </label>

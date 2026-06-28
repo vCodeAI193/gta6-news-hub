@@ -15,19 +15,25 @@ export function AuthPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
+  const [code, setCode] = useState('')
+  const [need2fa, setNeed2fa] = useState(false)
   const [busy, setBusy] = useState(false)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setBusy(true)
     try {
-      if (mode === 'login') await login(email, password)
+      if (mode === 'login') await login(email, password, code || undefined)
       else await register(email, password, displayName)
       notify('Willkommen! 🎉', 'success')
       navigate('/')
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : 'Etwas ist schiefgelaufen'
-      notify(msg, 'error')
+      if (err instanceof ApiError && err.status === 401 && /2fa/i.test(err.message)) {
+        setNeed2fa(true)
+        notify('Bitte 2FA-Code aus deiner Authenticator-App eingeben.', 'info')
+      } else {
+        notify(err instanceof ApiError ? err.message : 'Etwas ist schiefgelaufen', 'error')
+      }
     } finally {
       setBusy(false)
     }
@@ -68,6 +74,19 @@ export function AuthPage() {
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
             />
           </label>
+          {mode === 'login' && need2fa && (
+            <label>
+              2FA-Code (Authenticator-App)
+              <input
+                type="text"
+                inputMode="numeric"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="123456"
+                autoComplete="one-time-code"
+              />
+            </label>
+          )}
           <button type="submit" className="btn" disabled={busy || !enabled}>
             {busy ? '…' : mode === 'login' ? 'Anmelden' : 'Registrieren'}
           </button>

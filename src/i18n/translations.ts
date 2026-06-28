@@ -1,4 +1,7 @@
-export type Locale = 'de' | 'en'
+export type Locale = 'de' | 'en' | 'ar'
+
+/** Sprachen mit Rechts-nach-links-Schreibrichtung. */
+export const RTL_LOCALES: Locale[] = ['ar']
 
 /** Übersetzungs-Schlüssel der UI. DE ist die Standardsprache. */
 export const translations = {
@@ -75,6 +78,43 @@ export const translations = {
     'vote.credible': 'Credible',
     'vote.fake': 'Not credible',
     'theme.toggle': 'Toggle theme',
+  },
+  ar: {
+    'nav.home': 'الرئيسية',
+    'nav.bookmarks': 'المحفوظات',
+    'nav.settings': 'الإعدادات',
+    'nav.admin': 'الإدارة',
+    'search.placeholder': 'ابحث في الأخبار…',
+    'search.label': 'ابحث في الأخبار',
+    'feed.title': 'أحدث الأخبار',
+    'feed.loading': 'جارٍ التحميل…',
+    'feed.empty.title': 'لا نتائج',
+    'feed.empty.text': 'لم يتم العثور على مقالات لبحثك.',
+    'feed.suggestions': 'ربما يهمك:',
+    'feed.loadMore': 'عرض المزيد',
+    'article.related': 'مقالات ذات صلة',
+    'article.back': 'رجوع',
+    'article.source': 'المصدر',
+    'article.sources': 'المصادر',
+    'article.updated': 'تم التحديث',
+    'article.original': 'عرض المصدر الأصلي',
+    'common.all': 'الكل',
+    'common.save': 'حفظ',
+    'common.cancel': 'إلغاء',
+    'common.delete': 'حذف',
+    'common.share': 'مشاركة',
+    'common.bookmark': 'حفظ',
+    'common.bookmarked': 'محفوظ',
+    'common.readLater': 'اقرأ لاحقًا',
+    'comments.title': 'التعليقات',
+    'comments.placeholder': 'اكتب تعليقًا…',
+    'comments.submit': 'نشر',
+    'comments.reply': 'رد',
+    'comments.empty': 'لا توجد تعليقات بعد. كن الأول!',
+    'vote.question': 'ما مدى مصداقية هذا التسريب؟',
+    'vote.credible': 'موثوق',
+    'vote.fake': 'غير موثوق',
+    'theme.toggle': 'تبديل المظهر',
   },
 } as const
 

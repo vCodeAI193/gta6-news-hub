@@ -184,6 +184,15 @@ const MIGRATIONS = [
     data TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    text TEXT NOT NULL,
+    link TEXT,
+    read INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  )`,
 ]
 
 export function createDb(path = ':memory:') {
@@ -195,6 +204,9 @@ export function createDb(path = ':memory:') {
   ensureColumn(db, 'users', 'reputation', 'INTEGER NOT NULL DEFAULT 0')
   ensureColumn(db, 'articles', 'submitted_by', 'TEXT')
   ensureColumn(db, 'articles', 'views', 'INTEGER NOT NULL DEFAULT 0')
+  ensureColumn(db, 'articles', 'co_authors', "TEXT NOT NULL DEFAULT '[]'")
+  ensureColumn(db, 'users', 'totp_secret', 'TEXT')
+  ensureColumn(db, 'users', 'totp_enabled', 'INTEGER NOT NULL DEFAULT 0')
   seedArticles(db)
   return db
 }
@@ -291,5 +303,6 @@ export function rowToArticle(row) {
     status: row.status,
     publishAt: row.publish_at ?? undefined,
     views: row.views ?? 0,
+    coAuthors: JSON.parse(row.co_authors || '[]'),
   }
 }

@@ -2,6 +2,11 @@ import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import request from 'supertest'
 import { createApp } from './app.mjs'
+import { totpCode } from './totp.mjs'
+
+function currentCode(secret) {
+  return totpCode(secret, Math.floor(Date.now() / 1000 / 30))
+}
 
 // Node-eigener Test-Runner (kein Vite/Vitest), damit node:sqlite nativ läuft.
 
@@ -290,6 +295,53 @@ describe('Gamification', () => {
     const res = await request(app).get('/api/leaderboard')
     assert.equal(res.status, 200)
     assert.ok(Array.isArray(res.body.leaders))
+  })
+})
+
+describe('2FA, Mentions & Co-Authoring', () => {
+  it('TOTP-Flow: setup → enable → Login erfordert Code', async () => {
+    const { body } = await register()
+    const auth = `Bearer ${body.token}`
+    const setup = await request(app).post('/api/auth/2fa/setup').set('Authorization', auth)
+    assert.ok(setup.body.secret)
+    assert.match(setup.body.otpauth, /^otpauth:\/\/totp\//)
+
+    // Falscher Code → kein Enable.
+    assert.equal((await request(app).post('/api/auth/2fa/enable').set('Authorization', auth).send({ code: '000000' })).status, 400)
+    // Richtiger Code → Enable.
+    const enable = await request(app).post('/api/auth/2fa/enable').set('Authorization', auth).send({ code: currentCode(setup.body.secret) })
+    assert.equal(enable.body.twoFactorEnabled, true)
+
+    // Login ohne Code → 401 mit require2fa.
+    const noCode = await request(app).post('/api/auth/login').send({ email: 'a@b.de', password: 'password123' })
+    assert.equal(noCode.status, 401)
+    assert.equal(noCode.body.require2fa, true)
+    // Login mit Code → ok.
+    const ok = await request(app).post('/api/auth/login').send({ email: 'a@b.de', password: 'password123', code: currentCode(setup.body.secret) })
+    assert.equal(ok.status, 200)
+    assert.equal(ok.body.user.twoFactorEnabled, true)
+  })
+
+  it('@mention erzeugt eine Benachrichtigung', async () => {
+    const a = await register() // Tester
+    const b = await registerSecond() // Leser
+    await request(app).post('/api/articles/release-date-confirmed/comments')
+      .set('Authorization', `Bearer ${b.body.token}`)
+      .send({ text: 'Hey @Tester schau dir das an!' })
+    const notifs = await request(app).get('/api/me/notifications').set('Authorization', `Bearer ${a.body.token}`)
+    assert.equal(notifs.body.unread, 1)
+    assert.match(notifs.body.notifications[0].text, /erwähnt/)
+
+    await request(app).post('/api/me/notifications/read').set('Authorization', `Bearer ${a.body.token}`)
+    const after = await request(app).get('/api/me/notifications').set('Authorization', `Bearer ${a.body.token}`)
+    assert.equal(after.body.unread, 0)
+  })
+
+  it('Artikel speichert Co-Autoren', async () => {
+    const { body } = await register()
+    const res = await request(app).post('/api/articles').set('Authorization', `Bearer ${body.token}`)
+      .send({ title: 'Teamarbeit', source: 'Q', coAuthors: ['Co-Autor A', 'Co-Autor B'] })
+    assert.deepEqual(res.body.article.coAuthors, ['Co-Autor A', 'Co-Autor B'])
   })
 })
 

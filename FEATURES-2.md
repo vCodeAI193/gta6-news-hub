@@ -103,6 +103,17 @@ Details: [server/README.md](./server/README.md).
   Community-Tally
 - 60 Backend-Tests (inkl. Account/Social-Tests) + 48 Frontend-Tests — alle grün
 
+### ✅ Welle 10 umgesetzt — Sicherheit & Internationalisierung
+
+- **2-Faktor-Authentifizierung (TOTP/RFC 6238)** ohne externe Dienste — kompatibel
+  mit Authenticator-Apps; Einrichtung in den Einstellungen, Code-Abfrage beim Login
+- **@mentions → Benachrichtigungen**: Erwähnungen in Kommentaren erzeugen
+  Server-Benachrichtigungen (Glocke mit Ungelesen-Zähler)
+- **Co-Authoring**: Co-Autor:innen pro Artikel
+- **Erweiterte Lokalisierung**: Arabisch + **RTL-Unterstützung** (`dir=rtl`)
+- **Echtzeit-Besucherzähler** (Online-Zähler + Präsenz, bereits via WebSocket)
+- 68 Backend-Tests (inkl. TOTP-Unit + RFC-Vektor) + 48 Frontend-Tests — alle grün
+
 ---
 
 ## 11. Konten & Identität
@@ -111,7 +122,7 @@ Details: [server/README.md](./server/README.md).
 - [ ] **OAuth-Login** — Anmeldung via Google, Discord, Apple.
 - [ ] **Magic-Link-Login** — Passwortlose Anmeldung per E-Mail-Link.
 - [x] **Öffentliche Profilseiten** — Avatar, Bio, Aktivität, Kommentare eines Nutzers. *(/u/:id — Reputation, Level, Badges, Kommentare)*
-- [ ] **2-Faktor-Authentifizierung** — TOTP/Authenticator-App-Support.
+- [x] **2-Faktor-Authentifizierung** — TOTP/Authenticator-App-Support. *(TOTP/RFC 6238, Authenticator-Apps)*
 - [x] **Server-seitige Sync** — Lesezeichen/Einstellungen geräteübergreifend synchronisieren. *(Lesezeichen/Einstellungen, /api/me/sync)*
 - [x] **Rollen & Berechtigungen** — Leser, Autor, Moderator, Admin.
 - [x] **Konto-Einstellungen** — E-Mail ändern, Passwort zurücksetzen, Konto löschen (DSGVO). *(Name/E-Mail/Passwort ändern, Konto löschen)*
@@ -138,7 +149,7 @@ Details: [server/README.md](./server/README.md).
 - [x] **Spam-Filter** — Automatische Erkennung & Quarantäne von Spam. *(Heuristik: Links/CAPS/Wiederholungen → Queue)*
 - [x] **Wort-/Blocklisten** — Konfigurierbare Filter für Kommentare. *(serverseitig, via COMMENT_BLOCKLIST erweiterbar)*
 - [x] **Versionshistorie** — Änderungsverlauf je Artikel mit Diff & Rollback. *(Revisionen + Rollback)*
-- [ ] **Mehrere Autoren** — Co-Authoring & Zuweisung von Beiträgen.
+- [x] **Mehrere Autoren** — Co-Authoring & Zuweisung von Beiträgen. *(Co-Autor:innen pro Artikel)*
 - [x] **Audit-Log** — Nachvollziehbare Protokollierung aller Redaktions-Aktionen.
 - [x] **Geplanter Redaktionskalender** — Kalender-Ansicht für geplante Beiträge. *(Admin: geplante/Review-Beiträge nach Datum)*
 - [x] **Bann-/Mute-System** — Nutzer temporär oder dauerhaft sperren.
@@ -180,7 +191,7 @@ Details: [server/README.md](./server/README.md).
 - [ ] **Wöchentliche Community-Challenges** — Themen-Aktionen mit Belohnung.
 - [x] **Tippspiel zum Release** — Wetten auf Termin/Details, Bestenliste. *(/tippspiel — Tipps + Tally)*
 - [x] **Folgen & Feed** — Autoren/Themen folgen, personalisierter Aktivitäts-Feed. *(Profile folgen → /feed)*
-- [ ] **Nutzer-Erwähnungen** — `@mention` in Kommentaren mit Benachrichtigung.
+- [x] **Nutzer-Erwähnungen** — `@mention` in Kommentaren mit Benachrichtigung. *(@mention → Benachrichtigung)*
 - [ ] **Community-Wiki** — Kollaborative Wissensseiten zu GTA 6.
 
 ## 17. Medien & Interaktiv
@@ -215,7 +226,7 @@ Details: [server/README.md](./server/README.md).
 - [ ] **A/B-Testing-Framework** — Überschriften/Layouts experimentell testen.
 - [ ] **Funnel-Analyse** — Conversion vom Besuch zum Abo nachverfolgen.
 - [ ] **Heatmaps** — Klick-/Scroll-Verhalten visualisieren.
-- [ ] **Echtzeit-Besucherzähler** — Live-Traffic im Dashboard.
+- [x] **Echtzeit-Besucherzähler** — Live-Traffic im Dashboard. *(Online-Zähler + Präsenz via WebSocket)*
 - [x] **Such-Analytics** — Häufige Suchbegriffe & Null-Treffer auswerten. *(Top-Begriffe + Null-Treffer)*
 - [ ] **Kohorten-Analyse** — Nutzerbindung über die Zeit.
 - [ ] **Trend-Erkennung** — Aufkommende Themen automatisch erkennen.
@@ -225,7 +236,7 @@ Details: [server/README.md](./server/README.md).
 ## 20. Plattform & Betrieb
 
 - [ ] **Native Mobile-App** — iOS/Android via React Native/Expo.
-- [ ] **Erweiterte Lokalisierung** — Mehr Sprachen + RTL-Support.
+- [x] **Erweiterte Lokalisierung** — Mehr Sprachen + RTL-Support. *(Arabisch + RTL-Unterstützung)*
 - [x] **Feature-Flags** — Funktionen gezielt ausrollen (Canary/Beta). *(GET /api/flags, Admin-Toggle, gated im UI)*
 - [x] **Observability** — Logging, Tracing, Metriken (OpenTelemetry). *(Request-Metriken + Uptime, /api/metrics)*
 - [ ] **Echtes Fehler-Monitoring** — Sentry mit Source-Maps in Produktion.

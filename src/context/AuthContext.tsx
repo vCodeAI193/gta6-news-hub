@@ -15,6 +15,7 @@ export interface AuthUser {
   displayName: string
   role: 'reader' | 'author' | 'moderator' | 'admin'
   reputation: number
+  twoFactorEnabled?: boolean
   createdAt: string
 }
 
@@ -22,8 +23,10 @@ interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   enabled: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, code?: string) => Promise<void>
   register: (email: string, password: string, displayName: string) => Promise<void>
+  /** Aktualisiert den lokalen Nutzer (z. B. nach 2FA-Änderung). */
+  refresh: () => Promise<void>
   logout: () => Promise<void>
   /** Mindestrolle prüfen. */
   hasRole: (role: AuthUser['role']) => boolean
@@ -50,14 +53,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false))
   }, [enabled])
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, code?: string) => {
     const res = await api<{ token: string; user: AuthUser }>('/api/auth/login', {
       method: 'POST',
-      body: { email, password },
+      body: { email, password, code },
       auth: false,
     })
     setToken(res.token)
     setUser(res.user)
+  }, [])
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await api<{ user: AuthUser }>('/api/auth/me')
+      setUser(res.user)
+    } catch {
+      /* ignoriert */
+    }
   }, [])
 
   const register = useCallback(
@@ -89,8 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const value = useMemo(
-    () => ({ user, loading, enabled, login, register, logout, hasRole }),
-    [user, loading, enabled, login, register, logout, hasRole],
+    () => ({ user, loading, enabled, login, register, logout, hasRole, refresh }),
+    [user, loading, enabled, login, register, logout, hasRole, refresh],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

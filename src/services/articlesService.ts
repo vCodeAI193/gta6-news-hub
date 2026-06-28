@@ -90,6 +90,7 @@ export interface ArticleInput {
   image: string
   tags?: string[]
   author?: string
+  coAuthors?: string[]
   reliability?: Article['reliability']
   status?: Article['status']
   publishAt?: string

@@ -2,12 +2,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react'
 import { readJSON, writeJSON } from '../services/storage'
-import { translations, type Locale, type TranslationKey } from './translations'
+import { RTL_LOCALES, translations, type Locale, type TranslationKey } from './translations'
 
 interface I18nContextValue {
   locale: Locale
@@ -21,10 +22,21 @@ const KEY = 'locale'
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => readJSON<Locale>(KEY, 'de'))
 
+  const applyLang = (loc: Locale) => {
+    document.documentElement.lang = loc
+    document.documentElement.dir = RTL_LOCALES.includes(loc) ? 'rtl' : 'ltr'
+  }
+
+  // Schreibrichtung/Sprache beim Start anwenden.
+  useEffect(() => {
+    applyLang(locale)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next)
     writeJSON(KEY, next)
-    document.documentElement.lang = next
+    applyLang(next)
   }, [])
 
   const t = useCallback(
