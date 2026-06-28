@@ -46,6 +46,8 @@ const NotificationsPage = lazy(() => import('./routes/NotificationsPage').then((
 const PricingPage = lazy(() => import('./routes/PricingPage').then((m) => ({ default: m.PricingPage })))
 const PrivacyDashboardPage = lazy(() => import('./routes/PrivacyDashboardPage').then((m) => ({ default: m.PrivacyDashboardPage })))
 const AccessibilityPage = lazy(() => import('./routes/AccessibilityPage').then((m) => ({ default: m.AccessibilityPage })))
+const AnalyticsDashboardPage = lazy(() => import('./routes/AnalyticsDashboardPage').then((m) => ({ default: m.AnalyticsDashboardPage })))
+const PresseKitPage = lazy(() => import('./routes/PresseKitPage').then((m) => ({ default: m.PresseKitPage })))
 
 export default function App() {
   return (
@@ -121,6 +123,8 @@ export default function App() {
         <Route path="premium" element={<Suspense fallback={<SkeletonGrid count={2} />}><PricingPage /></Suspense>} />
         <Route path="datenschutz-dashboard" element={<Suspense fallback={null}><PrivacyDashboardPage /></Suspense>} />
         <Route path="barrierefreiheit" element={<Suspense fallback={null}><AccessibilityPage /></Suspense>} />
+        <Route path="analytics" element={<Suspense fallback={<SkeletonGrid count={2} />}><AnalyticsDashboardPage /></Suspense>} />
+        <Route path="presse" element={<Suspense fallback={null}><PresseKitPage /></Suspense>} />
         <Route path="datenbank" element={<Suspense fallback={<SkeletonGrid count={3} />}><DatabasePage /></Suspense>} />
         <Route path="soundtrack" element={<Suspense fallback={<SkeletonGrid count={3} />}><SoundtrackPage /></Suspense>} />
         <Route path="benachrichtigungen" element={<Suspense fallback={null}><NotificationsPage /></Suspense>} />

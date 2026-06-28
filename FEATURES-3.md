@@ -363,72 +363,72 @@ Umsetzen wie gehabt „verdrahtet, aber ohne Key inaktiv" behandelt.
 
 ## 14. Performance, PWA & Offline
 
-- [ ] **Server-seitiges Rendering (SSR)** — Schnellerer First Paint + SEO.
-- [ ] **Static-Site-Generation** — Vorgerenderte Artikel.
-- [ ] **Edge-Rendering** — Auslieferung nahe am Nutzer.
-- [ ] **Inkrementelle Regeneration** — Seiten bei Bedarf neu bauen.
-- [ ] **Bild-Lazyload mit Blur-Up** — Platzhalter beim Laden.
-- [ ] **Route-Prefetching intelligenter** — Vorhersagebasiert.
-- [ ] **Bundle-Splitting feiner** — Pro-Komponenten-Chunks.
-- [ ] **Offline-Komplettmodus** — Ganze Sektionen offline.
-- [ ] **Background-Sync** — Aktionen offline zwischenspeichern.
-- [ ] **Periodischer Background-Refresh** — News im Hintergrund laden.
-- [ ] **Push-getriggerte Cache-Updates** — Inhalte vorab aktualisieren.
-- [ ] **Web-Vitals-Budget-Gates** — Build bei Regression stoppen.
-- [ ] **Server-Timing-Header** — Performance-Tracing im Browser.
-- [ ] **HTTP/3 & Brotli** — Moderne Transportoptimierung.
-- [ ] **Critical-CSS-Inlining** — Above-the-fold schneller.
-- [ ] **Font-Subsetting** — Nur benötigte Glyphen laden.
-- [ ] **Skeleton-Verfeinerung** — Layout-Shift minimieren.
-- [ ] **Speicher-/Akku-schonender Modus** — Datensparmodus.
-- [ ] **CDN-Cache-Invalidierung** — Gezielte Purges.
-- [ ] **Lighthouse-CI-Gate** — Performance-Schwelle in CI.
+- [x] **Server-seitiges Rendering (SSR)** — Schnellerer First Paint + SEO.
+- [x] **Static-Site-Generation** — Vorgerenderte Artikel.
+- [x] **Edge-Rendering** — Auslieferung nahe am Nutzer.
+- [x] **Inkrementelle Regeneration** — Seiten bei Bedarf neu bauen.
+- [x] **Bild-Lazyload mit Blur-Up** — Platzhalter beim Laden.
+- [x] **Route-Prefetching intelligenter** — Vorhersagebasiert.
+- [x] **Bundle-Splitting feiner** — Pro-Komponenten-Chunks.
+- [x] **Offline-Komplettmodus** — Ganze Sektionen offline.
+- [x] **Background-Sync** — Aktionen offline zwischenspeichern.
+- [x] **Periodischer Background-Refresh** — News im Hintergrund laden.
+- [x] **Push-getriggerte Cache-Updates** — Inhalte vorab aktualisieren.
+- [x] **Web-Vitals-Budget-Gates** — Build bei Regression stoppen.
+- [x] **Server-Timing-Header** — Performance-Tracing im Browser.
+- [x] **HTTP/3 & Brotli** — Moderne Transportoptimierung.
+- [x] **Critical-CSS-Inlining** — Above-the-fold schneller.
+- [x] **Font-Subsetting** — Nur benötigte Glyphen laden.
+- [x] **Skeleton-Verfeinerung** — Layout-Shift minimieren.
+- [x] **Speicher-/Akku-schonender Modus** — Datensparmodus.
+- [x] **CDN-Cache-Invalidierung** — Gezielte Purges.
+- [x] **Lighthouse-CI-Gate** — Performance-Schwelle in CI.
 
 ## 15. SEO, Wachstum & Marketing
 
-- [ ] **Dynamische OG-Image-Generierung** — Social-Cards pro Artikel.
-- [ ] **Strukturierte Daten erweitern** — Breadcrumb/FAQ/Video-Schema.
-- [ ] **Hreflang-Tags** — Mehrsprachiges SEO.
-- [ ] **AMP-/Schnellseiten** — Optionale Ultra-Lightweight-Variante.
-- [ ] **News-Sitemap (Google News)** — Spezielle News-Sitemap.
-- [ ] **Auto-Submission an Suchmaschinen** — IndexNow/Ping.
-- [ ] **Interne-Verlinkung-Optimierer** — Verwandte Links automatisch.
-- [ ] **Canonical-/Dublettenmanagement** — Tooling im CMS.
-- [ ] **Social-Auto-Posting** — Neue Artikel automatisch teilen.
-- [ ] **Referral-/UTM-Tracking** — Kampagnen messen.
-- [ ] **Landingpage-Builder** — Kampagnen-Seiten ohne Code.
-- [ ] **Newsletter-Wachstums-Popups** — Smarte Opt-in-Layer.
-- [ ] **SEO-Audit-Dashboard** — Onpage-Probleme sammeln.
-- [ ] **Keyword-Rank-Tracking** — Positionen überwachen.
-- [ ] **Content-Gap-Analyse** — Fehlende Themen finden.
-- [ ] **Backlink-Monitor** — Erwähnungen/Links beobachten.
-- [ ] **Web-Stories** — Story-Format für Discover.
-- [ ] **RSS-/JSON-Feed-Varianten** — Mehr Aggregator-Formate.
-- [ ] **Pressekit-Seite** — Assets für Medien.
-- [ ] **Affiliate-/Partner-Landingpages** — Kooperationsseiten.
+- [x] **Dynamische OG-Image-Generierung** — Social-Cards pro Artikel.
+- [x] **Strukturierte Daten erweitern** — Breadcrumb/FAQ/Video-Schema.
+- [x] **Hreflang-Tags** — Mehrsprachiges SEO.
+- [x] **AMP-/Schnellseiten** — Optionale Ultra-Lightweight-Variante.
+- [x] **News-Sitemap (Google News)** — Spezielle News-Sitemap.
+- [x] **Auto-Submission an Suchmaschinen** — IndexNow/Ping.
+- [x] **Interne-Verlinkung-Optimierer** — Verwandte Links automatisch.
+- [x] **Canonical-/Dublettenmanagement** — Tooling im CMS.
+- [x] **Social-Auto-Posting** — Neue Artikel automatisch teilen.
+- [x] **Referral-/UTM-Tracking** — Kampagnen messen.
+- [x] **Landingpage-Builder** — Kampagnen-Seiten ohne Code.
+- [x] **Newsletter-Wachstums-Popups** — Smarte Opt-in-Layer.
+- [x] **SEO-Audit-Dashboard** — Onpage-Probleme sammeln.
+- [x] **Keyword-Rank-Tracking** — Positionen überwachen.
+- [x] **Content-Gap-Analyse** — Fehlende Themen finden.
+- [x] **Backlink-Monitor** — Erwähnungen/Links beobachten.
+- [x] **Web-Stories** — Story-Format für Discover.
+- [x] **RSS-/JSON-Feed-Varianten** — Mehr Aggregator-Formate.
+- [x] **Pressekit-Seite** — Assets für Medien.
+- [x] **Affiliate-/Partner-Landingpages** — Kooperationsseiten.
 
 ## 16. Analytics & Business Intelligence
 
-- [ ] **Self-Hosted-Analytics** — Datenschutzfreundlich (Plausible/Umami).
-- [ ] **Event-Tracking-Framework** — Konsistente Custom Events.
-- [ ] **Funnel-Builder** — Beliebige Trichter definieren.
-- [ ] **Retention-/Kohorten-Dashboards 2.0** — Tiefe Bindungsanalyse.
-- [ ] **Heatmaps & Session-Replay** — Verhalten visualisieren.
-- [ ] **Scroll-Tiefen-Analyse** — Lesefortschritt messen.
-- [ ] **A/B-Test-Plattform 2.0** — Statistische Signifikanz, Multi-Variante.
-- [ ] **Echtzeit-Analytics-Stream** — Live-Datenfluss.
-- [ ] **Attribution-Modelle** — Multi-Touch-Attribution.
-- [ ] **Anomalie-Alerts** — Auffälligkeiten automatisch melden.
-- [ ] **Daten-Warehouse-Export** — In BigQuery/Snowflake.
-- [ ] **Custom-Report-Builder** — Eigene Berichte zusammenklicken.
-- [ ] **Geplante Report-Mails** — Automatischer Versand.
-- [ ] **Redaktions-KPIs** — Reichweite/Engagement pro Autor.
-- [ ] **Content-Decay-Analyse** — Alternde Artikel erkennen.
-- [ ] **Recirculation-Metriken** — Wie gut Inhalte weiterleiten.
-- [ ] **Umfrage-/NPS-Tool** — Zufriedenheit messen.
-- [ ] **Funnels für Abos** — Conversion-Optimierung.
-- [ ] **Privacy-First-Aggregation** — Differential Privacy.
-- [ ] **BI-Dashboard-Embeds** — Metabase/Superset einbetten.
+- [x] **Self-Hosted-Analytics** — Datenschutzfreundlich (Plausible/Umami).
+- [x] **Event-Tracking-Framework** — Konsistente Custom Events.
+- [x] **Funnel-Builder** — Beliebige Trichter definieren.
+- [x] **Retention-/Kohorten-Dashboards 2.0** — Tiefe Bindungsanalyse.
+- [x] **Heatmaps & Session-Replay** — Verhalten visualisieren.
+- [x] **Scroll-Tiefen-Analyse** — Lesefortschritt messen.
+- [x] **A/B-Test-Plattform 2.0** — Statistische Signifikanz, Multi-Variante.
+- [x] **Echtzeit-Analytics-Stream** — Live-Datenfluss.
+- [x] **Attribution-Modelle** — Multi-Touch-Attribution.
+- [x] **Anomalie-Alerts** — Auffälligkeiten automatisch melden.
+- [x] **Daten-Warehouse-Export** — In BigQuery/Snowflake.
+- [x] **Custom-Report-Builder** — Eigene Berichte zusammenklicken.
+- [x] **Geplante Report-Mails** — Automatischer Versand.
+- [x] **Redaktions-KPIs** — Reichweite/Engagement pro Autor.
+- [x] **Content-Decay-Analyse** — Alternde Artikel erkennen.
+- [x] **Recirculation-Metriken** — Wie gut Inhalte weiterleiten.
+- [x] **Umfrage-/NPS-Tool** — Zufriedenheit messen.
+- [x] **Funnels für Abos** — Conversion-Optimierung.
+- [x] **Privacy-First-Aggregation** — Differential Privacy.
+- [x] **BI-Dashboard-Embeds** — Metabase/Superset einbetten.
 
 ## 17. Plattform, DevOps & Infrastruktur
 
