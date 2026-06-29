@@ -138,19 +138,23 @@ describe('PermissionService', () => {
 
   describe('hasAllPermissions', () => {
     it('should check if user has all permissions', async () => {
-      global.fetch = vi
-        .fn()
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ role: 'admin' }),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            id: 'admin',
-            permissions: ['admin:system', 'manage:users', 'manage:roles'],
-          }),
-        })
+      global.fetch = vi.fn().mockImplementation((url: string) => {
+        if (url.includes('/user')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({ role: 'admin' }),
+          })
+        } else if (url.includes('/roles/admin')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              id: 'admin',
+              permissions: ['admin:system', 'manage:users', 'manage:roles'],
+            }),
+          })
+        }
+        return Promise.resolve({ ok: false })
+      })
 
       const has = await permissionService.hasAllPermissions('user1', ['admin:system', 'manage:users'])
       expect(has).toBe(true)
