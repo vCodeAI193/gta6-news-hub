@@ -44,7 +44,7 @@ class SchedulingService {
   ): Promise<ScheduledItem> {
     const item: ScheduledItem = {
       id: `scheduled-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      type: type as any,
+      type: type as ScheduledItem['type'],
       title,
       scheduledFor,
       status: 'scheduled',
@@ -53,18 +53,14 @@ class SchedulingService {
       updatedAt: Date.now(),
     }
 
-    try {
-      const response = await fetch('/api/scheduling', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
-      })
+    const response = await fetch('/api/scheduling', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    })
 
-      if (!response.ok) throw new Error('Failed to schedule item')
-      return response.json()
-    } catch (error) {
-      throw error
-    }
+    if (!response.ok) throw new Error('Failed to schedule item')
+    return response.json()
   }
 
   /**
@@ -130,7 +126,7 @@ class SchedulingService {
     const schedule: RecurringSchedule = {
       id: `recur-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       itemId,
-      frequency: frequency as any,
+      frequency: frequency as RecurringSchedule['frequency'],
       interval: 1,
       startDate,
       endDate,

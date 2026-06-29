@@ -229,11 +229,11 @@ class ServiceWorkerService {
   onMessage(callback: (message: unknown) => void): () => void {
     if (!this.isSWSupported()) return () => {}
 
-    const handler = (event: any) => {
+    const handler = (event: ExtendableMessageEvent) => {
       callback(event.data)
     }
 
-    navigator.serviceWorker.addEventListener('message', handler)
+    navigator.serviceWorker.addEventListener('message', handler as EventListener)
 
     return () => {
       navigator.serviceWorker.removeEventListener('message', handler)

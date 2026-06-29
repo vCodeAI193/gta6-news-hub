@@ -8,7 +8,7 @@ global.caches = {
   delete: vi.fn(),
   match: vi.fn(),
   addAll: vi.fn(),
-} as any
+} as unknown as CacheStorage
 
 describe('ServiceWorkerService', () => {
   beforeEach(() => {
@@ -62,9 +62,9 @@ describe('ServiceWorkerService', () => {
 
   describe('precacheAssets', () => {
     it('should precache assets', async () => {
-      vi.mocked(global.caches.open as any).mockResolvedValueOnce({
+      vi.mocked(global.caches.open as unknown as typeof global.caches.open).mockResolvedValueOnce({
         addAll: vi.fn().mockResolvedValueOnce(undefined),
-      })
+      } as unknown as Cache)
 
       await expect(
         serviceWorkerService.precacheAssets({
@@ -77,11 +77,11 @@ describe('ServiceWorkerService', () => {
 
   describe('clearOldCaches', () => {
     it('should clear old caches', async () => {
-      vi.mocked(global.caches.keys as any).mockResolvedValueOnce([
+      vi.mocked(global.caches.keys as unknown as typeof global.caches.keys).mockResolvedValueOnce([
         'precache-1.0.0',
         'precache-0.9.0',
       ])
-      vi.mocked(global.caches.delete as any).mockResolvedValueOnce(true)
+      vi.mocked(global.caches.delete as unknown as typeof global.caches.delete).mockResolvedValueOnce(true)
 
       const deleted = await serviceWorkerService.clearOldCaches('1.0.0')
       expect(deleted).toBeGreaterThanOrEqual(0)

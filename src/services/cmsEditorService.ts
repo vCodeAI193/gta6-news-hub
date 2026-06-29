@@ -60,16 +60,25 @@ class CMSEditorService {
     const newContent =
       state.content.slice(0, position) + text + state.content.slice(position)
 
+    let newHistory = [...state.history]
+
+    if (state.historyIndex + 1 < newHistory.length) {
+      newHistory = newHistory.slice(0, state.historyIndex + 1)
+    }
+
+    newHistory = this.addToHistory(newHistory, {
+      content: newContent,
+      cursorPosition: position + text.length,
+      timestamp: Date.now(),
+      operation: 'insert',
+    })
+
     return {
       ...state,
       content: newContent,
       cursorPosition: position + text.length,
-      history: this.addToHistory(state.history, {
-        content: newContent,
-        cursorPosition: position + text.length,
-        timestamp: Date.now(),
-        operation: 'insert',
-      }),
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
     }
   }
 
@@ -84,16 +93,25 @@ class CMSEditorService {
     const newContent =
       state.content.slice(0, start) + state.content.slice(end)
 
+    let newHistory = [...state.history]
+
+    if (state.historyIndex + 1 < newHistory.length) {
+      newHistory = newHistory.slice(0, state.historyIndex + 1)
+    }
+
+    newHistory = this.addToHistory(newHistory, {
+      content: newContent,
+      cursorPosition: start,
+      timestamp: Date.now(),
+      operation: 'delete',
+    })
+
     return {
       ...state,
       content: newContent,
       cursorPosition: start,
-      history: this.addToHistory(state.history, {
-        content: newContent,
-        cursorPosition: start,
-        timestamp: Date.now(),
-        operation: 'delete',
-      }),
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
     }
   }
 
@@ -113,15 +131,24 @@ class CMSEditorService {
       newFormatting[format as 'bold' | 'italic' | 'underline' | 'strikethrough'] = !newFormatting[format as 'bold' | 'italic' | 'underline' | 'strikethrough']
     }
 
+    let newHistory = [...state.history]
+
+    if (state.historyIndex + 1 < newHistory.length) {
+      newHistory = newHistory.slice(0, state.historyIndex + 1)
+    }
+
+    newHistory = this.addToHistory(newHistory, {
+      content: state.content,
+      cursorPosition: state.cursorPosition,
+      timestamp: Date.now(),
+      operation: 'format',
+    })
+
     return {
       ...state,
       formatting: newFormatting,
-      history: this.addToHistory(state.history, {
-        content: state.content,
-        cursorPosition: state.cursorPosition,
-        timestamp: Date.now(),
-        operation: 'format',
-      }),
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
     }
   }
 
@@ -129,9 +156,11 @@ class CMSEditorService {
    * Undo last action
    */
   undo(state: EditorState): EditorState {
-    if (state.historyIndex <= 0) return state
+    if (state.historyIndex < 0 || state.history.length === 0) return state
 
     const newIndex = state.historyIndex - 1
+    if (newIndex < 0) return state
+
     const entry = state.history[newIndex]!
 
     return {
