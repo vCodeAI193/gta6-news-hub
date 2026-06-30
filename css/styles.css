@@ -432,6 +432,12 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: va
 .filter-lang { display: flex; align-items: center; gap: .6rem; margin-top: .8rem; flex-wrap: wrap; }
 .filter-label { font-size: .82rem; color: var(--text-muted); font-weight: 600; }
 
+/* Preferences: translation server config */
+.pref-translate { flex-wrap: wrap; align-items: flex-start; }
+.translate-config { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; flex: 1; min-width: 0; justify-content: flex-end; }
+.translate-config input { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: .45rem .65rem; font-size: .82rem; min-width: 180px; flex: 1; }
+.translate-config .form-msg { flex-basis: 100%; text-align: right; }
+
 /* Preferences: view modes */
 .pref-view { border-bottom: 0; padding-bottom: .25rem; }
 .pref-hint { margin: 0 0 .5rem; font-size: .8rem; color: var(--text-muted); padding-bottom: 1rem; border-bottom: 1px solid var(--border); }

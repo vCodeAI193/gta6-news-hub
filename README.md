@@ -22,6 +22,7 @@ A fast, installable, **static** web app (no backend, no build step) implementing
 - 💬 **Community**: newsletter, polls, tip submission, FAQ — all client-side
 - 🔖 Bookmarks, likes, reactions, local comments, "read" state, recently viewed
 - 🎨 Dark/light themes, accent picker, text-size & density, reduced-motion
+- 🌐 **Article translation** into the UI language via a self-hosted, LibreTranslate-compatible engine (no third-party, no API cost — see [`TRANSLATION.md`](TRANSLATION.md))
 - 📲 **PWA**: installable, offline-capable via service worker
 - ♿ Accessible: semantic landmarks, ARIA, focus traps, keyboard nav
 - 🔎 SEO: meta tags, Open Graph, JSON-LD structured data, print stylesheet
@@ -47,8 +48,10 @@ sw.js                   # service worker (cache-first + offline)
 css/styles.css          # theming via CSS custom properties
 js/data.js              # articles, channels, timeline, FAQ, polls (swappable for an API)
 js/app.js               # all behaviour, localStorage persistence
-FEATURES.md             # the 100-feature scope (source of truth)
+js/translate.js         # self-hosted translation client (LibreTranslate-compatible)
+FEATURES.md             # the feature scope (source of truth)
 DECISIONS.md            # architecture decision log
+TRANSLATION.md          # how to self-host the translation engine
 ```
 
 ## Notes & limitations

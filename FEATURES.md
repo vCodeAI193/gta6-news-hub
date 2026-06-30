@@ -142,3 +142,6 @@ by area. The static frontend implements client-side behaviour via vanilla JS and
 106. ✅ Online/offline status banner
 107. ✅ Visible PWA "install app" button
 108. ✅ Restore last visited section on return
+109. ✅ On-demand article translation into the UI language via a self-hosted,
+     LibreTranslate-compatible engine (configurable endpoint, cached, graceful
+     fallback). See `TRANSLATION.md`.

@@ -3,6 +3,7 @@
 // Vanilla ES modules, DOM-driven, localStorage persistence.
 // ===========================================================================
 import { getArticles, CHANNELS, TIMELINE, FAQ, POLLS, CHARACTERS } from './data.js';
+import { translateArticle, isTranslationEnabled, getEndpoint, setEndpoint, testEndpoint, toISO } from './translate.js';
 
 // --- Constants (ADR-006) ---------------------------------------------------
 const RELEASE_DATE = new Date('2026-11-19T00:00:00');
@@ -91,6 +92,11 @@ const I18N = {
     'm.namePh': 'Your name', 'm.commentPh': 'Add a comment…', 'm.postComment': 'Post comment',
     'm.copy': '🔗 Copy link', 'm.share': '𝕏 Share', 'm.save': '🏷 Save', 'm.saved': '🔖 Saved',
     'm.verified': '✓ Verified', 'm.rumor': '⚠ Rumor', 'm.readAloud': '🔊 Read aloud', 'm.stop': '⏹ Stop',
+    'm.translate': '🌐 Translate', 'm.translating': '⏳ Translating…', 'm.showOriginal': '🌐 Original',
+    't.translateFailed': 'Translation unavailable — showing original',
+    'prefs.translate': 'Translation server', 'prefs.translatePh': 'https://translate.your-server.de',
+    'prefs.translateTest': 'Test', 'prefs.translateHint': 'Point this at your self-hosted LibreTranslate instance (runs on your own server). Leave empty to disable. No data leaves your server.',
+    'prefs.translateOk': 'Server reachable ✓', 'prefs.translateErr': 'Could not reach server',
     'sc.title': 'Keyboard shortcuts',
     'sc.body': '/ search · j/k next/prev · o open · t theme · v cycle view · l language · Esc close',
   },
@@ -156,6 +162,11 @@ const I18N = {
     'm.namePh': 'Dein Name', 'm.commentPh': 'Kommentar hinzufügen…', 'm.postComment': 'Kommentar posten',
     'm.copy': '🔗 Link kopieren', 'm.share': '𝕏 Teilen', 'm.save': '🏷 Speichern', 'm.saved': '🔖 Gespeichert',
     'm.verified': '✓ Verifiziert', 'm.rumor': '⚠ Gerücht', 'm.readAloud': '🔊 Vorlesen', 'm.stop': '⏹ Stopp',
+    'm.translate': '🌐 Übersetzen', 'm.translating': '⏳ Übersetze…', 'm.showOriginal': '🌐 Original',
+    't.translateFailed': 'Übersetzung nicht verfügbar — Original wird angezeigt',
+    'prefs.translate': 'Übersetzungsserver', 'prefs.translatePh': 'https://translate.dein-server.de',
+    'prefs.translateTest': 'Testen', 'prefs.translateHint': 'Verweise hier auf deine selbstgehostete LibreTranslate-Instanz (läuft auf deinem eigenen Server). Leer lassen zum Deaktivieren. Keine Daten verlassen deinen Server.',
+    'prefs.translateOk': 'Server erreichbar ✓', 'prefs.translateErr': 'Server nicht erreichbar',
     'sc.title': 'Tastenkürzel',
     'sc.body': '/ Suche · j/k weiter/zurück · o öffnen · t Design · v Ansicht · l Sprache · Esc schließen',
   },
@@ -195,7 +206,10 @@ const state = {
   read: new Set(Store.get('read', [])),
   likes: Store.get('likes', {}),
   recent: Store.get('recent', []),
+  translatedView: new Set(), // article ids currently shown translated (session-only)
 };
+// Per-open translated content cache so re-renders keep the translation instantly.
+const translatedContent = new Map();
 
 // ===========================================================================
 // Utilities
@@ -486,9 +500,15 @@ function openArticle(id) {
     .filter((x) => x.id !== id && (x.category === a.category || x.source === a.source))
     .slice(0, 3);
 
+  // Translation display (ADR-011): show translated copy when toggled on.
+  const translated = state.translatedView.has(id) ? translatedContent.get(id) : null;
+  const dispTitle = translated ? translated.title : a.title;
+  const dispBody = translated ? translated.body : a.body;
+  const canTranslate = isTranslationEnabled() && toISO(a.lang) && toISO(LANG) && toISO(a.lang) !== toISO(LANG);
+
   $('#modalBody').innerHTML = `
     <span class="tag">${a.category}</span>
-    <h1 id="modalTitle">${escapeHtml(a.title)}</h1>
+    <h1 id="modalTitle">${escapeHtml(dispTitle)}</h1>
     <div class="modal-meta">
       <span class="badge-verify ${a.verified ? 'verified' : 'rumor'}">${a.verified ? t('m.verified') : t('m.rumor')}</span>
       <span>${t('m.by')} ${escapeHtml(a.author)}</span>
@@ -496,9 +516,10 @@ function openArticle(id) {
       <span>${readingTime(a.body)} ${t('m.minread')}</span>
       <a href="${a.sourceUrl}" target="_blank" rel="noopener">${t('m.source')}: ${escapeHtml(channelName(a.source))} ↗</a>
       <button class="btn btn-small btn-ghost" id="ttsBtn">${t('m.readAloud')}</button>
+      ${canTranslate ? `<button class="btn btn-small btn-ghost" id="translateBtn">${translated ? t('m.showOriginal') : t('m.translate')}</button>` : ''}
     </div>
     <div class="modal-hero ${a.image}"></div>
-    ${a.body.split('\n\n').map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
+    ${dispBody.split('\n\n').map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
 
     <div class="reactions" aria-label="Reactions">
       ${['🔥', '😮', '😂', '😢', '👍'].map((emo) => `
@@ -531,6 +552,10 @@ function openArticle(id) {
 
   // TTS (comfort: read article aloud)
   $('#ttsBtn').addEventListener('click', () => toggleTTS(a, $('#ttsBtn')));
+
+  // Translate into UI language (ADR-011)
+  const trBtn = $('#translateBtn');
+  if (trBtn) trBtn.addEventListener('click', () => onTranslateClick(a));
 
   $$('#modalBody .reaction').forEach((btn) => btn.addEventListener('click', () => {
     const emo = btn.dataset.emo;
@@ -573,6 +598,29 @@ function openArticle(id) {
     const p = modal.scrollTop / (modal.scrollHeight - modal.clientHeight || 1);
     $('#modalProgress').style.width = Math.min(100, p * 100) + '%';
   };
+}
+
+// Toggle translation of the open article into the current UI language.
+function onTranslateClick(a) {
+  if (state.translatedView.has(a.id)) {        // toggle back to original
+    state.translatedView.delete(a.id);
+    openArticle(a.id);
+    return;
+  }
+  const btn = $('#translateBtn');
+  if (btn) { btn.textContent = t('m.translating'); btn.disabled = true; }
+  stopTTS(); // TTS reads original-language text; stop before swapping
+  translateArticle(a, toISO(LANG)).then((res) => {
+    const unchanged = res.title === a.title && res.body === a.body;
+    if (unchanged) {
+      toast(t('t.translateFailed'));
+      if (btn) { btn.textContent = t('m.translate'); btn.disabled = false; }
+      return;
+    }
+    translatedContent.set(a.id, res);
+    state.translatedView.add(a.id);
+    openArticle(a.id);
+  });
 }
 
 function renderComment(c) {
@@ -928,6 +976,25 @@ function initPrefs() {
   $$('#densitySeg button').forEach((b) => b.addEventListener('click', () => {
     document.documentElement.dataset.density = b.dataset.densityVal; Store.set('density', b.dataset.densityVal); syncPrefUI();
   }));
+  // Translation server config (ADR-011)
+  const epInput = $('#translateEndpoint');
+  if (epInput) {
+    epInput.value = getEndpoint();
+    epInput.addEventListener('change', () => {
+      setEndpoint(epInput.value.trim());
+      $('#translateMsg').textContent = '';
+    });
+    $('#translateTest').addEventListener('click', () => {
+      const url = epInput.value.trim();
+      const msg = $('#translateMsg');
+      setEndpoint(url);
+      msg.textContent = '…'; msg.className = 'form-msg';
+      testEndpoint(url).then((ok) => {
+        msg.textContent = ok ? t('prefs.translateOk') : t('prefs.translateErr');
+        msg.className = 'form-msg ' + (ok ? 'ok' : 'err');
+      });
+    });
+  }
   $('#shortcutsBtn').addEventListener('click', () => toast(t('sc.title') + ' — ' + t('sc.body')));
   $('#resetPrefs').addEventListener('click', () => {
     ['theme', 'accent', 'font', 'density', 'viewMode'].forEach((k) => localStorage.removeItem('gta6_' + k));

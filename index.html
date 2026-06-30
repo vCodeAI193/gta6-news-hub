@@ -384,6 +384,17 @@
           </div>
         </div>
 
+        <!-- Translation server (ADR-011): self-hosted LibreTranslate endpoint -->
+        <div class="pref-row pref-translate">
+          <span data-i18n="prefs.translate">Translation server</span>
+          <div class="translate-config">
+            <input type="url" id="translateEndpoint" placeholder="https://translate.your-server.de" data-i18n-ph="prefs.translatePh" aria-label="Translation server URL" />
+            <button class="btn btn-small btn-ghost" id="translateTest" data-i18n="prefs.translateTest">Test</button>
+            <span class="form-msg" id="translateMsg" aria-live="polite"></span>
+          </div>
+        </div>
+        <p class="pref-hint" data-i18n="prefs.translateHint">Point this at your self-hosted LibreTranslate instance. Leave empty to disable.</p>
+
         <div class="pref-row">
           <button class="btn btn-ghost btn-small" id="shortcutsBtn" data-i18n="prefs.shortcuts">⌨️ Keyboard shortcuts</button>
           <button class="btn btn-ghost btn-small" id="resetPrefs" data-i18n="prefs.reset">Reset all preferences</button>

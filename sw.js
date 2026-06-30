@@ -1,5 +1,5 @@
 // Service worker — cache-first with offline fallback (ADR-004, features 79-84)
-const CACHE = 'gta6-hub-v1';
+const CACHE = 'gta6-hub-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './css/styles.css',
   './js/app.js',
   './js/data.js',
+  './js/translate.js',
   './manifest.webmanifest',
 ];
 

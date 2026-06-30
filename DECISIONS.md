@@ -5,6 +5,38 @@ codebase stays transparent over time. Newest entries on top.
 
 ---
 
+## ADR-011 — Article translation via a self-hosted engine
+- **Decision:** Articles can be translated into the current UI language on demand. The
+  translation engine is **self-hosted by the project owner** (recommended:
+  **LibreTranslate** via Docker, CPU-only) and is reached through a **runtime-configurable
+  endpoint** entered in Preferences. The frontend talks to a LibreTranslate-compatible
+  `POST /translate` API. See `TRANSLATION.md` for ops.
+- **Why this engine / why self-hosted:**
+  - The owner required the AI to run on **their own server in Germany** — LibreTranslate
+    runs fully locally on CPU (~200–300 MB per language pair), so **no article text leaves
+    the server** (GDPR / data sovereignty) and there are **no API/usage costs**.
+  - The LibreTranslate API is a de-facto standard, so the engine can later be upgraded to
+    **NLLB-200** or an **LLM via LTEngine** (Gemma 2 9B / Qwen2.5 7B, GPU) **without any
+    frontend change** — same URL, same API.
+- **Frontend architecture (`js/translate.js`):**
+  - Endpoint stored in `localStorage` (`gta6_translateEndpoint`); empty = feature off.
+  - Title + excerpt + body sent as **one batched array request**; results **cached** per
+    segment in `localStorage` (FIFO-capped ~300) and **de-duplicated** in-flight.
+  - **Graceful degradation**: any missing-endpoint / network / timeout / bad-shape error
+    resolves to the **original text** and never rejects; an 8 s `AbortController` timeout
+    guards a slow CPU instance.
+  - **Never mutates `state.articles`** — search, reading-time and TTS keep working on the
+    original text; translated copies live only in DOM + a session `Map`.
+  - Modal shows a **🌐 Translate / Original toggle**; hidden when the article is already in
+    the UI language.
+- **Ops requirements (documented, not enforced in code):** the engine must send CORS
+  headers for the site origin and use HTTPS when the site is HTTPS (mixed-content). A
+  "Test" button in Preferences probes reachability/CORS.
+- **Trade-off:** the project owner must run and maintain the engine; the app ships only
+  the client + docs. Accepted, since self-hosting in Germany was the explicit requirement.
+
+---
+
 ## ADR-010 — Comfort layer: view modes, i18n, shortcuts, TTS, connectivity
 - **Decision:** Add a set of convenience features on top of the core 100:
   - **View modes** `data-view` = `casual` | `standard` | `insider`. Casual hides
