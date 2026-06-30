@@ -395,6 +395,15 @@
         </div>
         <p class="pref-hint" data-i18n="prefs.translateHint">Point this at your self-hosted LibreTranslate instance. Leave empty to disable.</p>
 
+        <!-- Auto-translate feed toggle (shown only when endpoint is configured) -->
+        <div class="pref-row" id="autoTranslateRow" hidden>
+          <label for="autoTranslate" data-i18n="prefs.autoTranslate">Auto-translate news to my language</label>
+          <label class="toggle-switch" aria-label="Auto-translate toggle">
+            <input type="checkbox" id="autoTranslate" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
         <div class="pref-row">
           <button class="btn btn-ghost btn-small" id="shortcutsBtn" data-i18n="prefs.shortcuts">⌨️ Keyboard shortcuts</button>
           <button class="btn btn-ghost btn-small" id="resetPrefs" data-i18n="prefs.reset">Reset all preferences</button>

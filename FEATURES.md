@@ -145,3 +145,6 @@ by area. The static frontend implements client-side behaviour via vanilla JS and
 109. ✅ On-demand article translation into the UI language via a self-hosted,
      LibreTranslate-compatible engine (configurable endpoint, cached, graceful
      fallback). See `TRANSLATION.md`.
+110. ✅ Feed auto-translate toggle — when the translation endpoint is configured,
+     a Preferences toggle enables automatic title/excerpt translation in feed cards
+     (cache-first, async DOM patch, max 3 concurrent requests, DOM-connected guard).

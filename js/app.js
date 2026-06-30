@@ -3,7 +3,7 @@
 // Vanilla ES modules, DOM-driven, localStorage persistence.
 // ===========================================================================
 import { getArticles, CHANNELS, TIMELINE, FAQ, POLLS, CHARACTERS } from './data.js';
-import { translateArticle, isTranslationEnabled, getEndpoint, setEndpoint, testEndpoint, toISO } from './translate.js';
+import { translateArticle, translateText, isTranslationEnabled, getEndpoint, setEndpoint, testEndpoint, toISO } from './translate.js';
 
 // --- Constants (ADR-006) ---------------------------------------------------
 const RELEASE_DATE = new Date('2026-11-19T00:00:00');
@@ -97,6 +97,8 @@ const I18N = {
     'prefs.translate': 'Translation server', 'prefs.translatePh': 'https://translate.your-server.de',
     'prefs.translateTest': 'Test', 'prefs.translateHint': 'Point this at your self-hosted LibreTranslate instance (runs on your own server). Leave empty to disable. No data leaves your server.',
     'prefs.translateOk': 'Server reachable ✓', 'prefs.translateErr': 'Could not reach server',
+    'prefs.autoTranslate': 'Auto-translate news to my language',
+    't.autoTranslateOn': 'Auto-translate: on', 't.autoTranslateOff': 'Auto-translate: off',
     'sc.title': 'Keyboard shortcuts',
     'sc.body': '/ search · j/k next/prev · o open · t theme · v cycle view · l language · Esc close',
   },
@@ -167,6 +169,8 @@ const I18N = {
     'prefs.translate': 'Übersetzungsserver', 'prefs.translatePh': 'https://translate.dein-server.de',
     'prefs.translateTest': 'Testen', 'prefs.translateHint': 'Verweise hier auf deine selbstgehostete LibreTranslate-Instanz (läuft auf deinem eigenen Server). Leer lassen zum Deaktivieren. Keine Daten verlassen deinen Server.',
     'prefs.translateOk': 'Server erreichbar ✓', 'prefs.translateErr': 'Server nicht erreichbar',
+    'prefs.autoTranslate': 'News automatisch in meine Sprache übersetzen',
+    't.autoTranslateOn': 'Auto-Übersetzung: an', 't.autoTranslateOff': 'Auto-Übersetzung: aus',
     'sc.title': 'Tastenkürzel',
     'sc.body': '/ Suche · j/k weiter/zurück · o öffnen · t Design · v Ansicht · l Sprache · Esc schließen',
   },
@@ -210,6 +214,9 @@ const state = {
 };
 // Per-open translated content cache so re-renders keep the translation instantly.
 const translatedContent = new Map();
+// Limits simultaneous auto-translate network calls from the feed (cache hits bypass this).
+let feedXlatActive = 0;
+const FEED_XLAT_MAX = 3;
 
 // ===========================================================================
 // Utilities
@@ -305,6 +312,24 @@ function articleCard(a) {
         <button class="act-share" data-act="share" aria-label="Share">↗</button>
       </div>
     </div>`;
+
+  // Feed auto-translate: patch title/excerpt async when toggle is on and langs differ.
+  if (Store.get('autoTranslateFeed', false) && isTranslationEnabled()
+      && toISO(a.lang) && toISO(LANG) && toISO(a.lang) !== toISO(LANG)
+      && feedXlatActive < FEED_XLAT_MAX) {
+    feedXlatActive++;
+    const h3 = card.querySelector('h3');
+    const excerptEl = card.querySelector('.card-excerpt');
+    Promise.all([
+      translateText(a.title, a.lang, LANG),
+      translateText(a.excerpt, a.lang, LANG),
+    ]).then(([title, exc]) => {
+      if (!card.isConnected || card.dataset.id !== a.id) return;
+      if (title !== a.title) h3.textContent = title;
+      if (exc !== a.excerpt) excerptEl.textContent = exc;
+    }).finally(() => { feedXlatActive--; });
+  }
+
   return card;
 }
 
@@ -978,11 +1003,21 @@ function initPrefs() {
   }));
   // Translation server config (ADR-011)
   const epInput = $('#translateEndpoint');
+  const autoTranslateChk = $('#autoTranslate');
+  function syncAutoTranslateRow() {
+    const row = $('#autoTranslateRow');
+    const on = isTranslationEnabled();
+    if (row) row.hidden = !on;
+    if (!on && autoTranslateChk && autoTranslateChk.checked) {
+      autoTranslateChk.checked = false; Store.set('autoTranslateFeed', false);
+    }
+  }
   if (epInput) {
     epInput.value = getEndpoint();
     epInput.addEventListener('change', () => {
       setEndpoint(epInput.value.trim());
       $('#translateMsg').textContent = '';
+      syncAutoTranslateRow();
     });
     $('#translateTest').addEventListener('click', () => {
       const url = epInput.value.trim();
@@ -992,9 +1027,19 @@ function initPrefs() {
       testEndpoint(url).then((ok) => {
         msg.textContent = ok ? t('prefs.translateOk') : t('prefs.translateErr');
         msg.className = 'form-msg ' + (ok ? 'ok' : 'err');
+        syncAutoTranslateRow();
       });
     });
   }
+  if (autoTranslateChk) {
+    autoTranslateChk.checked = Store.get('autoTranslateFeed', false);
+    autoTranslateChk.addEventListener('change', () => {
+      Store.set('autoTranslateFeed', autoTranslateChk.checked);
+      toast(t(autoTranslateChk.checked ? 't.autoTranslateOn' : 't.autoTranslateOff'));
+      renderFeed();
+    });
+  }
+  syncAutoTranslateRow();
   $('#shortcutsBtn').addEventListener('click', () => toast(t('sc.title') + ' — ' + t('sc.body')));
   $('#resetPrefs').addEventListener('click', () => {
     ['theme', 'accent', 'font', 'density', 'viewMode'].forEach((k) => localStorage.removeItem('gta6_' + k));
