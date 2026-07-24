@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="pink" data-density="comfortable" data-view="standard" data-uilang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GTA 6 News Hub — Worldwide GTA VI News, Trailers, Leaks & Countdown</title>
+
+  <!-- SEO / meta (features 96-99) -->
+  <meta name="description" content="The worldwide GTA 6 news hub. Track release updates, trailers, leaks and Rockstar announcements from every channel — official, press, community and social. Launches November 19, 2026." />
+  <meta name="keywords" content="GTA 6, GTA VI, Grand Theft Auto 6, Rockstar, Vice City, Leonida, release date, trailer, leaks, news" />
+  <meta name="theme-color" content="#0c0c14" />
+  <link rel="canonical" href="https://gta6newshub.example/" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230c0c14'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%23ff2e88'%3EVI%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="GTA 6 News Hub — Worldwide GTA VI Coverage" />
+  <meta property="og:description" content="Everything GTA 6, from every channel worldwide. Trailers, leaks, official news and a live countdown to Nov 19, 2026." />
+  <meta property="og:site_name" content="GTA 6 News Hub" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GTA 6 News Hub" />
+  <meta name="twitter:description" content="Worldwide GTA 6 news, trailers, leaks and countdown." />
+
+  <!-- Structured data (feature 97) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "GTA 6 News Hub",
+    "url": "https://gta6newshub.example/",
+    "description": "Worldwide GTA 6 news aggregator: trailers, leaks, official announcements and countdown.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://gta6newshub.example/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+
+  <!-- Reading progress bar (feature 54) -->
+  <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+
+  <!-- Online/offline status banner (comfort) -->
+  <div class="status-banner" id="offlineBanner" hidden role="status">
+    <span data-i18n="offline">You are offline — showing cached news.</span>
+  </div>
+
+  <!-- Header / nav (features 1-9) -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a href="#home" class="brand" aria-label="GTA 6 News Hub home">
+        <span class="brand-mark">VI</span>
+        <span class="brand-text">GTA 6 <em>News Hub</em></span>
+      </a>
+
+      <nav class="main-nav" id="mainNav" aria-label="Main navigation">
+        <a href="#feed" data-nav data-i18n="nav.news">News</a>
+        <a href="#channels" data-nav data-i18n="nav.channels">Channels</a>
+        <a href="#countdown" data-nav data-i18n="nav.countdown">Countdown</a>
+        <a href="#media" data-nav data-i18n="nav.media">Media</a>
+        <a href="#timeline" data-nav data-i18n="nav.roadmap">Roadmap</a>
+        <a href="#community" data-nav data-i18n="nav.community">Community</a>
+        <a href="#faq" data-nav data-i18n="nav.faq">FAQ</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn install-btn" id="installBtn" hidden aria-label="Install app" title="Install app">📥</button>
+        <button class="icon-btn lang-btn" id="langToggle" aria-label="Switch language" title="Language">🌐<span id="langLabel">EN</span></button>
+        <button class="icon-btn" id="searchToggle" aria-label="Open search" title="Search">🔍</button>
+        <button class="icon-btn" id="savedToggle" aria-label="View saved articles" title="Saved">
+          🔖<span class="badge" id="savedCount" hidden>0</span>
+        </button>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark/light theme" title="Theme">🌙</button>
+        <button class="icon-btn" id="prefsToggle" aria-label="Open preferences" title="Preferences">⚙️</button>
+        <button class="icon-btn menu-btn" id="menuToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile drawer (feature 3) -->
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Mobile menu">
+    <nav class="drawer-nav">
+      <a href="#feed" data-nav data-i18n="nav.news">News</a>
+      <a href="#channels" data-nav data-i18n="nav.channels">Channels</a>
+      <a href="#countdown" data-nav data-i18n="nav.countdown">Countdown</a>
+      <a href="#media" data-nav data-i18n="nav.media">Media</a>
+      <a href="#timeline" data-nav data-i18n="nav.roadmap">Roadmap</a>
+      <a href="#community" data-nav data-i18n="nav.community">Community</a>
+      <a href="#faq" data-nav data-i18n="nav.faq">FAQ</a>
+      <a href="#saved" data-nav data-i18n="nav.saved">Saved articles</a>
+    </nav>
+  </aside>
+
+  <main id="main">
+    <!-- Hero / featured (features 24, 57) -->
+    <section class="hero" id="home">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="hero.eyebrow">Worldwide GTA VI coverage · every channel, one hub</p>
+          <h1>Everything <span class="grad-text">GTA 6</span>, <span data-i18n="hero.title2">from everywhere.</span></h1>
+          <p class="lede" data-i18n="hero.lede">Official news, trailers, leaks and community buzz — aggregated worldwide so you never miss a beat. Launches <strong>November 19, 2026</strong>.</p>
+          <div class="hero-cta">
+            <a href="#feed" class="btn btn-primary" data-i18n="cta.read">Read the news</a>
+            <a href="#channels" class="btn btn-ghost" data-i18n="cta.channels">Browse channels</a>
+          </div>
+          <!-- New-since-last-visit badge (feature 87) -->
+          <p class="new-since" id="newSince" hidden></p>
+        </div>
+
+        <!-- Countdown (feature 57) -->
+        <div class="countdown-card" id="countdown">
+          <p class="countdown-label" data-i18n="countdown.label">Countdown to launch</p>
+          <div class="countdown" id="countdownTimer" role="timer" aria-live="polite">
+            <div class="cd-unit"><span id="cdDays">--</span><small data-i18n="cd.days">days</small></div>
+            <div class="cd-unit"><span id="cdHours">--</span><small data-i18n="cd.hrs">hrs</small></div>
+            <div class="cd-unit"><span id="cdMins">--</span><small data-i18n="cd.min">min</small></div>
+            <div class="cd-unit"><span id="cdSecs">--</span><small data-i18n="cd.sec">sec</small></div>
+          </div>
+          <p class="countdown-since" id="countdownSince"></p>
+          <div class="countdown-actions">
+            <button class="btn btn-small" id="addToCalendar" data-i18n="btn.addCal">📅 Add to calendar</button>
+            <button class="btn btn-small btn-ghost" id="notifyToggle" data-i18n="btn.remind">🔔 Remind me</button>
+          </div>
+          <ul class="platforms" aria-label="Platforms">
+            <li>PS5</li><li>Xbox Series X|S</li><li>PC (TBA)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search panel (features 35-44) -->
+    <section class="search-panel" id="searchPanel" hidden aria-label="Search and filter">
+      <div class="container">
+        <div class="search-row">
+          <input type="search" id="searchInput" placeholder="Search GTA 6 news…" data-i18n-ph="search.placeholder" aria-label="Search news" autocomplete="off" />
+          <select id="sortSelect" aria-label="Sort articles">
+            <option value="newest" data-i18n="sort.newest">Newest first</option>
+            <option value="oldest" data-i18n="sort.oldest">Oldest first</option>
+            <option value="popular" data-i18n="sort.popular">Most popular</option>
+          </select>
+        </div>
+        <div class="filter-chips" id="categoryChips" role="group" aria-label="Filter by category"></div>
+        <!-- Language / region filter (comfort + worldwide vision) -->
+        <div class="filter-lang" id="langFilterWrap">
+          <span class="filter-label" data-i18n="filter.lang">Language / region:</span>
+          <div class="filter-chips" id="langChips" role="group" aria-label="Filter by language or region"></div>
+        </div>
+        <div class="filter-secondary">
+          <label class="checkbox"><input type="checkbox" id="verifiedOnly" /> <span data-i18n="filter.verifiedOnly">Verified only</span></label>
+          <button class="link-btn" id="clearFilters" data-i18n="filter.clear">Clear all filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feed (features 21-34) -->
+    <section class="section" id="feed">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="section.latest">Latest News</h2>
+          <div class="feed-modes" role="tablist" aria-label="Feed mode">
+            <button class="chip is-active" data-mode="latest" role="tab" data-i18n="mode.latest">Latest</button>
+            <button class="chip" data-mode="trending" role="tab" data-i18n="mode.trending">Trending</button>
+            <button class="chip" data-mode="official" role="tab" data-i18n="mode.official">Official only</button>
+          </div>
+          <button class="btn btn-small btn-ghost" id="refreshFeed" title="Check for updates" data-i18n="btn.refresh">⟳ Refresh</button>
+        </div>
+        <div class="feed-grid" id="feedGrid" aria-live="polite"></div>
+        <div class="feed-empty" id="feedEmpty" hidden>
+          <p data-i18n="feed.empty">No articles match your filters.</p>
+          <button class="btn btn-small" id="emptyReset" data-i18n="feed.reset">Reset filters</button>
+        </div>
+        <div class="feed-more">
+          <button class="btn btn-ghost" id="loadMore" data-i18n="btn.loadMore">Load more</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Channels hub (ADR-007, features for worldwide aggregation) -->
+    <section class="section section-alt" id="channels">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="section.channels">Channels Hub</h2>
+          <p class="section-sub" data-i18n="channels.sub">Every GTA 6 source worldwide, in one place — official, press, community &amp; social.</p>
+        </div>
+        <div class="channel-filter" id="channelFilter" role="group" aria-label="Filter channels by type"></div>
+        <div class="channel-grid" id="channelGrid"></div>
+      </div>
+    </section>
+
+    <!-- Media (features 64-70) -->
+    <section class="section" id="media">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="section.media">Media Gallery</h2>
+          <div class="feed-modes" role="group" aria-label="Media filter">
+            <button class="chip is-active" data-media="all" data-i18n="media.all">All</button>
+            <button class="chip" data-media="trailer" data-i18n="media.trailers">Trailers</button>
+            <button class="chip" data-media="screenshot" data-i18n="media.screenshots">Screenshots</button>
+            <button class="chip" data-media="art" data-i18n="media.art">Art</button>
+          </div>
+        </div>
+        <div class="media-grid" id="mediaGrid"></div>
+
+        <h3 class="subhead" data-i18n="subhead.characters">Characters &amp; world</h3>
+        <div class="character-grid" id="characterGrid"></div>
+      </div>
+    </section>
+
+    <!-- Timeline / roadmap (feature 59) -->
+    <section class="section section-alt" id="timeline">
+      <div class="container">
+        <div class="section-head"><h2 data-i18n="section.roadmap">Release Roadmap</h2></div>
+        <ol class="timeline" id="timelineList"></ol>
+      </div>
+    </section>
+
+    <!-- Community (features 71-78) -->
+    <section class="section" id="community">
+      <div class="container">
+        <div class="section-head"><h2 data-i18n="section.community">Community</h2></div>
+        <div class="community-grid">
+          <!-- Newsletter -->
+          <div class="card pad">
+            <h3 data-i18n="card.newsletter">📨 Newsletter</h3>
+            <p data-i18n="newsletter.desc">Get major GTA 6 updates in your inbox.</p>
+            <form class="newsletter-form" id="newsletterForm" novalidate>
+              <input type="email" id="newsletterEmail" placeholder="you@example.com" aria-label="Email address" required />
+              <button class="btn btn-primary" type="submit" data-i18n="newsletter.subscribe">Subscribe</button>
+              <p class="form-msg" id="newsletterMsg" role="status"></p>
+            </form>
+          </div>
+
+          <!-- Polls -->
+          <div class="card pad">
+            <h3 data-i18n="card.polls">📊 Community Polls</h3>
+            <div id="pollsContainer"></div>
+          </div>
+
+          <!-- Tip submission -->
+          <div class="card pad">
+            <h3 data-i18n="card.tip">💡 Submit a Tip</h3>
+            <p data-i18n="tip.desc">Spotted GTA 6 news? Share the link.</p>
+            <form class="tip-form" id="tipForm" novalidate>
+              <input type="url" id="tipUrl" placeholder="https://source.example/article" aria-label="Tip URL" required />
+              <textarea id="tipNote" placeholder="What's it about?" data-i18n-ph="tip.note" aria-label="Tip note" rows="2"></textarea>
+              <button class="btn btn-primary" type="submit" data-i18n="tip.send">Send tip</button>
+              <p class="form-msg" id="tipMsg" role="status"></p>
+            </form>
+          </div>
+
+          <!-- Community links -->
+          <div class="card pad">
+            <h3 data-i18n="card.join">🌐 Join the conversation</h3>
+            <div class="community-links">
+              <a class="community-link" href="https://www.reddit.com/r/GTA6/" target="_blank" rel="noopener">r/GTA6 →</a>
+              <a class="community-link" href="https://twitter.com/search?q=%23GTA6" target="_blank" rel="noopener">#GTA6 on X →</a>
+              <a class="community-link" href="https://www.youtube.com/@RockstarGames" target="_blank" rel="noopener">Rockstar YouTube →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ (feature 77) -->
+    <section class="section section-alt" id="faq">
+      <div class="container">
+        <div class="section-head"><h2 data-i18n="section.faq">Frequently Asked Questions</h2></div>
+        <div class="faq" id="faqList"></div>
+      </div>
+    </section>
+
+    <!-- Saved articles (feature 46) -->
+    <section class="section" id="saved">
+      <div class="container">
+        <div class="section-head"><h2 data-i18n="section.saved">🔖 Saved Articles</h2></div>
+        <div class="feed-grid" id="savedGrid"></div>
+        <p class="muted" id="savedEmpty" data-i18n="saved.empty">You haven't saved any articles yet. Tap the 🔖 on any card.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer (feature 4, 99) -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="#home" class="brand"><span class="brand-mark">VI</span><span class="brand-text">GTA 6 News Hub</span></a>
+        <p class="muted" data-i18n="footer.about">A community news platform dedicated to GTA 6. Not affiliated with Rockstar Games or Take-Two Interactive.</p>
+      </div>
+      <nav aria-label="Footer sections">
+        <h4 data-i18n="footer.sections">Sections</h4>
+        <a href="#feed" data-i18n="nav.news">News</a><a href="#channels" data-i18n="nav.channels">Channels</a><a href="#media" data-i18n="nav.media">Media</a><a href="#timeline" data-i18n="nav.roadmap">Roadmap</a>
+      </nav>
+      <nav aria-label="Community">
+        <h4 data-i18n="nav.community">Community</h4>
+        <a href="#community" data-i18n="card.newsletter">Newsletter</a><a href="#community" data-i18n="card.polls">Polls</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#saved" data-i18n="nav.saved">Saved</a>
+      </nav>
+      <nav aria-label="Channels">
+        <h4 data-i18n="footer.topchannels">Top channels</h4>
+        <a href="https://www.rockstargames.com/VI" target="_blank" rel="noopener">Rockstar</a>
+        <a href="https://www.reddit.com/r/GTA6/" target="_blank" rel="noopener">r/GTA6</a>
+        <a href="https://www.ign.com/games/grand-theft-auto-6" target="_blank" rel="noopener">IGN</a>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <p data-i18n="footer.copy">© 2026 GTA 6 News Hub · Fan-made. GTA and Grand Theft Auto are trademarks of Take-Two Interactive.</p>
+      <p data-i18n="footer.release">Release target: November 19, 2026</p>
+    </div>
+  </footer>
+
+  <!-- Article detail modal (feature 23) -->
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <article class="modal" id="articleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close article">✕</button>
+      <div class="modal-progress" id="modalProgress"></div>
+      <div class="modal-body" id="modalBody"></div>
+    </article>
+  </div>
+
+  <!-- Preferences panel (features 11-20) -->
+  <div class="modal-backdrop" id="prefsBackdrop" hidden>
+    <div class="modal modal-narrow" role="dialog" aria-modal="true" aria-labelledby="prefsTitle">
+      <button class="modal-close" id="prefsClose" aria-label="Close preferences">✕</button>
+      <div class="modal-body">
+        <h2 id="prefsTitle" data-i18n="prefs.title">Preferences</h2>
+
+        <!-- View modes (Casual / Standard / Insider) -->
+        <div class="pref-row pref-view">
+          <span data-i18n="prefs.view">View</span>
+          <div class="seg" id="viewSeg">
+            <button data-view-val="casual">🌴 <span data-i18n="view.casual">Casual</span></button>
+            <button data-view-val="standard" class="is-active">📰 <span data-i18n="view.standard">Standard</span></button>
+            <button data-view-val="insider">🕵️ <span data-i18n="view.insider">Insider</span></button>
+          </div>
+        </div>
+        <p class="pref-hint" id="viewHint" data-i18n="view.hint.standard">Balanced full view — all news with verified &amp; rumor badges.</p>
+
+        <div class="pref-row">
+          <span data-i18n="prefs.lang">Language</span>
+          <div class="seg" id="langSeg">
+            <button data-lang-val="en" class="is-active">English</button>
+            <button data-lang-val="de">Deutsch</button>
+          </div>
+        </div>
+
+        <div class="pref-row">
+          <span data-i18n="prefs.theme">Theme</span>
+          <div class="seg" id="themeSeg">
+            <button data-theme-val="dark" class="is-active" data-i18n="theme.dark">Dark</button>
+            <button data-theme-val="light" data-i18n="theme.light">Light</button>
+          </div>
+        </div>
+
+        <div class="pref-row">
+          <span data-i18n="prefs.accent">Accent color</span>
+          <div class="accent-picker" id="accentPicker">
+            <button data-accent-val="pink" style="--swatch:#ff2e88" aria-label="Pink"></button>
+            <button data-accent-val="cyan" style="--swatch:#22d3ee" aria-label="Cyan"></button>
+            <button data-accent-val="green" style="--swatch:#34d399" aria-label="Green"></button>
+            <button data-accent-val="orange" style="--swatch:#fb923c" aria-label="Orange"></button>
+          </div>
+        </div>
+
+        <div class="pref-row">
+          <span data-i18n="prefs.textsize">Text size</span>
+          <div class="seg" id="fontSeg">
+            <button data-font-val="small">A−</button>
+            <button data-font-val="normal" class="is-active">A</button>
+            <button data-font-val="large">A+</button>
+          </div>
+        </div>
+
+        <div class="pref-row">
+          <span data-i18n="prefs.density">Density</span>
+          <div class="seg" id="densitySeg">
+            <button data-density-val="comfortable" class="is-active" data-i18n="density.comfortable">Comfortable</button>
+            <button data-density-val="compact" data-i18n="density.compact">Compact</button>
+          </div>
+        </div>
+
+        <!-- Translation server (ADR-011): self-hosted LibreTranslate endpoint -->
+        <div class="pref-row pref-translate">
+          <span data-i18n="prefs.translate">Translation server</span>
+          <div class="translate-config">
+            <input type="url" id="translateEndpoint" placeholder="https://translate.your-server.de" data-i18n-ph="prefs.translatePh" aria-label="Translation server URL" />
+            <button class="btn btn-small btn-ghost" id="translateTest" data-i18n="prefs.translateTest">Test</button>
+            <span class="form-msg" id="translateMsg" aria-live="polite"></span>
+          </div>
+        </div>
+        <p class="pref-hint" data-i18n="prefs.translateHint">Point this at your self-hosted LibreTranslate instance. Leave empty to disable.</p>
+
+        <!-- Auto-translate feed toggle (shown only when endpoint is configured) -->
+        <div class="pref-row" id="autoTranslateRow" hidden>
+          <label for="autoTranslate" data-i18n="prefs.autoTranslate">Auto-translate news to my language</label>
+          <label class="toggle-switch" aria-label="Auto-translate toggle">
+            <input type="checkbox" id="autoTranslate" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="pref-row">
+          <button class="btn btn-ghost btn-small" id="shortcutsBtn" data-i18n="prefs.shortcuts">⌨️ Keyboard shortcuts</button>
+          <button class="btn btn-ghost btn-small" id="resetPrefs" data-i18n="prefs.reset">Reset all preferences</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie/consent banner (feature 88) -->
+  <div class="consent" id="consentBanner" hidden>
+    <p data-i18n="consent.text">We store preferences and your saved articles locally on your device. No tracking, no servers.</p>
+    <button class="btn btn-small btn-primary" id="consentAccept" data-i18n="consent.ok">Got it</button>
+  </div>
+
+  <!-- Toasts (feature 85) -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <!-- Back to top with progress ring (features 5, 89) -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top" hidden>
+    <svg viewBox="0 0 36 36" class="ring"><circle id="ringProgress" cx="18" cy="18" r="16"></circle></svg>
+    <span>↑</span>
+  </button>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
