@@ -1,5 +1,24 @@
 # Architecture Decision Log — GTA 6 News Hub
 
+---
+
+## ADR-012 — URL deep-linking for articles
+- **Decision:** Opening an article modal pushes `?article=<id>` to the browser history
+  via `history.pushState`. Closing the modal (✕ button, Escape, backdrop click) pops
+  the param back to the clean pathname. The browser back button therefore closes the
+  modal naturally without a full navigation.
+- **On load:** `init()` reads `?article=` from `URLSearchParams` and opens the matching
+  article after the feed renders. Legacy `#article-<id>` hashes are still handled for
+  backward-compatible links.
+- **Share button:** `shareArticle()` builds its URL from `?article=<id>` so copied /
+  shared links open the exact article.
+- **Why:** Sharing a GTA 6 article via X/Reddit/WhatsApp sent users to the homepage,
+  discarding the context that made the link worth sharing. Deep-linking closes that
+  gap without a router library or a backend.
+- **Trade-off:** The article content is still rendered client-side, so search engines
+  see the shell page, not the article body. Acceptable for a fan site; a static
+  pre-render step can fix this later.
+
 This file records important implementation decisions so the reasoning behind the
 codebase stays transparent over time. Newest entries on top.
 

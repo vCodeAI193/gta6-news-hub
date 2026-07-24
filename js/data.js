@@ -5,18 +5,26 @@
 
 // Worldwide channels the hub aggregates (ADR-007: multi-channel, worldwide).
 export const CHANNELS = [
-  { id: 'rockstar',  name: 'Rockstar Games (Official)', type: 'Official',   region: 'Global', lang: 'EN', url: 'https://www.rockstargames.com/VI', desc: 'Official site, newswire & press releases.' },
-  { id: 'youtube',   name: 'Rockstar on YouTube',       type: 'Video',      region: 'Global', lang: 'EN', url: 'https://www.youtube.com/@RockstarGames', desc: 'Official trailers & reveals.' },
-  { id: 'reddit',    name: 'r/GTA6',                     type: 'Community',  region: 'Global', lang: 'EN', url: 'https://www.reddit.com/r/GTA6/', desc: 'Largest GTA 6 discussion community.' },
-  { id: 'x',         name: 'X / Twitter (#GTA6)',        type: 'Social',     region: 'Global', lang: 'Multi', url: 'https://twitter.com/search?q=%23GTA6', desc: 'Real-time chatter & breaking posts.' },
-  { id: 'ign',       name: 'IGN',                        type: 'Press',      region: 'US',     lang: 'EN', url: 'https://www.ign.com/games/grand-theft-auto-6', desc: 'Coverage, previews & interviews.' },
-  { id: 'gamespot',  name: 'GameSpot',                   type: 'Press',      region: 'US',     lang: 'EN', url: 'https://www.gamespot.com/games/grand-theft-auto-6/', desc: 'News & analysis.' },
-  { id: 'eurogamer', name: 'Eurogamer',                  type: 'Press',      region: 'EU',     lang: 'EN', url: 'https://www.eurogamer.net/', desc: 'European gaming coverage.' },
-  { id: 'gamestar',  name: 'GameStar',                   type: 'Press',      region: 'DE',     lang: 'DE', url: 'https://www.gamestar.de/', desc: 'German-language coverage.' },
-  { id: 'jeuxvideo', name: 'Jeuxvideo.com',              type: 'Press',      region: 'FR',     lang: 'FR', url: 'https://www.jeuxvideo.com/', desc: 'French-language coverage.' },
-  { id: 'famitsu',   name: 'Famitsu',                    type: 'Press',      region: 'JP',     lang: 'JP', url: 'https://www.famitsu.com/', desc: 'Japanese gaming press.' },
-  { id: 'wiki',      name: 'GTA Fandom Wiki',            type: 'Reference',  region: 'Global', lang: 'Multi', url: 'https://gta.fandom.com/wiki/Grand_Theft_Auto_VI', desc: 'Community encyclopedia.' },
-  { id: 'leaks',     name: 'Leak Watch (community)',     type: 'Leaks',      region: 'Global', lang: 'EN', url: 'https://www.reddit.com/r/GTA6/', desc: 'Unverified rumors — treat with caution.' },
+  { id: 'rockstar',        name: 'Rockstar Games (Official)',  type: 'Official',   region: 'Global', lang: 'EN',    url: 'https://www.rockstargames.com/VI', desc: 'Official site, newswire & press releases.' },
+  { id: 'youtube',        name: 'Rockstar on YouTube',        type: 'Video',      region: 'Global', lang: 'EN',    url: 'https://www.youtube.com/@RockstarGames', desc: 'Official trailers & reveals.' },
+  { id: 'instagram',      name: 'Rockstar on Instagram',      type: 'Social',     region: 'Global', lang: 'EN',    url: 'https://www.instagram.com/rockstargames/', desc: 'Visual updates & behind-the-scenes teasers.' },
+  { id: 'tiktok',         name: 'TikTok #GTA6',               type: 'Social',     region: 'Global', lang: 'Multi', url: 'https://www.tiktok.com/tag/gta6', desc: 'Short-form fan videos, leaks and reaction content.' },
+  { id: 'gtaseriesvideos',name: 'GTASeriesVideos (YouTube)',  type: 'Video',      region: 'Global', lang: 'EN',    url: 'https://www.youtube.com/@GTASeriesVideos', desc: 'Top fan-run channel: breakdowns, analysis & news.' },
+  { id: 'reddit',         name: 'r/GTA6',                     type: 'Community',  region: 'Global', lang: 'EN',    url: 'https://www.reddit.com/r/GTA6/', desc: 'Largest GTA 6 discussion community.' },
+  { id: 'discord',        name: 'GTA 6 Community Discord',    type: 'Community',  region: 'Global', lang: 'Multi', url: 'https://discord.gg/gta', desc: 'Real-time chat, speculation and event announcements.' },
+  { id: 'x',              name: 'X / Twitter (#GTA6)',        type: 'Social',     region: 'Global', lang: 'Multi', url: 'https://twitter.com/search?q=%23GTA6', desc: 'Real-time chatter & breaking posts.' },
+  { id: 'ign',            name: 'IGN',                        type: 'Press',      region: 'US',     lang: 'EN',    url: 'https://www.ign.com/games/grand-theft-auto-6', desc: 'Coverage, previews & interviews.' },
+  { id: 'gamespot',       name: 'GameSpot',                   type: 'Press',      region: 'US',     lang: 'EN',    url: 'https://www.gamespot.com/games/grand-theft-auto-6/', desc: 'News & analysis.' },
+  { id: 'eurogamer',      name: 'Eurogamer',                  type: 'Press',      region: 'EU',     lang: 'EN',    url: 'https://www.eurogamer.net/', desc: 'European gaming coverage.' },
+  { id: 'gamestar',       name: 'GameStar',                   type: 'Press',      region: 'DE',     lang: 'DE',    url: 'https://www.gamestar.de/', desc: 'German-language coverage.' },
+  { id: 'pcgames',        name: 'PC Games',                   type: 'Press',      region: 'DE',     lang: 'DE',    url: 'https://www.pcgames.de/', desc: 'German PC & console coverage.' },
+  { id: 'jeuxvideo',      name: 'Jeuxvideo.com',              type: 'Press',      region: 'FR',     lang: 'FR',    url: 'https://www.jeuxvideo.com/', desc: 'French-language coverage.' },
+  { id: 'famitsu',        name: 'Famitsu',                    type: 'Press',      region: 'JP',     lang: 'JP',    url: 'https://www.famitsu.com/', desc: 'Japanese gaming press.' },
+  { id: 'vandal',         name: 'Vandal.net',                 type: 'Press',      region: 'ES',     lang: 'ES',    url: 'https://vandal.elespanol.com/', desc: 'Spanish-language gaming coverage.' },
+  { id: 'multiplayer',    name: 'Multiplayer.it',             type: 'Press',      region: 'IT',     lang: 'IT',    url: 'https://www.multiplayer.it/', desc: 'Italian gaming news and reviews.' },
+  { id: 'gamevicio',      name: 'GameVício',                  type: 'Press',      region: 'BR',     lang: 'PT',    url: 'https://www.gamevicio.com/', desc: 'Brazilian Portuguese gaming coverage.' },
+  { id: 'wiki',           name: 'GTA Fandom Wiki',            type: 'Reference',  region: 'Global', lang: 'Multi', url: 'https://gta.fandom.com/wiki/Grand_Theft_Auto_VI', desc: 'Community encyclopedia.' },
+  { id: 'leaks',          name: 'Leak Watch (community)',     type: 'Leaks',      region: 'Global', lang: 'EN',    url: 'https://www.reddit.com/r/GTA6/', desc: 'Unverified rumors — treat with caution.' },
 ];
 
 const DAY = 86400000;
@@ -178,8 +186,8 @@ export const ARTICLES = [
   {
     id: 'a11',
     title: 'Famitsu: 日本でのGTA 6への期待',
-    excerpt: 'Japanese press weighs in on expectations for the worldwide launch.',
-    body: `Japanese outlet Famitsu covers growing anticipation for GTA 6 ahead of its worldwide November 2026 release. Coverage focuses on the dual-protagonist structure and the scope of the new open world.\n\nLocalization details for the Japanese market have not yet been announced.`,
+    excerpt: 'ファミ通が2026年11月19日発売予定のグランド・セフト・オートVIへの期待感を特集。',
+    body: `ファミ通は、2026年11月19日に全世界同時発売予定の『グランド・セフト・オートVI』への期待感を特集した。デュアル主人公システムや、レオニダ州の広大なオープンワールドが国内ファンの間でも大きな注目を集めている。\n\n日本市場向けの日本語吹き替えおよび字幕の有無については、まだ公式発表がなく、ファンコミュニティで議論が続いている。過去作（GTA V）と同様の完全日本語対応が期待されているが、詳細はロックスター・ゲームスからの続報を待つ必要がある。`,
     category: 'Official',
     source: 'famitsu', sourceUrl: 'https://www.famitsu.com/',
     region: 'JP', lang: 'JP',
@@ -188,6 +196,21 @@ export const ARTICLES = [
     image: 'gradient-11',
     verified: true,
     likes: 760,
+    featured: false,
+  },
+  {
+    id: 'a13',
+    title: 'GTA 6 : ce que la communauté française attend du retour à Vice City',
+    excerpt: 'Jeuxvideo.com fait le point sur les attentes des joueurs francophones avant la sortie mondiale du 19 novembre 2026.',
+    body: `La communauté francophone trépigne d'impatience à l'approche de la sortie de Grand Theft Auto VI, prévue le 19 novembre 2026 sur PS5 et Xbox Series X|S. Le retour à Vice City, modernisé pour le hardware actuel, suscite un vif enthousiasme — notamment grâce aux images spectaculaires du second trailer.\n\nLes joueurs francophones espèrent une localisation complète, avec doublage et sous-titres en français, dans la continuité de GTA V. Aucune annonce officielle n'a encore été faite à ce sujet. Rockstar Games devrait communiquer davantage sur les versions localisées dans les semaines précédant le lancement.`,
+    category: 'Official',
+    source: 'jeuxvideo', sourceUrl: 'https://www.jeuxvideo.com/',
+    region: 'EU', lang: 'FR',
+    author: 'Jeuxvideo.com',
+    date: ago(22),
+    image: 'gradient-13',
+    verified: true,
+    likes: 870,
     featured: false,
   },
   {
@@ -208,25 +231,36 @@ export const ARTICLES = [
 ];
 
 export const TIMELINE = [
-  { date: '2022-02-04', title: 'Rockstar confirms development', desc: 'Rockstar officially confirms the next Grand Theft Auto is in active development.' },
-  { date: '2023-12-04', title: 'First trailer revealed', desc: 'Trailer 1 debuts, confirming Vice City, the state of Leonida, and protagonist Lucia.' },
-  { date: '2025-05-02', title: 'Window narrows to 2026', desc: 'Rockstar narrows the release window, building anticipation.' },
-  { date: '2026-06-22', title: 'Trailer 2 drops', desc: 'A second trailer breaks first-day view records.' },
-  { date: '2026-11-19', title: 'Worldwide release', desc: 'GTA 6 launches on PS5 and Xbox Series X|S.' },
+  { date: '2018-01-01', title: 'Early development reported', desc: 'Industry sources indicate Rockstar began early-stage GTA 6 development following Red Dead Redemption 2.' },
+  { date: '2022-02-04', title: 'Rockstar confirms development', desc: 'Rockstar officially confirms the next Grand Theft Auto is in active development — ending years of speculation.' },
+  { date: '2022-09-18', title: 'Massive source-code leak', desc: '90+ early gameplay clips and internal source code surface — the largest gaming leak at the time. Rockstar confirms authenticity and promises to continue development.' },
+  { date: '2023-12-04', title: 'Trailer 1 — record 90 M views', desc: 'Trailer 1 debuts and hits 90 million YouTube views in 24 hours, a record at the time. Confirms Vice City, the state of Leonida and protagonist Lucia.' },
+  { date: '2024-04-06', title: 'Take-Two narrows launch window', desc: 'Take-Two Interactive earnings call mentions fiscal year 2025 window, sparking speculation about a possible delay.' },
+  { date: '2025-04-25', title: 'Delay to autumn 2026 confirmed', desc: 'Rockstar announces the game is delayed from an earlier window to autumn 2026 to ensure the highest quality release.' },
+  { date: '2026-03-06', title: 'Release date locked: Nov 19', desc: 'Rockstar confirms November 19, 2026 as the worldwide release date for PlayStation 5 and Xbox Series X|S.' },
+  { date: '2026-06-22', title: 'Trailer 2 breaks records again', desc: 'A second trailer breaks Trailer 1\'s first-day view record, revealing Jason as second protagonist and showing dynamic NPC systems.' },
+  { date: '2026-09-01', title: 'Pre-order details announced', desc: 'Official pre-order details, editions and digital bonuses go live across all major storefronts.' },
+  { date: '2026-10-15', title: 'Final content showcase', desc: 'A dedicated State of Play / Rockstar showcase reveals gameplay, online details and launch day roadmap.' },
+  { date: '2026-11-19', title: 'Worldwide release', desc: 'GTA 6 launches simultaneously worldwide on PS5 and Xbox Series X|S. The wait is over.' },
 ];
 
 export const FAQ = [
-  { q: 'When does GTA 6 release?', a: 'November 19, 2026 on PlayStation 5 and Xbox Series X|S.' },
-  { q: 'Is there a PC version?', a: 'Not dated yet. Rockstar has historically released PC versions after consoles.' },
-  { q: 'Where is GTA 6 set?', a: 'In the state of Leonida, centered on a modern reimagining of Vice City.' },
-  { q: 'Who are the protagonists?', a: 'Lucia — the series\' first playable female lead — and her partner Jason.' },
-  { q: 'How do I tell verified news from rumors?', a: 'Look for the "Verified" badge. Items marked "Rumor" come from unofficial channels.' },
-  { q: 'Are leaks reliable?', a: 'Treat all leaks with caution. Only Rockstar announcements are confirmation.' },
+  { q: 'When does GTA 6 release?', a: 'November 19, 2026, simultaneously worldwide on PlayStation 5 and Xbox Series X|S.' },
+  { q: 'Is there a PC version?', a: 'No PC date has been announced. Rockstar has historically released PC versions months after console launch (GTA V: ~18 months, RDR2: ~14 months).' },
+  { q: 'Which platforms are confirmed?', a: 'PlayStation 5 and Xbox Series X|S on launch day. No current-gen (PS4/Xbox One) or PC release has been confirmed.' },
+  { q: 'Where is GTA 6 set?', a: 'In the state of Leonida, centered on a modern reimagining of Vice City — the largest open world Rockstar has built to date.' },
+  { q: 'Who are the protagonists?', a: 'Lucia (the series\' first playable female lead) and Jason, her partner in a Bonnie-and-Clyde-style story. You switch between the two.' },
+  { q: 'Will there be a multiplayer / GTA Online successor?', a: 'Rockstar has not detailed the online component. Expect more information after the single-player launch, mirroring GTA V\'s rollout.' },
+  { q: 'How much will GTA 6 cost?', a: 'No official pricing announced. Next-gen blockbusters typically launch at $69.99–$79.99 USD; special editions are expected.' },
+  { q: 'How do I tell verified news from rumors?', a: 'Look for the green "✓ Verified" badge on articles and cards. Items marked "⚠ Rumor" come from unofficial channels and should be treated with caution.' },
+  { q: 'Are leaks reliable?', a: 'Treat all leaks with caution — only Rockstar announcements are confirmation. The 2022 source-code leak was real, but many subsequent "leaks" were fabricated.' },
+  { q: 'Where can I find official updates?', a: 'The Rockstar Newswire (rockstargames.com) and Rockstar\'s official YouTube, X and Instagram are the only authoritative sources.' },
 ];
 
 export const POLLS = [
   { id: 'p1', q: 'Which feature are you most excited about?', options: ['Dual protagonists', 'Bigger map', 'Improved GTA Online', 'Modern Vice City'] },
   { id: 'p2', q: 'Will the PC version arrive within 6 months of launch?', options: ['Yes', 'No', 'No idea'] },
+  { id: 'p3', q: 'How are you planning to play GTA 6 at launch?', options: ['Day-one purchase', 'Wait for a sale', 'Wait for PC', 'Still undecided'] },
 ];
 
 export const CHARACTERS = [

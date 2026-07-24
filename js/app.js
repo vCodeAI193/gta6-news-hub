@@ -487,7 +487,8 @@ function updateSavedCount() {
 
 async function shareArticle(id) {
   const a = state.articles.find((x) => x.id === id);
-  const url = location.origin + location.pathname + '#article-' + id;
+  // location.href already contains ?article=id via pushState (ADR-012)
+  const url = location.origin + location.pathname + '?article=' + id;
   const data = { title: a.title, text: a.excerpt, url };
   if (navigator.share) { try { await navigator.share(data); return; } catch {} }
   try { await navigator.clipboard.writeText(url); toast(t('t.linkCopied')); }
@@ -521,9 +522,17 @@ function openArticle(id) {
   const comments = Store.get('comments_' + id, []);
   const reactions = Store.get('reactions_' + id, {});
   const userReact = Store.get('userReact_' + id, null);
+  // Scored related-article ranking (ADR-012): category match > region match > lang match
   const related = state.articles
-    .filter((x) => x.id !== id && (x.category === a.category || x.source === a.source))
-    .slice(0, 3);
+    .filter((x) => x.id !== id)
+    .map((x) => ({
+      article: x,
+      score: (x.category === a.category ? 3 : 0) + (x.region === a.region ? 2 : 0) + (x.lang === a.lang ? 1 : 0),
+    }))
+    .filter((x) => x.score > 0)
+    .sort((x, y) => y.score - x.score)
+    .slice(0, 3)
+    .map((x) => x.article);
 
   // Translation display (ADR-011): show translated copy when toggled on.
   const translated = state.translatedView.has(id) ? translatedContent.get(id) : null;
@@ -616,6 +625,12 @@ function openArticle(id) {
 
   $$('#modalBody [data-related]').forEach((el) => el.addEventListener('click', () => openArticle(el.dataset.related)));
 
+  // Deep-link: push article ID into URL so the page is directly shareable (ADR-012)
+  const currentParam = new URLSearchParams(location.search).get('article');
+  if (currentParam !== id) {
+    history.pushState({ articleId: id }, '', '?article=' + id);
+  }
+
   showModal('#modalBackdrop');
   const modal = $('#articleModal');
   modal.scrollTop = 0;
@@ -684,7 +699,13 @@ function showModal(sel) {
 function hideModal(sel) {
   $(sel).hidden = true;
   document.body.style.overflow = '';
-  if (sel === '#modalBackdrop') stopTTS();
+  if (sel === '#modalBackdrop') {
+    stopTTS();
+    // Remove ?article= from URL when closing the modal (ADR-012)
+    if (new URLSearchParams(location.search).get('article')) {
+      history.pushState(null, '', location.pathname + (location.hash || ''));
+    }
+  }
   if (lastFocused) lastFocused.focus();
 }
 function initModals() {
@@ -1203,6 +1224,22 @@ function initPWA() {
 }
 
 // ===========================================================================
+// URL deep-linking (ADR-012) — browser back/forward navigates article modals
+// ===========================================================================
+function initDeepLinks() {
+  window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.articleId) {
+      openArticle(e.state.articleId);
+    } else if (!$('#modalBackdrop').hidden) {
+      $('#modalBackdrop').hidden = true;
+      document.body.style.overflow = '';
+      stopTTS();
+      if (lastFocused) lastFocused.focus();
+    }
+  });
+}
+
+// ===========================================================================
 // Boot
 // ===========================================================================
 function init() {
@@ -1235,11 +1272,16 @@ function init() {
   initVisitTracking();
   initConnectivity();
   initPWA();
+  initDeepLinks();
 
   tickCountdown();
   setInterval(tickCountdown, 1000);
 
-  if (location.hash.startsWith('#article-')) {
+  // Open article from URL on load — ?article=id (new) or #article-id (legacy)
+  const articleFromUrl = new URLSearchParams(location.search).get('article');
+  if (articleFromUrl) {
+    setTimeout(() => openArticle(articleFromUrl), 300);
+  } else if (location.hash.startsWith('#article-')) {
     const id = location.hash.replace('#article-', '');
     setTimeout(() => openArticle(id), 300);
   } else {

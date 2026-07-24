@@ -8,6 +8,10 @@ November 19, 2026.
 > possible across every channel on the internet, worldwide — official, press,
 > community and social, in multiple languages and regions.
 
+## Vision
+
+See [`VISION.md`](VISION.md) for the project north star — what it is, who it is for, the four information pillars, design principles, and what it deliberately is not.
+
 ## What's inside
 
 A fast, installable, **static** web app (no backend, no build step) implementing the

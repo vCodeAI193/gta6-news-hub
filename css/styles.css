@@ -271,6 +271,7 @@ a { color: inherit; text-decoration: none; }
 .gradient-10 { background: linear-gradient(135deg, #f59e0b, #ec4899); }
 .gradient-11 { background: linear-gradient(135deg, #ef4444, #8b5cf6); }
 .gradient-12 { background: linear-gradient(135deg, #06b6d4, #34d399); }
+.gradient-13 { background: linear-gradient(135deg, #3b82f6, #a855f7); }
 
 mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--text); border-radius: 3px; padding: 0 2px; }
 
